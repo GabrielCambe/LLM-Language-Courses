@@ -114,7 +114,30 @@ Text:
 ```
 Paste the JSON into the app's **Flashcards → Import cards** box.
 
-## 8. 🏗️ The Unit Generator (the experiment itself)
+## 8. 📖 The Reading Companion (for books and articles)
+
+```text
+I'm reading "{book/article}" at level {A2}. Here is a paragraph:
+{paste one paragraph}
+1. Give a natural English translation.
+2. List verbs in the passé simple or other tenses above my level, with the passé composé equivalent.
+3. Pick the 3 most useful chunks for me to memorise (as flashcard JSON, like the Flashcard Maker).
+4. Ask me 2 short comprehension questions in French.
+Do NOT summarise or reveal anything beyond this paragraph (no spoilers).
+```
+
+## 9. 🧩 The Word Order Coach
+
+```text
+I'm practising French sentence structure (level {A2}). Give me 8 English sentences, one at a
+time, that test: adverb placement, object pronoun position (incl. stacking like "il me le
+donne"), negation in compound tenses, "de" for possession, and noun + à/de + noun.
+After my translation: if the word order is wrong, show my sentence as a slot map
+(SUBJECT | ne | pronouns | VERB | pas | adverb | participle | rest), explain the slot I got wrong,
+and let me try again before giving the answer. Ignore small vocabulary mistakes.
+```
+
+## 10. 🏗️ The Unit Generator (the experiment itself)
 
 Use [`unit-template.md`](unit-template.md). Give the model the template plus the roadmap line
 for the unit, and ask it to fill every section. Then **review it critically** before

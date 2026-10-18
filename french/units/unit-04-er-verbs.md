@@ -41,6 +41,10 @@ And remember Unit 2: *J'aime **la** musique.* (general category = definite artic
 *toujours* (always), *souvent* (often), *parfois* (sometimes), *rarement* (rarely):
 *Je travaille **souvent** le soir.*
 
+### 📍 Where it goes in the sentence
+**Subject + verb + adverb + rest**: *Je travaille **souvent** le soir.* The adverb never goes between subject and verb.
+See sections 1 and 4 of the [sentence map](../grammar/09-sentence-structure.md).
+
 ## ⚠️ Common traps
 - Pronouncing *-ent*: ❌ "ils parl-ENT" → ✅ "eel parl".
 - ❌ *Je suis travaille* / *Je suis travailler* (copying "I am working") → ✅ *Je travaille.*

@@ -45,6 +45,10 @@ Famous exceptions: *la page, la plage, l'image (f), la cage* · *l'eau (f), la p
 ### *Il y a*: there is / there are
 *Il y a un café dans la rue. Il y a des gens.* Invariable: same for singular and plural.
 
+### 📍 Where it goes in the sentence
+The main noun comes **first** and details follow: *la chanson **d'**Angèle* (Angèle's song), *une tasse **à** café* (a coffee cup).
+See section 2 of the [sentence map](../grammar/09-sentence-structure.md).
+
 ## ⚠️ Common traps
 - ❌ *J'aime musique.* → ✅ *J'aime **la** musique.*
 - ❌ *Il y a livres.* → ✅ *Il y a **des** livres.*

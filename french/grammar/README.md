@@ -11,9 +11,10 @@ a rule, then go and *use* it.
 | [03-negation-questions.md](03-negation-questions.md) | *ne…pas* family, 3 ways to ask questions, question words | 5 |
 | [04-adjectives-possessives.md](04-adjectives-possessives.md) | Agreement, placement, possessives, demonstratives, comparisons | 3, 6, 21 |
 | [05-prepositions.md](05-prepositions.md) | *à/de* contractions, places, countries, transport | 7 |
-| [06-past-future.md](06-past-future.md) | Futur proche, venir de, passé composé, imparfait, futur simple, conditionnel | 12, 14–15, 18–19, 22, 24 |
+| [06-past-future.md](06-past-future.md) | Futur proche, venir de, passé composé, imparfait, futur simple, conditionnel, passé simple (recognise only) | 12, 14–15, 18–19, 22, 24 |
 | [07-pronouns.md](07-pronouns.md) | Stressed, object, reflexive pronouns, *y/en*, relatives | 16, 17, 20, 23 |
 | [08-numbers.md](08-numbers.md) | Numbers (incl. Belgian/Swiss), time, dates | 8 |
+| [09-sentence-structure.md](09-sentence-structure.md) | **Word order map**, noun phrases, pronoun stacking, adverbs, spoken-French structure, connectors | 1–4 (map), 17, 20, and anytime |
 
 **Trusted external references:** *Bescherelle* (verbs), [Le Conjugueur](https://leconjugueur.lefigaro.fr/),
 [Larousse dictionary](https://www.larousse.fr/dictionnaires/francais-anglais), [WordReference forums](https://forum.wordreference.com/) (great for nuance questions).

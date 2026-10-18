@@ -92,6 +92,24 @@ Irregular **stems** (endings stay the same):
 
 Use: plans, predictions, promises, formal future. Speech prefers *futur proche*.
 
+## Passé simple: recognise only (before reading novels)
+The **literary past tense**. It's used in novels, fairy tales and history writing, and almost never
+in speech. You only need to **recognise** it; in speech and your own writing, use the passé composé.
+
+| Group | il/elle | ils/elles | Example |
+|---|---|---|---|
+| -ER verbs | -**a** | -**èrent** | *il parl**a**, ils parl**èrent*** |
+| -IR / -RE verbs | -**it** | -**irent** | *elle fin**it**, ils répond**irent*** |
+| être | **fut** | **furent** | *Il était une fois un roi qui **fut** très malheureux.* |
+| avoir | **eut** | **eurent** | *Elle **eut** peur.* |
+| faire | **fit** | **firent** | *Il **fit** un vœu.* |
+| venir | **vint** | **vinrent** | *Le loup **vint**.* |
+| voir | **vit** | **virent** | *Elle **vit** le loup.* |
+
+Recognition trick: in a story, an unfamiliar verb form ending in **-a, -it, -ut, -int, -èrent,
+-irent, -urent** is almost certainly a passé simple. Read it as the passé composé (*il parla* ≈ *il a parlé*).
+Fairy tales open with ***Il était une fois…*** ("Once upon a time…", literally "there was one time").
+
 ## Conditionnel présent (A2, Unit 24)
 **Futur stem + imparfait endings**: *je **voudr**ais, tu **aim**erais, il **ser**ait, nous **pourr**ions*.
 Uses:

@@ -35,7 +35,7 @@ material that matches your actual progress (that's the LLM experiment).
 | 10 | Food and quantities | **Partitive** *du/de la/des*, *pas de*, quantities | [nouns](grammar/01-nouns-articles.md) | A cooking video (e.g. a short French recipe on YouTube) |
 | 11 | Tell me what to do | **Imperative**, *-ir/-re* verbs | [present](grammar/02-present-tense.md) | Angèle: *Balance ton quoi* (title is an imperative) |
 | 12 | Near future and near past | **Futur proche** (*aller* + inf.), **venir de** + inf. | [past & future](grammar/06-past-future.md) | Animation: *Ernest et Célestine* |
-| 13 | A1 review + milestone | Interleaved review, first 10-minute conversation | — | Re-listen to all unit songs: notice how much more you understand |
+| 13 | A1 review + milestone | Interleaved review, first 10-minute conversation, **sentence-structure map** review | [structure](grammar/09-sentence-structure.md) | Re-listen to all unit songs: notice how much more you understand |
 
 **A1 milestone:** a 10-minute voice conversation with the LLM partner about yourself, your
 work and your week, plus understanding the gist of the Angèle songs above with French lyrics.
@@ -62,13 +62,16 @@ work and your week, plus understanding the gist of the Angèle songs above with 
 
 ## After A2 → B1
 - Switch most input to **native media** with French subtitles (see [`media/films-and-series.md`](media/films-and-series.md)).
-- Read your first book: *Le Petit Prince* (Saint-Exupéry), then graded readers.
+- Follow the [reading ladder](media/reading.md): graded readers and *Le Petit Nicolas*, then *Le Petit Prince*.
+- Learn to **recognise** the passé simple (the past tense of books).
 - Weekly real conversation: a tandem partner (Tandem / HelloTalk apps) or a tutor (italki).
 
 ---
 
 ## Supporting material
 - 📚 [Grammar reference](grammar/): the rules, one family per file
+- 🧩 [Sentence structure map](grammar/09-sentence-structure.md): how a French sentence is built (read it at Unit 1, come back often)
+- 📖 [Reading guide](media/reading.md): picture books → fairy tales → comics → novels → press
 - 🎵 [Music guide](media/music.md): Angèle-first, with the song study method
 - 🎬 [Films, series, animation](media/films-and-series.md)
 - 🎙️ [Podcasts and YouTube](media/listening.md)

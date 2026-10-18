@@ -63,6 +63,10 @@ Adjectives already ending in **-e** don't change in the feminine: *facile, jeune
 **BAGS** adjectives go **before**: **B**eauty (*beau, joli*), **A**ge (*jeune, vieux, nouveau*),
 **G**ood/bad (*bon, mauvais*), **S**ize (*petit, grand, gros*): *une **petite** maison, un **bon** café.*
 
+### 📍 Where it goes in the sentence
+**determiner + (BAGS) + noun + (other adjectives)**: *une **petite** voiture **rouge***.
+See section 2 of the [sentence map](../grammar/09-sentence-structure.md).
+
 ## ⚠️ Common traps
 - ❌ *Je suis 30 ans.* → ✅ *J'**ai** 30 ans.*
 - ❌ *Je suis froid.* (= "I'm a cold person" 🥶) → ✅ *J'**ai** froid.*
