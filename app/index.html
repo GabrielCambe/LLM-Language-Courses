@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>French Study App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>🇫🇷 French Study</h1>
+    <nav id="tabs" role="tablist">
+      <button data-tab="today" class="active">Today</button>
+      <button data-tab="cards">Flashcards</button>
+      <button data-tab="conj">Conjugation</button>
+      <button data-tab="gender">Gender</button>
+      <button data-tab="numbers">Numbers</button>
+      <button data-tab="songs">Song Workshop</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="tab-today" class="tab active"></section>
+    <section id="tab-cards" class="tab"></section>
+    <section id="tab-conj" class="tab"></section>
+    <section id="tab-gender" class="tab"></section>
+    <section id="tab-numbers" class="tab"></section>
+    <section id="tab-songs" class="tab"></section>
+  </main>
+
+  <div id="accent-bar" class="accent-bar" aria-label="Accent keyboard">
+    <span>Accents:</span>
+  </div>
+
+  <footer class="foot">
+    Progress is saved in this browser only. Use <b>Today → Backup</b> to export it.
+    · Lyrics you paste stay local; never commit them to the repo.
+  </footer>
+
+  <script src="data/vocab.js"></script>
+  <script src="data/verbs.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

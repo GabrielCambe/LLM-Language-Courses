@@ -1,0 +1,158 @@
+:root {
+  --bg: #f7f5f0;
+  --panel: #ffffff;
+  --text: #1d1d1f;
+  --muted: #6b6b70;
+  --line: #e2ded5;
+  --accent: #2b59c3;
+  --accent-soft: #e5ecfa;
+  --on-accent: #ffffff;
+  --good: #1f8a4c;
+  --good-soft: #e3f4ea;
+  --bad: #c0392b;
+  --bad-soft: #fbe7e4;
+  --warn: #b7791f;
+  --warn-soft: #fdf3e1;
+  --radius: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15161a;
+    --panel: #1f2026;
+    --text: #ececf0;
+    --muted: #9a9aa5;
+    --line: #33343c;
+    --accent: #7ea2ff;
+    --accent-soft: #263152;
+    --on-accent: #0d1530;
+    --good: #5ccf8a;
+    --good-soft: #1d3527;
+    --bad: #ff7b6e;
+    --bad-soft: #3c2220;
+    --warn: #f0b85a;
+    --warn-soft: #3a2f1c;
+  }
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding-bottom: 64px;
+}
+a { color: var(--accent); }
+h1 { font-size: 1.2rem; margin: 0; }
+h2 { font-size: 1.15rem; margin: 0 0 12px; }
+h3 { font-size: 1rem; margin: 16px 0 8px; }
+
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 16px;
+  display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
+}
+#tabs { display: flex; gap: 4px; overflow-x: auto; max-width: 100%; }
+#tabs button {
+  border: 0; background: transparent; color: var(--muted);
+  padding: 6px 10px; border-radius: 8px; cursor: pointer; white-space: nowrap; font: inherit;
+}
+#tabs button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+main { max-width: 860px; margin: 0 auto; padding: 16px; }
+.tab { display: none; }
+.tab.active { display: block; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.muted { color: var(--muted); font-size: 0.9rem; }
+.big-stat { font-size: 2rem; font-weight: 700; line-height: 1.1; }
+
+button, .btn {
+  font: inherit; cursor: pointer;
+  border: 1px solid var(--line); background: var(--panel); color: var(--text);
+  padding: 8px 14px; border-radius: 8px;
+}
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+button.small { padding: 4px 8px; font-size: 0.85rem; }
+button:disabled { opacity: 0.5; cursor: default; }
+
+input[type=text], input[type=number], textarea, select {
+  font: inherit; color: var(--text); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+  max-width: 100%;
+}
+input[type=text]:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+textarea { width: 100%; min-height: 120px; resize: vertical; }
+
+/* Flashcards */
+.card {
+  text-align: center; padding: 32px 16px;
+  min-height: 260px; display: flex; flex-direction: column; gap: 12px; justify-content: center; align-items: center;
+}
+.card .prompt { font-size: 2rem; font-weight: 600; }
+.card .answer { font-size: 1.5rem; color: var(--accent); }
+.card .note { color: var(--muted); }
+.card input[type=text] { width: min(420px, 100%); text-align: center; }
+.rate { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: min(520px, 100%); }
+.rate button { display: flex; flex-direction: column; align-items: center; }
+.rate button small { color: var(--muted); }
+.rate .again { border-color: var(--bad); }
+.rate .good { border-color: var(--good); }
+
+.feedback { padding: 8px 12px; border-radius: 8px; }
+.feedback.ok { background: var(--good-soft); color: var(--good); }
+.feedback.no { background: var(--bad-soft); color: var(--bad); }
+.feedback.warn { background: var(--warn-soft); color: var(--warn); }
+
+.tag { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); }
+
+/* Checklist */
+.check { display: flex; gap: 8px; align-items: center; padding: 4px 0; }
+.check input { width: 18px; height: 18px; }
+
+/* Timer */
+.timer { font-variant-numeric: tabular-nums; font-size: 2.4rem; font-weight: 700; }
+
+/* Pick lists */
+.picks { display: flex; flex-wrap: wrap; gap: 6px; }
+.picks label { border: 1px solid var(--line); border-radius: 99px; padding: 3px 10px; font-size: 0.9rem; cursor: pointer; }
+.picks label.locked { opacity: 0.6; }
+
+/* Song workshop */
+.songs-layout { display: grid; grid-template-columns: 220px 1fr; gap: 16px; }
+@media (max-width: 700px) { .songs-layout { grid-template-columns: 1fr; } }
+.song-list button { display: block; width: 100%; text-align: left; margin-bottom: 6px; }
+.song-list button.active { border-color: var(--accent); background: var(--accent-soft); }
+.lyrics { line-height: 2.1; }
+.lyrics .line { display: flex; gap: 8px; align-items: baseline; }
+.lyrics .w { cursor: pointer; border-radius: 4px; padding: 0 1px; }
+.lyrics .w:hover { background: var(--accent-soft); }
+.lyrics input.gap { width: 6ch; padding: 0 4px; border-radius: 4px; font: inherit; }
+.lyrics input.gap.ok { border-color: var(--good); background: var(--good-soft); }
+.lyrics input.gap.no { border-color: var(--bad); background: var(--bad-soft); }
+
+/* Accent bar */
+.accent-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--panel); border-top: 1px solid var(--line);
+  padding: 6px 16px; display: flex; gap: 4px; align-items: center; overflow-x: auto;
+}
+.accent-bar span { color: var(--muted); font-size: 0.85rem; margin-right: 6px; }
+.accent-bar button { padding: 4px 9px; min-width: 34px; }
+
+.foot { max-width: 860px; margin: 0 auto; padding: 0 16px 16px; color: var(--muted); font-size: 0.8rem; }
+
+.gender-word { font-size: 2.4rem; font-weight: 700; text-align: center; margin: 16px 0; }
+.gender-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.gender-btns button { padding: 18px; font-size: 1.2rem; }
