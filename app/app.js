@@ -1004,6 +1004,29 @@ function setupAccentBar() {
   });
 }
 
+// ───────────────────────── theme ─────────────────────────
+// Auto (follow the device) → Light → Dark. Stored as "llc.theme", shared with the course site.
+const THEME_KEY = "llc.theme";
+const THEME_ORDER = ["auto", "light", "dark"];
+const THEME_LABEL = { auto: "🌓 Auto", light: "☀️ Light", dark: "🌙 Dark" };
+function setupThemeToggle() {
+  const btn = $("#theme-toggle");
+  let current = "auto";
+  try { current = localStorage.getItem(THEME_KEY) || "auto"; } catch (e) { /* default */ }
+  const render = () => {
+    btn.textContent = THEME_LABEL[current];
+    btn.setAttribute("aria-label", `Theme: ${current}. Click to change.`);
+  };
+  btn.onclick = () => {
+    current = THEME_ORDER[(THEME_ORDER.indexOf(current) + 1) % THEME_ORDER.length];
+    try { localStorage.setItem(THEME_KEY, current); } catch (e) { /* this page only */ }
+    if (current === "auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", current);
+    render();
+  };
+  render();
+}
+
 // ───────────────────────── boot ─────────────────────────
 const RENDER = { today: renderToday, cards: renderCards, conj: renderConj, gender: renderGender, numbers: renderNumbers, songs: renderSongs };
 function showTab(name) {
@@ -1015,6 +1038,7 @@ function showTab(name) {
 $$("#tabs button").forEach((b) => (b.onclick = () => showTab(b.dataset.tab)));
 tts.init();
 setupAccentBar();
+setupThemeToggle();
 let startTab = "today";
 try { startTab = sessionStorage.getItem(PREFIX + "tab") || "today"; } catch (e) { /* ignore */ }
 showTab(RENDER[startTab] ? startTab : "today");

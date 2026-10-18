@@ -4,11 +4,20 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>French Study App</title>
+  <script>
+    // Apply the saved theme before first paint (shared with the course site: same key)
+    (function () {
+      var t = "auto";
+      try { t = localStorage.getItem("llc.theme") || "auto"; } catch (e) {}
+      if (t !== "auto") document.documentElement.setAttribute("data-theme", t);
+    })();
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="topbar">
     <h1>🇫🇷 French Study</h1>
+    <button id="theme-toggle" class="theme-toggle" type="button"></button>
     <nav id="tabs" role="tablist">
       <button data-tab="today" class="active">Today</button>
       <button data-tab="cards"><span class="long">Flashcards</span><span class="short">Cards</span></button>

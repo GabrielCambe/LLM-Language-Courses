@@ -14,6 +14,9 @@ Works on phones and computers: the layout adapts down to 320 px wide. On phones 
 short names (Cards, Verbs, Songs), and the accent keys appear only while you're typing. You can also
 long-press a letter on the phone keyboard (e → é è ê).
 
+**Light / dark mode:** the button in the top bar cycles 🌓 Auto (follows your device) → ☀️ Light → 🌙 Dark.
+The course website has the same button, and one choice applies to both.
+
 ## What's inside
 
 | Tab | What it trains | Research principle |
