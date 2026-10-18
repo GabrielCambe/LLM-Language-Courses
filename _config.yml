@@ -1,0 +1,20 @@
+# GitHub Pages (Jekyll) settings.
+# Site: https://gabrielcambe.github.io/LLM-Language-Courses/
+title: LLM Language Courses
+description: An experiment in LLM-built, research-based language courses. First up, French.
+theme: jekyll-theme-primer
+
+kramdown:
+  input: GFM
+  # Render Markdown inside HTML blocks, e.g. the <details> self-test answers in each unit
+  parse_block_html: true
+
+plugins:
+  - jekyll-relative-links      # links to .md files become links to the rendered .html pages
+  - jekyll-readme-index        # README.md is the index page of its folder
+  - jekyll-optional-front-matter
+  - jekyll-titles-from-headings
+
+relative_links:
+  enabled: true
+  collections: false

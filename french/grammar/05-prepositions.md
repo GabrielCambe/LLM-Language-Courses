@@ -1,6 +1,7 @@
 # Prepositions
 
 ## *à* and *de* merge with *le* and *les*
+
 | | + le | + la | + l' | + les |
 |---|---|---|---|---|
 | **à** (to, at) | **au** | à la | à l' | **aux** |
@@ -11,6 +12,7 @@
 ⚠️ No contraction with *le/les* as **object pronouns**: *Je commence à le comprendre.*
 
 ## Places: cities, countries, regions
+
 | Kind | to / in | from |
 |---|---|---|
 | City | **à** Paris, à Bruxelles | **de** Paris, **d'**Anvers |
@@ -25,6 +27,7 @@ Exceptions: *le Mexique, le Cambodge* (m. despite -e) → *au Mexique*.
 *chez moi* (at my place / home), *chez Marie, chez le médecin* (at the doctor's).
 
 ## Location
+
 | French | English |
 |---|---|
 | dans | in, inside |
@@ -43,6 +46,7 @@ With *de* phrases, contractions apply: *à côté **du** bureau, près **des** m
 **à** + things you sit *on* (or your feet): *à pied, à vélo, à moto, à cheval*.
 
 ## Time
+
 | French | English | Example |
 |---|---|---|
 | à | at (clock time) | *à 8 heures* |

@@ -12,6 +12,7 @@
 5. **Short and frequent beats long and rare.** One 20-min episode on 3 days > a film once a week.
 
 ## A1: Animation & children's shows (simple language, visual context)
+
 | Title | Type | Why |
 |---|---|---|
 | **Peppa Pig** (in French) | kids' series | Short, slow, everyday vocabulary. Embarrassingly effective. |
@@ -25,6 +26,7 @@
 | **Extr@ French** | learners' sitcom (YouTube) | Made for learners: slow and very repetitive |
 
 ## A2: Accessible live-action
+
 | Title | Why |
 |---|---|
 | ***Le Fabuleux Destin d'Amélie Poulain*** (2001) | Narrated, so lots of descriptive French (imparfait!) |

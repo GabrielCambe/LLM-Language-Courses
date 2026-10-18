@@ -1,6 +1,7 @@
 # Negation & questions
 
 ## Negation: a sandwich around the verb
+
 | French | English |
 |---|---|
 | ne … **pas** | not |
@@ -22,6 +23,7 @@ In casual speech (and in songs), *ne* almost always disappears: *Je sais pas* ("
 *C'est pas grave, J'ai rien compris*. **Understand it, but write with *ne*** until B1.
 
 ## Three ways to ask a yes/no question
+
 | Register | How | Example |
 |---|---|---|
 | Casual (most common in speech) | rising intonation | *Tu viens ?* |
@@ -35,6 +37,7 @@ Inversion details: with *il/elle/on* and a verb ending in a vowel, add **-t-**: 
 ***Si*** = "yes" to a **negative** question: *Tu ne viens pas ? — **Si** !* (Yes, I am coming!)
 
 ## Question words
+
 | Word | Meaning | Example (neutral) | Example (casual, word at end) |
 |---|---|---|---|
 | **qui** | who | *Qui est-ce ?* | *C'est qui ?* |

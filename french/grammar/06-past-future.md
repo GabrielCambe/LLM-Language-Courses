@@ -19,6 +19,7 @@ Completed actions/events in the past: "I ate", "I have eaten".
 **Structure:** *avoir* or *être* (present) + **past participle**.
 
 ### Past participles
+
 | Group | Rule | Example |
 |---|---|---|
 | -ER | → **-é** | parler → parl**é** |
@@ -26,6 +27,7 @@ Completed actions/events in the past: "I ate", "I have eaten".
 | -RE | → **-u** | vendre → vend**u** |
 
 Irregular (most common verbs, so learn them early):
+
 | infinitive | participle | infinitive | participle |
 |---|---|---|---|
 | être | **été** | avoir | **eu** |
@@ -61,6 +63,7 @@ Word order with negation: *Je **n'**ai **pas** compris. Elle **n'**est **jamais*
 **Only exception:** *être* → ***ét-***: *j'étais, tu étais, il était...*
 
 ### Passé composé vs imparfait: the key A2 decision
+
 | Imparfait = the **background / film set** | Passé composé = the **events / plot** |
 |---|---|
 | descriptions: *Il faisait beau. Elle était fatiguée.* | single completed actions: *Elle est partie.* |
@@ -77,6 +80,7 @@ Word order with negation: *Je **n'**ai **pas** compris. Elle **n'**est **jamais*
 *parler**ai**, finir**as**, vendr**a***.
 
 Irregular **stems** (endings stay the same):
+
 | verb | stem | verb | stem |
 |---|---|---|---|
 | être | **ser-** | avoir | **aur-** |

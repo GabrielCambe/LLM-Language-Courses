@@ -8,6 +8,7 @@
 ## 📐 The rule
 
 ### Avoir (to have): irregular
+
 | | |
 |---|---|
 | j'**ai** | (elision: *je → j'*) |
@@ -21,6 +22,7 @@
 The only difference is **s vs z**.
 
 ### Expressions with avoir (where English uses "to be")
+
 | French | English |
 |---|---|
 | avoir **30 ans** | to be 30 years old |
@@ -34,6 +36,7 @@ The only difference is **s vs z**.
 
 ### Adjective agreement
 Adjectives agree in **gender and number** with the noun:
+
 | | masculine | feminine |
 |---|---|---|
 | singular | petit | petit**e** |
@@ -45,6 +48,7 @@ Adjectives agree in **gender and number** with the noun:
 Adjectives already ending in **-e** don't change in the feminine: *facile, jeune, belge, rouge*.
 
 **Common irregular feminines**
+
 | m. | f. | pattern |
 |---|---|---|
 | heureux | heureuse | -eux → -euse |

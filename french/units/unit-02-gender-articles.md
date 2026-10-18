@@ -12,6 +12,7 @@ There's usually no logic to it (a *table* is feminine, a *book* is masculine), s
 nouns with their article**: not "*maison*" but "***la** maison*". The flashcards always show the article.
 
 ### Articles
+
 | | masculine | feminine | plural (both) |
 |---|---|---|---|
 | **definite** (the) | **le** | **la** | **les** |
@@ -29,6 +30,7 @@ nouns with their article**: not "*maison*" but "***la** maison*". The flashcards
 - Already ending in -s/-x/-z: no change (*le pays → les pays*).
 
 ### Ending rules for gender (≈ 80% reliable)
+
 | Usually **masculine** | Usually **feminine** |
 |---|---|
 | **-age** (*le fromage, le voyage*) | **-tion, -sion** (*la nation, la télévision*) |

@@ -13,6 +13,7 @@
 ## 📐 The rules
 
 ### 1. Final letters are usually silent
+
 | Write | Say | Example |
 |---|---|---|
 | final **-e** | silent | *la table* → "la tabl" |
@@ -23,6 +24,7 @@
 ⚠️ Exception to CaReFuL: **-er** at the end of verbs is "é": *parler* = "par-lé".
 
 ### 2. Vowels
+
 | Spelling | Sound | Example | Tip |
 |---|---|---|---|
 | **u** | [y] | *tu, rue* | Say "ee" with rounded lips, like whistling |
@@ -39,6 +41,7 @@
 ### 3. Nasal vowels (the "French sound")
 When a vowel is followed by **n** or **m** *and then a consonant or the end of the word*, the vowel
 goes nasal and the *n/m* is **not** pronounced.
+
 | Spelling | Example | Rough description |
 |---|---|---|
 | **an, en, am, em** | *vent, enfant, temps* | open "ah" through the nose |
@@ -74,6 +77,7 @@ Liaison is how you tell **ils sont** ("eel sohn", *they are*) from **ils ont** (
 *they have*). That's Unit 3.
 
 ### 7. Accents
+
 | Mark | Name | Effect |
 |---|---|---|
 | **é** | accent aigu | always [e] "ay" |

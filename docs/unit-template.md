@@ -47,6 +47,7 @@ Link to the grammar reference file.
 - Learners say X → correct is Y, because ...
 
 ## 🧱 Vocabulary  *(high frequency; goes into the SRS deck)*
+
 | French | English | Note |
 |---|---|---|
 

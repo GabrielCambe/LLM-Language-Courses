@@ -9,6 +9,7 @@
 
 ### Regular -ER verbs: remove *-er*, add the ending
 **parler** (to speak) → stem **parl-**
+
 | | ending | form | sounds like |
 |---|---|---|---|
 | je | -e | parl**e** | "parl" |

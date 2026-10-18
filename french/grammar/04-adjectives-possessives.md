@@ -2,6 +2,7 @@
 
 ## Agreement
 Base (m. sing.) **+e** → feminine · **+s** → plural · **+es** → feminine plural.
+
 | Pattern | m. | f. |
 |---|---|---|
 | ends in -e | jeune | jeune |
@@ -13,6 +14,7 @@ Base (m. sing.) **+e** → feminine · **+s** → plural · **+es** → feminine
 | irregular | blanc, long, doux, faux | blanche, longue, douce, fausse |
 
 ### beau, nouveau, vieux: 3 forms in the masculine
+
 | m. | m. before vowel | f. | m. pl. | f. pl. |
 |---|---|---|---|---|
 | beau | **bel** (*un bel homme*) | belle | beaux | belles |
@@ -33,6 +35,7 @@ Meaning changes with position: *un **grand** homme* (great) / *un homme **grand*
 
 ## Possessive adjectives
 Agree with the **thing possessed**, *not* the owner.
+
 | owner | m. sing. | f. sing. | plural |
 |---|---|---|---|
 | je | mon | ma | mes |
@@ -42,17 +45,19 @@ Agree with the **thing possessed**, *not* the owner.
 | vous | votre | votre | vos |
 | ils / elles | leur | leur | leurs |
 
-- ***sa** voiture* = his car **or** her car (*voiture* is feminine; the owner doesn't matter).
+- **sa voiture** = his car **or** her car (*voiture* is feminine; the owner doesn't matter).
 - Before a feminine word starting with a vowel: **mon/ton/son**: *mon amie, ton école* (avoids *ma amie*).
 - 🎵 *Ta reine* (your queen), *Je veux tes yeux* (I want your eyes): both Angèle titles.
 
 ## Demonstratives (this / that / these)
+
 | m. | m. before vowel | f. | plural |
 |---|---|---|---|
 | ce | cet | cette | ces |
 *ce livre, cet homme, cette chanson, ces films.* Add **-ci / -là** to contrast: *ce livre-ci* (this one) / *ce livre-là* (that one).
 
 ## Comparisons
+
 | | Adjective | Adverb |
 |---|---|---|
 | more … than | **plus** grand **que** | **plus** vite **que** |

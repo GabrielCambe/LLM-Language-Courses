@@ -8,6 +8,7 @@
 ## 📐 The rule
 
 ### Subject pronouns
+
 | | singular | plural |
 |---|---|---|
 | 1st | **je** (I) | **nous** (we) |
@@ -22,6 +23,7 @@
 - **ils** is used for any group with at least one masculine member. 💡 One man in a group of 100 women → *ils*.
 
 ### Être (to be): irregular, the most important verb
+
 | | | liaison/notes |
 |---|---|---|
 | je **suis** | I am | |
@@ -46,6 +48,7 @@
 - Saying *tu* to a shop assistant in France sounds rude. (In Québec *tu* is much more common.)
 
 ## 🧱 Vocabulary (in the app as Unit 1)
+
 | French | English | Note |
 |---|---|---|
 | bonjour / bonsoir | hello / good evening | *bonjour* also replaces "excuse me" when entering a shop |

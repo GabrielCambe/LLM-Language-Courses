@@ -18,6 +18,9 @@ instead of being the whole plan.
 
 First language: **French** 🇫🇷🇧🇪
 
+🌐 **Website (phone & computer):** https://gabrielcambe.github.io/LLM-Language-Courses/
+📱 **Study app:** https://gabrielcambe.github.io/LLM-Language-Courses/app/ (add it to your phone's home screen)
+
 ---
 
 ## Start here (10 minutes)
@@ -25,7 +28,7 @@ First language: **French** 🇫🇷🇧🇪
 1. Read [`docs/learning-science.md`](docs/learning-science.md) to see *why* the method looks the way it does (skim the TL;DR).
 2. Read [`docs/study-system.md`](docs/study-system.md) for the daily and weekly routine, including the "minimum viable day".
 3. Open [`french/README.md`](french/README.md) for the roadmap. Begin with **Unit 0 (sounds)**.
-4. Open [`app/index.html`](app/index.html) in your browser (double-click it; no install needed).
+4. Open the [study app](app/index.html): online at the link above, or double-click `app/index.html` locally.
 
 ## Repo map
 

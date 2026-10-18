@@ -18,6 +18,7 @@ Other -IR (*finir*-type): *choisir, réussir, grandir, réfléchir, remplir*.
 Other -RE: *attendre, entendre, répondre, perdre, descendre*.
 
 ### -ER spelling changes
+
 | Verb type | Change | Example |
 |---|---|---|
 | -ger | nous **-geons** | mangeons, voyageons |
@@ -27,6 +28,7 @@ Other -RE: *attendre, entendre, répondre, perdre, descendre*.
 | -yer | y → i before silent endings | je pa**i**e, j'envo**i**e |
 
 ## The essential irregulars (learn as songs, not rules)
+
 | Verb | je | tu | il | nous | vous | ils |
 |---|---|---|---|---|---|---|
 | **être** (be) | suis | es | est | sommes | êtes | sont |

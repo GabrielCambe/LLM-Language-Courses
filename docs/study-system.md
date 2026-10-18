@@ -14,6 +14,7 @@ That's it. On bad days, this keeps the spaced-repetition chain alive, and that c
 more than any single long session.
 
 ### 🟡 Normal day (25 min, one focus block)
+
 | Min | Activity | Why |
 |---|---|---|
 | 0–5 | Flashcards (due cards) | Spaced retrieval |

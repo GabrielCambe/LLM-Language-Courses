@@ -4,6 +4,7 @@
 Every noun is **masculine** or **feminine**. Learn every noun **with its article**.
 
 ### Ending rules (≈ 80% reliable)
+
 | Usually masculine | Usually feminine |
 |---|---|
 | -age, -ment, -eau, -isme, -oir, -et, -al, -ail, -eil | -tion, -sion, -té, -ette, -ure, -ence, -ance, -ie, -ade, -esse, -ude, -ée |
@@ -19,6 +20,7 @@ un musicien / une musicienne · un développeur / une développeuse*.
 Some don't change: *un/une élève, un/une journaliste, un/une artiste*.
 
 ## Articles
+
 | | m. sing. | f. sing. | before vowel/h | plural |
 |---|---|---|---|---|
 | definite (the) | le | la | l' | les |
@@ -43,6 +45,7 @@ Definite articles never change: *J'aime le café → Je n'aime pas **le** café.
 *beaucoup **de** gens, un peu **de** sucre, une bouteille **d'**eau, un kilo **de** pommes, trop **de** travail.*
 
 ## Plural
+
 | Rule | Example |
 |---|---|
 | + **s** (silent) | *le livre → les livres* |

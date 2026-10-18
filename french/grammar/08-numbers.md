@@ -10,6 +10,7 @@
 Pattern: **et un** for 21, 31, 41, 51, 61; hyphen for the rest (*trente-quatre*).
 
 ## 70–99: the famous math (France)
+
 | | | |
 |---|---|---|
 | 70 = 60 + 10 | **soixante-dix** | 71 **soixante et onze**, 72 soixante-douze ... 79 soixante-dix-neuf |
@@ -20,6 +21,7 @@ Pattern: **et un** for 21, 31, 41, 51, 61; hyphen for the rest (*trente-quatre*)
 Norman influence. English has a trace too: "four score and seven years ago" = 87.
 
 ### 🇧🇪 Belgium & 🇨🇭 Switzerland: much simpler
+
 | | France | Belgium | Switzerland (most of it) |
 |---|---|---|---|
 | 70 | soixante-dix | **septante** | **septante** |
@@ -43,6 +45,7 @@ Dates use **cardinals** except the 1st: *le **premier** mai* but *le **deux** ma
 
 ## Time
 *Il est quelle heure ? / Quelle heure est-il ?*
+
 | | |
 |---|---|
 | 3:00 | Il est trois heures. |

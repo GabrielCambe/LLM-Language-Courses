@@ -1,6 +1,7 @@
 # Pronouns
 
 ## Overview table
+
 | subject | stressed | reflexive | direct object | indirect object |
 |---|---|---|---|---|
 | je | moi | me | me | me |
@@ -31,6 +32,7 @@ Reciprocal: *On **s'**aime. Ils **se** parlent.* (each other)
   Typical *à* verbs: *parler à, téléphoner à, donner à, dire à, demander à, écrire à, répondre à*.
 
 ### Position: before the conjugated verb (or before the infinitive if there is one)
+
 | Structure | Example |
 |---|---|
 | present | *Je **le** regarde.* |
@@ -50,6 +52,7 @@ Reciprocal: *On **s'**aime. Ils **se** parlent.* (each other)
   *J'ai trois frères → J'**en** ai trois.* · *Je viens de Paris → J'**en** viens.*
 
 ## Relative pronouns (Unit 23)
+
 | Pronoun | Replaces | Example |
 |---|---|---|
 | **qui** | subject | *La fille **qui** chante est belge.* |

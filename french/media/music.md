@@ -27,6 +27,7 @@ check rules against the grammar reference.
 **Roméo Elvis**. Her style is witty, ironic pop with clear diction, great for learners.
 
 **Albums**
+
 | Album | Year | Notes for learners |
 |---|---|---|
 | ***Brol*** | 2018 | *Brol* = Belgian slang for "stuff/mess". Lots of everyday vocabulary and irony. |
@@ -36,6 +37,7 @@ check rules against the grammar reference.
 | ***Instinct*** | Oct 2026 | Brand new! More electronic (Justice, Soulwax). Save it for A2+. |
 
 **Song → unit map** (✱ = easiest for beginners)
+
 | Song | Album | Use it for | Unit |
 |---|---|---|---|
 | *Bruxelles je t'aime* ✱ | Nonante-Cinq | Elision (*je t'aime*), *être*, Belgian identity | 0, 1 |
@@ -58,6 +60,7 @@ check rules against the grammar reference.
 ## Other artists, by difficulty
 
 ### ✱ Beginner-friendly (slow, clear, repetitive)
+
 | Artist · Song | Why |
 |---|---|
 | **Stromae** 🇧🇪 · *Alors on danse* | Very repetitive; the pronoun *on* |
