@@ -8,6 +8,10 @@ A small offline study app: plain HTML/JS, no install, no build, no account.
   branch `main`, folder `/`), then open `https://<you>.github.io/LLM-Language-Courses/app/`.
   Progress is stored per device/browser, so use **Today → Backup** to move it.
 
+Works on phones and computers: the layout adapts down to 320 px wide. On phones the tabs use
+short names (Cards, Verbs, Songs), and the accent keys appear only while you're typing. You can also
+long-press a letter on the phone keyboard (e → é è ê).
+
 ## What's inside
 | Tab | What it trains | Research principle |
 |---|---|---|

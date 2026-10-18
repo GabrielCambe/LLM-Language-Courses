@@ -154,6 +154,19 @@ await page.selectOption("#cz-density", "func");
 eq("cloze page renders", await page.$eval("#song-body .lyrics", (el) => el.textContent.includes("pourquoi") || el.querySelectorAll("input.gap").length > 0), true);
 
 eq("no page errors", errors, []);
+
+// ── Responsive: no horizontal scrolling on any tab, phone to desktop ──
+for (const width of [320, 390, 768, 1280]) {
+  const p = await browser.newPage({ viewport: { width, height: 800 } });
+  await p.goto(url);
+  const overflowing = [];
+  for (const tab of ["today", "cards", "conj", "gender", "numbers", "songs"]) {
+    await p.click(`#tabs button[data-tab=${tab}]`);
+    if ((await p.evaluate(() => document.documentElement.scrollWidth)) > width) overflowing.push(tab);
+  }
+  eq(`no horizontal scroll at ${width}px`, overflowing, []);
+  await p.close();
+}
 await browser.close();
 console.log(failed ? `\n${failed} test(s) failed` : "\nAll tests passed");
 process.exit(failed ? 1 : 0);

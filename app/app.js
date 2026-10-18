@@ -438,10 +438,15 @@ function renderConj() {
   const verbs = window.FR_VERBS;
   if (!conj.verbs) conj.verbs = verbs.filter((v) => v.unit <= Math.max(1, settings.unit)).map((v) => v.inf);
   if (!conj.tenses) conj.tenses = window.FR_TENSES.filter((t) => t.unit <= Math.max(1, settings.unit)).map((t) => t.id);
+  const tenseNames = window.FR_TENSES.filter((t) => conj.tenses.includes(t.id)).map((t) => t.label).join(", ") || "none";
   root.innerHTML = `
     <div class="panel">
       <h2>Conjugation drill</h2>
       <p class="muted">Type only the verb form (e.g. <i>suis</i>, <i>ai parlé</i>). Mixing verbs and tenses is harder but works better: that's <b>interleaving</b>.</p>
+    </div>
+    <div class="panel card" id="conj-card"></div>
+    <details class="panel" id="conj-opts">
+      <summary><b>Choose verbs & tenses</b> <span class="muted">(${conj.verbs.length} verbs · ${escapeHtml(tenseNames)})</span></summary>
       <h3>Tenses</h3>
       <div class="picks" id="conj-tenses">${window.FR_TENSES.map((t) => `
         <label class="${t.unit > settings.unit ? "locked" : ""}"><input type="checkbox" value="${t.id}" ${conj.tenses.includes(t.id) ? "checked" : ""}> ${t.label}${t.unit > settings.unit ? ` <small>(unit ${t.unit})</small>` : ""}</label>`).join("")}
@@ -450,12 +455,11 @@ function renderConj() {
       <div class="picks" id="conj-verbs">${verbs.map((v) => `
         <label class="${v.unit > settings.unit ? "locked" : ""}"><input type="checkbox" value="${v.inf}" ${conj.verbs.includes(v.inf) ? "checked" : ""}> ${v.inf}</label>`).join("")}
       </div>
-    </div>
-    <div class="panel card" id="conj-card"></div>`;
+    </details>`;
   $$("#conj-tenses input").forEach((i) => (i.onchange = () => { conj.tenses = $$("#conj-tenses input:checked").map((x) => x.value); store.set("conjTenses", conj.tenses); newConjQ(); }));
   $$("#conj-verbs input").forEach((i) => (i.onchange = () => { conj.verbs = $$("#conj-verbs input:checked").map((x) => x.value); store.set("conjVerbs", conj.verbs); newConjQ(); }));
-  $("#conj-unit").onclick = () => { conj.verbs = verbs.filter((v) => v.unit <= Math.max(1, settings.unit)).map((v) => v.inf); store.set("conjVerbs", conj.verbs); renderConj(); };
-  $("#conj-all").onclick = () => { conj.verbs = verbs.map((v) => v.inf); store.set("conjVerbs", conj.verbs); renderConj(); };
+  $("#conj-unit").onclick = () => { conj.verbs = verbs.filter((v) => v.unit <= Math.max(1, settings.unit)).map((v) => v.inf); store.set("conjVerbs", conj.verbs); renderConj(); $("#conj-opts").open = true; };
+  $("#conj-all").onclick = () => { conj.verbs = verbs.map((v) => v.inf); store.set("conjVerbs", conj.verbs); renderConj(); $("#conj-opts").open = true; };
   newConjQ();
 }
 
@@ -866,7 +870,7 @@ function renderToday() {
           <h2 style="margin:0">Unit ${u[0]}: ${escapeHtml(u[1])}</h2>
           <a href="${unitLink(settings.unit)}" target="_blank">Open the unit →</a>
         </div>
-        <label>Change unit <select id="t-unit">${UNITS.map(([n, t]) => `<option value="${n}" ${n === settings.unit ? "selected" : ""}>${n}: ${escapeHtml(t)}</option>`).join("")}</select></label>
+        <label class="unit-pick">Change unit <select id="t-unit">${UNITS.map(([n, t]) => `<option value="${n}" ${n === settings.unit ? "selected" : ""}>${n}: ${escapeHtml(t)}</option>`).join("")}</select></label>
       </div>
     </div>
     <div class="grid">
@@ -976,7 +980,10 @@ function chime() {
 // ───────────────────────── accent bar ─────────────────────────
 let lastInput = null;
 document.addEventListener("focusin", (e) => {
-  if (e.target.matches("input[type=text], textarea")) lastInput = e.target;
+  if (e.target.matches("input[type=text], textarea")) { lastInput = e.target; document.body.classList.add("typing"); }
+});
+document.addEventListener("focusout", (e) => {
+  if (e.target.matches("input[type=text], textarea")) document.body.classList.remove("typing");
 });
 function setupAccentBar() {
   const bar = $("#accent-bar");

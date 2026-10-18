@@ -156,3 +156,35 @@ textarea { width: 100%; min-height: 120px; resize: vertical; }
 .gender-word { font-size: 2.4rem; font-weight: 700; text-align: center; margin: 16px 0; }
 .gender-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .gender-btns button { padding: 18px; font-size: 1.2rem; }
+
+code { overflow-wrap: anywhere; }
+#tabs .short { display: none; }
+.unit-pick select { max-width: 100%; }
+details > summary { cursor: pointer; }
+
+/* ───── Phones ───── */
+@media (max-width: 600px) {
+  body { font-size: 15px; padding-bottom: 24px; }
+  .topbar { position: static; padding: 10px 12px; }
+  #tabs { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; overflow: visible; }
+  #tabs button { padding: 8px 4px; text-align: center; }
+  #tabs .short { display: inline; }
+  #tabs .long { display: none; }
+  main { padding: 12px 12px; }
+  .panel { padding: 14px; }
+  .card { padding: 20px 8px; min-height: 0; }
+  .card .prompt { font-size: 1.6rem; overflow-wrap: anywhere; }
+  .gender-word { font-size: 2rem; overflow-wrap: anywhere; }
+  .unit-pick { display: block; width: 100%; }
+  .unit-pick select { display: block; width: 100%; margin-top: 4px; }
+  .row > label { width: 100%; }
+  .row > label select, .row > input[type=text] { width: 100%; }
+  .rate { gap: 6px; }
+  .rate button { padding: 8px 4px; }
+  .timer { font-size: 2rem; }
+  /* Accent keys only while typing; they wrap instead of scrolling off-screen */
+  .accent-bar { display: none; flex-wrap: wrap; justify-content: center; padding: 6px 8px; }
+  body.typing .accent-bar { display: flex; }
+  .accent-bar span { display: none; }
+  .accent-bar button { min-width: 0; flex: 1 0 28px; padding: 6px 0; }
+}
