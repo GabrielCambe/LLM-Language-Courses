@@ -1043,37 +1043,39 @@ const TUTOR_MODELS = {
   "claude-haiku-5-5": { name: "Claude Haiku 5.5", tier: "cheapest", in: 0.1, out: 0.5, cacheRead: 0.01, fallbacks: false },
 };
 // Role-play scenarios, in the interface language (the learner reads and picks them).
-const scenarios = () => t("tutor.scenarios");
-// Instructions for Claude, kept in English. Written for the French course: a new course needs its own.
+const scenarios = () => local(COURSE.scenarios);
+// Instructions for Claude, kept in English. L is the course language; course-specific
+// lines come from the course's "tutor" entry in data/courses.js.
+const L = COURSE.name.en;
 const MODE_PROMPTS = {
   tutor: `MODE: Tutor.
 - Explain grammar explicitly and briefly: the rule, 3 examples, then the most common exception.
 - After explaining, quiz the learner immediately, one question at a time. Don't give the answer until they try (retrieval practice).
-- When they make a mistake, first give a hint so they can self-correct (e.g. "check the verb ending for nous"). If they fail twice, give the correct form and a one-line explanation.
-- Keep French at their level: words from their current unit plus the ~500 most common French words.
+- When they make a mistake, first give a hint so they can self-correct (e.g. "check the ending"). If they fail twice, give the correct form and a one-line explanation.
+- Keep ${L} at their level: words from their current unit plus the ~500 most common ${L} words.
 - Start by offering a 3-question warm-up on the current unit, or ask what they want to practise.`,
-  corrector: `MODE: Corrector. The learner sends French text they wrote. Reply with:
+  corrector: `MODE: Corrector. The learner sends ${L} text they wrote. Reply with:
 1. Their original with errors marked like this: ~~wrong~~ **right**
-2. A short list: error → rule → category (gender / agreement / conjugation / word choice / spelling / word order)
+2. A short list: error → rule → category (gender / agreement / case / conjugation / word choice / spelling / word order)
 3. ONE pattern they keep repeating that they should focus on.
 4. A more natural version a native speaker might write, at the same level.
-Don't rewrite their ideas, only their French. If they send English or a question instead, help briefly and ask for French text.`,
+Don't rewrite their ideas, only their ${L}. If they send English or a question instead, help briefly and ask for ${L} text.`,
   conversation: `MODE: Conversation partner. Role-play the scenario the learner gives you.
-- Speak ONLY French, short simple sentences at their level.
+- Speak ONLY ${L}, short simple sentences at their level.
 - If they make a mistake, recast it naturally in your reply (say it correctly back to them) without stopping the conversation.
 - If they write "??", re-say your last line more simply.
 - After 10 exchanges, or when they write "stop", switch to English and give: 3 errors they made and 3 useful new phrases.
 Start the scene yourself with one line.`,
-  song: `MODE: Song explainer. The learner pastes a few lines of a French song (from YouTube Music or similar) and names the song and artist. For each line:
+  song: `MODE: Song explainer. The learner pastes a few lines of a ${L} song (from YouTube Music or similar) and names the song and artist. For each line:
 - a literal translation and a natural translation,
-- grammar at their level (tenses, pronouns, negation, elision),
-- slang, Belgian/regional expressions, and places where the singer bends pronunciation or grammar for the rhythm,
+- grammar at their level,
+- ${COURSE.tutor.song}, and places where the singer bends pronunciation or grammar for the rhythm,
 then list 3 chunks worth memorising. Work ONLY with the lines they paste: never continue, complete or invent lyrics.`,
   reading: `MODE: Reading companion. The learner pastes one paragraph from a book or article and says what they're reading.
 1. A natural English translation.
-2. Verbs in the passé simple or other tenses above their level, with the passé composé equivalent.
+2. ${COURSE.tutor.reading}
 3. The 3 most useful chunks to memorise.
-4. Two short comprehension questions in French.
+4. Two short comprehension questions in ${L}.
 Never summarise or reveal anything beyond the pasted paragraph (no spoilers).`,
 };
 // Labels and hints: "tutor.mode.<id>" and "tutor.hint.<id>" in i18n.js. The kickoff is sent to Claude.
@@ -1113,19 +1115,19 @@ function keyRemembered() {
   try { return !!localStorage.getItem(KEY_NAME); } catch (e) { return false; }
 }
 function tutorLevel() {
-  return settings.unit === 0 ? "A0 (complete beginner)" : settings.unit <= 13 ? "A1" : "A2";
+  return settings.unit === 0 ? "A0 (complete beginner)" : settings.unit <= COURSE.a1Until ? "A1" : "A2";
 }
 // The system prompt depends only on mode, unit and language, so it stays byte-stable
 // for a whole chat (good for prompt caching).
 function tutorSystem(mode) {
   const u = UNITS[settings.unit];
-  return `You are a French tutor inside a self-study app.
-Learner: an adult who speaks ${tutor.lang}. Level: CEFR ${tutorLevel()}. Current unit: ${settings.unit}, "${u.en}". The course favours Belgian examples (the learner loves Angèle and Stromae), but teach standard French and mark regional usage.
+  return `You are a ${L} tutor inside a self-study app.
+Learner: an adult who speaks ${tutor.lang}. Level: CEFR ${tutorLevel()}. Current unit: ${settings.unit}, "${u.en}". ${COURSE.tutor.course}
 How to talk to them:
 - They have ADHD: keep replies short (about 8 lines or fewer unless they ask for more), use bullets, one task at a time.
 - If they drift off-topic, point it out kindly and offer to "park" it for later.
 - Use comparisons with ${tutor.lang} when they genuinely help.
-- Mark anything colloquial vs formal, and France vs Belgium/Switzerland/Québec.
+- ${COURSE.tutor.mark}
 - Never invent song lyrics or quotes.
 - Format with simple Markdown only: **bold**, *italics*, bullet or numbered lists.
 

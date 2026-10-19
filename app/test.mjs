@@ -204,7 +204,7 @@ await stale.route(/app\.js/, (r) => r.fulfill({ contentType: "text/javascript", 
 await stale.goto(url);
 eq("button still visible with a stale app.js", await stale.$eval("#theme-toggle", (b) => [b.textContent, b.offsetWidth > 40]), ["🌓 Auto", true]);
 eq("course and language pickers still usable with a stale app.js",
-  [await stale.$eval("#course-select", (s) => s.options.length), await stale.$eval("#lang-select", (s) => [...s.options].map((o) => o.value))], [1, ["en", "pt-BR"]]);
+  [await stale.$eval("#course-select", (s) => s.options.length), await stale.$eval("#lang-select", (s) => [...s.options].map((o) => o.value))], [3, ["en", "pt-BR"]]);
 await stale.close();
 
 // ── Tutor (Claude) against a mocked API: request shape, append-only history, errors ──
@@ -349,12 +349,13 @@ eq("no page errors", errors, []);
       window.LLC_COURSES.push({ id: "xx", flag: "🏳️", label: { en: "Testish", "pt-BR": "Testês" }, name: { en: "Testish", "pt-BR": "testês" },
         folder: "testish", storagePrefix: "llc.xx.", voiceLang: "es-ES", voiceSample: "Hola", accents: "á ñ",
         tabs: ["today", "cards", "songs"], vocab: { 0: [["el gato", "cat", "m", ""]] }, verbs: [], tenses: [],
-        units: [{ en: "Test unit", "pt-BR": "Unidade teste" }] });`;
+        units: [{ en: "Test unit", "pt-BR": "Unidade teste" }], a1Until: 1,
+        tutor: { course: "", mark: "", song: "", reading: "" }, scenarios: { en: ["a test"] } });`;
     await route.fulfill({ contentType: "text/javascript", body });
   });
   await p.goto(url);
   eq("course picker lists the courses", await p.$$eval("#course-select option", (o) => o.map((x) => [x.value || "", x.disabled])),
-    [["fr", false], ["xx", false], ["➕ More soon", true]]);
+    [["fr", false], ["la", false], ["pl", false], ["xx", false], ["➕ More soon", true]]);
   eq("French is the default course", await p.inputValue("#course-select"), "fr");
   await p.evaluate(() => localStorage.setItem("llc.fr.days", JSON.stringify(["2026-01-01"])));
 
@@ -370,6 +371,34 @@ eq("no page errors", errors, []);
   await Promise.all([p.waitForEvent("load"), p.selectOption("#course-select", "fr")]);
   eq("French progress untouched", await p.evaluate(() => localStorage.getItem("llc.fr.days")), JSON.stringify(["2026-01-01"]));
   eq("course: no page errors", pErrors, []);
+  await p.close();
+}
+
+// ── Latin and Polish starter courses ──
+for (const [id, firstCard, voice, tutorLine] of [
+  ["la", "salvē", "it-IT", "You are a Latin tutor"],
+  ["pl", "cześć", "pl-PL", "You are a Polish tutor"],
+]) {
+  const p = await browser.newPage();
+  const pErrors = [];
+  p.on("pageerror", (e) => pErrors.push(e.message));
+  await p.addInitScript((c) => localStorage.setItem("llc.course", c), id);
+  await p.goto(url);
+  eq(`${id}: course selected, starter tabs only`, [await p.inputValue("#course-select"),
+    await p.$$eval("#tabs button", (b) => b.filter((x) => !x.hidden).map((x) => x.dataset.tab))], [id, ["today", "cards", "tutor"]]);
+  eq(`${id}: unit link goes to the course roadmap`, await p.$eval("#tab-today a", (a) => a.getAttribute("href")), `../${id === "la" ? "latin" : "polish"}/README.md`);
+  await p.click("#tabs button[data-tab=cards]");
+  eq(`${id}: first card`, (await p.textContent("#fc-card .prompt")).trim().startsWith(firstCard), true);
+  eq(`${id}: no "include the article" hint (no articles)`, await p.evaluate(() => {
+    const deck = window.LLC_COURSES.find((c) => c.id === localStorage.getItem("llc.course")).vocab;
+    return Object.values(deck).flat().filter((e) => e[2] !== null).length;
+  }), 0);
+  eq(`${id}: speaks with the course voice`, await p.$eval("#fc-card .speak", (b) => b.dataset.lang), voice);
+  const sys = await p.evaluate(() => [window.__fr.tutorSystem("conversation"), window.__fr.claudeAiPrompt("conversation")]);
+  eq(`${id}: tutor is about the course language, not French`, [sys[0].includes(tutorLine), /French|Belgi|Angèle/.test(sys.join(" "))], [true, false]);
+  await p.click("#tabs button[data-tab=tutor]");
+  eq(`${id}: tutor tab renders`, !!(await p.$("#tm-setup")), true);
+  eq(`${id}: no page errors`, pErrors, []);
   await p.close();
 }
 

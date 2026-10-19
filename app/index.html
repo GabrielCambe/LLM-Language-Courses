@@ -13,13 +13,15 @@
     })();
   </script>
   <!-- ?v= forces phones to fetch all files fresh after an update: bump it whenever app files change -->
-  <link rel="stylesheet" href="style.css?v=2026-10-19.4">
+  <link rel="stylesheet" href="style.css?v=2026-10-19.5">
 </head>
 <body>
   <header class="topbar">
     <!-- Course and language pickers have static options so they still show with a stale cached app.js -->
     <h1><select id="course-select" class="course-select" aria-label="Course">
       <option value="fr">🇫🇷 French</option>
+      <option value="la">🏛️ Latin</option>
+      <option value="pl">🇵🇱 Polish</option>
     </select></h1>
     <div class="top-controls">
       <select id="lang-select" class="lang-select" aria-label="Interface language">
@@ -58,10 +60,12 @@
     · Lyrics you paste stay local; never commit them to the repo.
   </footer>
 
-  <script src="data/vocab.js?v=2026-10-19.4"></script>
-  <script src="data/verbs.js?v=2026-10-19.4"></script>
-  <script src="data/courses.js?v=2026-10-19.4"></script>
-  <script src="i18n.js?v=2026-10-19.4"></script>
-  <script src="app.js?v=2026-10-19.4"></script>
+  <script src="data/vocab.js?v=2026-10-19.5"></script>
+  <script src="data/verbs.js?v=2026-10-19.5"></script>
+  <script src="data/latin.js?v=2026-10-19.5"></script>
+  <script src="data/polish.js?v=2026-10-19.5"></script>
+  <script src="data/courses.js?v=2026-10-19.5"></script>
+  <script src="i18n.js?v=2026-10-19.5"></script>
+  <script src="app.js?v=2026-10-19.5"></script>
 </body>
 </html>
