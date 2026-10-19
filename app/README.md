@@ -7,6 +7,7 @@ A small offline study app: plain HTML/JS, no install, no build, no account.
 - **Online (phone or computer):** https://gabrielcambe.github.io/LLM-Language-Courses/app/
   On your phone, use the browser's *Add to Home Screen* to get an app-like icon.
   Progress is stored per device/browser, so use **Today → Backup** to move it between devices.
+  The backup also holds the ticks on the course pages' checklists; restoring adds them to the ones already on the device.
 - The site is built by **GitHub Pages** from the default branch (settings in `/_config.yml`).
   It rebuilds automatically ~1 minute after each push.
 

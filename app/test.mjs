@@ -399,6 +399,26 @@ for (const tab of ["conj", "numbers"]) {
   await p.close();
 }
 
+// ── Backup carries the course site's checklists; restoring merges them ──
+{
+  const p = await browser.newPage();
+  const A = "/LLM-Language-Courses/french/units/unit-00-sounds.html", B = "/LLM-Language-Courses/french/units/unit-01-etre.html";
+  await p.goto(url);
+  await p.evaluate(([a]) => { localStorage.clear(); localStorage.setItem("llc.checklists", JSON.stringify({ [a]: { "Shadow 5 minutes": true } })); }, [A]);
+  const backup = await p.evaluate(() => window.__fr.exportAll());
+  eq("backup: includes the site checklists", backup["site.checklists"], { [A]: { "Shadow 5 minutes": true } });
+  // This device already has other ticks; restoring adds the backup's instead of replacing them.
+  await p.evaluate(([a, b]) => localStorage.setItem("llc.checklists", JSON.stringify({ [a]: { "Read the rule": true }, [b]: { "Say it aloud": true } })), [A, B]);
+  p.once("dialog", (d) => d.accept());
+  await p.setInputFiles("#t-import", { name: "backup.json", mimeType: "application/json", buffer: Buffer.from(JSON.stringify(Object.assign(backup, { days: ["2026-10-18"] }))) });
+  await p.waitForLoadState("load");
+  await p.waitForFunction(() => localStorage.getItem("llc.fr.days"));
+  eq("backup: restore merges checklists and course progress", await p.evaluate(() => [JSON.parse(localStorage.getItem("llc.checklists")),
+    localStorage.getItem("llc.fr.days"), Object.keys(localStorage).filter((k) => k.includes("site."))]),
+    [{ [A]: { "Read the rule": true, "Shadow 5 minutes": true }, [B]: { "Say it aloud": true } }, '["2026-10-18"]', []]);
+  await p.close();
+}
+
 // ── Latin, Polish and Japanese starter courses ──
 for (const [id, firstCard, voice, tutorLine] of [
   ["la", "salvē", "it-IT", "You are a Latin tutor"],
