@@ -56,6 +56,14 @@
     background: var(--llc-bg, #fff); color: var(--llc-text, #24292e);
   }
   .llc-theme-toggle:hover { border-color: var(--llc-link, #0366d6); }
+
+  /* "Open the study app" button on the index page */
+  .markdown-body .llc-app-cta { margin: 20px 0; }
+  .markdown-body .llc-app-cta a {
+    display: inline-block; padding: 12px 22px; border-radius: 999px; font-size: 17px; font-weight: 600;
+    background: var(--llc-link, #0366d6); color: var(--llc-bg, #fff); text-decoration: none;
+  }
+  .markdown-body .llc-app-cta a:hover { opacity: 0.9; text-decoration: none; }
 </style>
 <script>
   document.addEventListener("DOMContentLoaded", function () {

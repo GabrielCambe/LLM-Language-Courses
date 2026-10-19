@@ -22,6 +22,8 @@ Courses:
 - **Polish** 🇵🇱: starter ([roadmap](polish/README.md))
 - **Japanese** 🇯🇵: starter, kana first ([roadmap](japanese/README.md))
 
+<p class="llc-app-cta"><a href="https://gabrielcambe.github.io/LLM-Language-Courses/app/">📱 Open the study app →</a></p>
+
 🌐 **Website (phone & computer):** https://gabrielcambe.github.io/LLM-Language-Courses/
 📱 **Study app:** https://gabrielcambe.github.io/LLM-Language-Courses/app/ (add it to your phone's home screen)
 

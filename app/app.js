@@ -1446,7 +1446,9 @@ const THEME_ORDER = ["auto", "light", "dark"];
 let theme = readGlobal(THEME_KEY) || "auto";
 function renderThemeButton() {
   const btn = $("#theme-toggle");
-  btn.textContent = t("theme." + theme);
+  // "🌓 Auto" → icon + label, so small phones can hide the label
+  const [icon, ...words] = t("theme." + theme).split(" ");
+  btn.innerHTML = `<span aria-hidden="true">${icon}</span> <span class="theme-label">${escapeHtml(words.join(" "))}</span>`;
   btn.setAttribute("aria-label", t("theme.aria", { theme: t("theme." + theme) }));
 }
 function setupThemeToggle() {
