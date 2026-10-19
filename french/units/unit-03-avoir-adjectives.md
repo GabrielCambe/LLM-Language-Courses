@@ -80,7 +80,8 @@ bon(ne), mauvais(e), content(e), fatigué(e), heureux/heureuse, facile, difficil
 - **App → Conjugation**: *avoir*, then *être + avoir* mixed (interleaving).
 - **App → Flashcards**: Unit 3.
 
-<details><summary>Self-test (answers)</summary>
+<details>
+<summary markdown="span">Self-test (answers)</summary>
 
 1. *Elles ___ faim.* → **ont**
 2. *Elles ___ fatiguées.* → **sont**

@@ -63,7 +63,8 @@ la table, la chambre, la porte, le téléphone, l'ordinateur (m), la rue, le mon
 - **App → Gender**: 3 rounds of 20. Read the rule hint after each answer, *especially when you're wrong*.
 - **App → Flashcards**: Unit 2.
 
-<details><summary>Self-test (answers)</summary>
+<details>
+<summary markdown="span">Self-test (answers)</summary>
 
 1. ___ télévision → **la** (-sion)
 2. ___ fromage → **le** (-age)

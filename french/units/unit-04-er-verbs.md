@@ -59,7 +59,8 @@ souvent, toujours, parfois, maintenant, aujourd'hui, beaucoup.*
 - **App → Conjugation**: tick all Unit 4 verbs + *être* + *avoir*. Mixed = interleaving.
 - **App → Flashcards**: Unit 4.
 
-<details><summary>Self-test (answers)</summary>
+<details>
+<summary markdown="span">Self-test (answers)</summary>
 
 1. *Nous ___ (manger) au restaurant.* → **mangeons**
 2. *Ils ___ (habiter) à Bruxelles.* → **habitent** (say: "eel-za-beet")

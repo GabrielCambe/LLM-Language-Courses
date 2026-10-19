@@ -53,7 +53,17 @@ Link to the grammar reference file.
 
 ## 🏋️ Drills  *(retrieval practice)*
 - App: which drill / which deck
-- 5 quick self-test questions (answers hidden in a `<details>` block)
+- 5 quick self-test questions, answers hidden in a collapsible block written **exactly** like this
+  (tags on their own lines, `markdown="span"` on the summary, blank line after it), or it won't
+  collapse on the course website:
+
+  ```html
+  <details>
+  <summary markdown="span">Self-test (answers)</summary>
+
+  1. question → **answer**
+  </details>
+  ```
 
 ## 🎧 Input + Hunt  *(comprehensible input + noticing)*
 - Song / clip / episode

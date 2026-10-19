@@ -153,7 +153,8 @@ Other spoken patterns you'll meet everywhere: *ne* dropped (*je sais pas*), *on*
   know. Christophe Maé's *Il est où le bonheur* has one in the title.
 - **Self-test:**
 
-<details><summary>Put these in order (answers)</summary>
+<details>
+<summary markdown="span">Put these in order (answers)</summary>
 
 1. *pas / je / vu / l' / ai / ne* → **Je ne l'ai pas vu.**
 2. *souvent / Angèle / écoute / j'* → **J'écoute souvent Angèle.**

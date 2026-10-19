@@ -104,7 +104,8 @@ is a bit longer. Don't stress the first syllable like in English: *ba-NA-na* →
 - **YouGlish** ([youglish.com/french](https://youglish.com/french)): type any word and hear it in
   hundreds of real YouTube clips. **Forvo** ([forvo.com](https://forvo.com)) has native recordings of single words.
 
-<details><summary>Self-test: how do you pronounce these? (click for answers)</summary>
+<details>
+<summary markdown="span">Self-test: how do you pronounce these? (click for answers)</summary>
 
 1. *ils chantent* → "eel shahnt" (‑ent silent)
 2. *bonne* vs *bon* → "bun" (n pronounced) vs nasal "boh(n)"

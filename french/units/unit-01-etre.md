@@ -71,7 +71,8 @@ See the full [sentence map](../grammar/09-sentence-structure.md).
 - **App → Conjugation**: *être*, present tense, until ≥ 80% accuracy.
 - **App → Flashcards**: Unit 1 deck.
 
-<details><summary>Self-test (answers)</summary>
+<details>
+<summary markdown="span">Self-test (answers)</summary>
 
 1. *Nous ___ fatigués.* → **sommes**
 2. *Vous ___ française ?* → **êtes**
