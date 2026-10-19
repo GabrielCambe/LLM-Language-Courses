@@ -80,6 +80,8 @@ la table, la chambre, la porte, le téléphone, l'ordinateur (m), la rue, le mon
 - Paste 4–6 lines into the **Song Explainer** prompt for a breakdown.
 
 ## 🗣️ Use it
+> 💬 All of this works in **App → Tutor** (Corrector and Conversation modes), or paste the prompts into Claude.ai.
+
 - **Write:** describe your room or your desk in 5 sentences with *il y a* (*Il y a un ordinateur,
   des livres...*). Corrector prompt.
 - **Speak:** describe a photo on your phone to the Conversation Partner.

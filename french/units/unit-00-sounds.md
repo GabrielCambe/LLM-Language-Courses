@@ -122,7 +122,9 @@ is a bit longer. Don't stress the first syllable like in English: *ba-NA-na* →
 - **Shadow:** the title line, 5 times, matching her rhythm.
 
 ## 🗣️ Use it
-Ask the LLM tutor: "*Give me 10 French words I've never seen and let me guess the pronunciation
+> 💬 All of this works in **App → Tutor** (Corrector and Conversation modes), or paste the prompts into Claude.ai.
+
+Open **App → Tutor** (Tutor mode) and ask: "*Give me 10 French words I've never seen and let me guess the pronunciation
 using the rules; then correct me.*" Type your guess in rough phonetic spelling.
 
 ## 💡 Curiosity

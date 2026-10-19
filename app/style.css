@@ -108,7 +108,7 @@ button.primary { background: var(--accent); color: var(--on-accent); border-colo
 button.small { padding: 4px 8px; font-size: 0.85rem; }
 button:disabled { opacity: 0.5; cursor: default; }
 
-input[type=text], input[type=number], textarea, select {
+input[type=text], input[type=password], input[type=number], textarea, select {
   font: inherit; color: var(--text); background: var(--bg);
   border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
   max-width: 100%;
@@ -183,11 +183,25 @@ code { overflow-wrap: anywhere; }
 .unit-pick select { max-width: 100%; }
 details > summary { cursor: pointer; }
 
+/* Tutor chat */
+.chat { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.msg { max-width: 88%; padding: 10px 14px; border-radius: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+.msg p { margin: 0 0 6px; } .msg p:last-child { margin-bottom: 0; }
+.msg ul, .msg ol { margin: 4px 0; padding-left: 20px; }
+.msg.user { align-self: flex-end; background: var(--accent-soft); }
+.msg.ai { align-self: flex-start; background: var(--panel); border: 1px solid var(--line); }
+.msg.ai del { color: var(--bad); }
+.msg.ai strong { color: var(--good); }
+.msg.pending { color: var(--muted); }
+.msg.note { align-self: center; background: none; color: var(--muted); font-size: 0.85rem; padding: 2px; }
+.toast { position: fixed; left: 50%; bottom: 70px; transform: translateX(-50%); background: var(--text); color: var(--bg);
+  padding: 10px 16px; border-radius: 10px; z-index: 20; max-width: 90vw; }
+
 /* ───── Phones ───── */
 @media (max-width: 600px) {
   body { font-size: 15px; padding-bottom: 24px; }
   .topbar { position: static; padding: 10px 12px; }
-  #tabs { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; overflow: visible; order: 4; }
+  #tabs { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; overflow: visible; order: 4; }
   .topbar h1 { flex: 1; }
   #tabs button { padding: 8px 4px; text-align: center; }
   #tabs .short { display: inline; }

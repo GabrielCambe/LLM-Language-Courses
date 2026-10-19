@@ -76,6 +76,8 @@ souvent, toujours, parfois, maintenant, aujourd'hui, beaucoup.*
 - **Shadow:** the chorus. Roméo Elvis raps faster, so pick 2 lines of his verse as a **stretch goal**.
 
 ## 🗣️ Use it
+> 💬 All of this works in **App → Tutor** (Corrector and Conversation modes), or paste the prompts into Claude.ai.
+
 - **Write:** "A normal week": 6 sentences using different -ER verbs and adverbs of frequency.
 - **Speak:** Conversation Partner as *a new colleague at an AI startup in Paris*: talk about what
   you work on (*Je développe des agents IA...*).

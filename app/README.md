@@ -27,6 +27,22 @@ The course website has the same button, and one choice applies to both.
 | **Gender** | le or la? with the ending rule (or exception) after each answer | Explicit rule + immediate feedback |
 | **Numbers** | Listen → digits, read → digits, digits → words; 🇫🇷/🇧🇪/🇨🇭 variants | Listening automaticity |
 | **Song Workshop** | Paste lyrics → click words to make cards, cloze (fill-the-gap) while listening | Noticing + retrieval with real media |
+| **💬 Tutor** | Chat with Claude in 5 modes (Tutor, Corrector, Conversation, Song explainer, Reading), aware of your current unit | Output + corrective feedback, retrieval |
+
+### The Tutor and your Claude account
+- **Claude Pro / Max subscription:** subscriptions can't be used by other apps. The Tutor tab
+  *copies a ready-made prompt* (with your unit and mode) and opens Claude.ai, where you paste it.
+- **API key (chat inside the app):** create a key in the [Claude Console](https://platform.claude.com/settings/keys).
+  API usage is billed separately from Pro, as prepaid credits. A tutoring message costs roughly 1–2 cents with
+  Claude Opus 5.5 (the default) and a fraction of a cent with Claude Haiku 5.5 (choose in *Tutor settings*).
+  **Set a monthly spend limit in the Console.**
+- The key is stored only in your browser (`localStorage`, or for the tab only if you untick *Remember*),
+  is sent only to `api.anthropic.com`, and is never included in **Today → Backup**. Avoid saving it on a shared computer.
+  Anyone who can run scripts on `gabrielcambe.github.io` (any of your GitHub Pages sites) could read it, so keep that site trusted.
+- Technical notes: the official [Anthropic TypeScript SDK](https://github.com/anthropics/anthropic-sdk-typescript)
+  (pinned version, loaded from jsDelivr only when the Tutor is used) calls the API straight from the browser
+  (`dangerouslyAllowBrowser`). Replies stream, use `effort: "low"` for speed, prompt caching for cheaper follow-ups,
+  and server-side refusal fallbacks (`fallbacks: "default"`) on Opus/Sonnet. History is append-only.
 
 ### Notes
 - 🔊 uses your system's **text-to-speech**. If it doesn't sound French, install a French voice
