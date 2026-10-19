@@ -1,5 +1,6 @@
-<!-- Light/dark theme toggle for the course site (Primer theme hook: included in every page's <head>).
-     The choice is stored under the same key as the study app ("llc.theme"), so one setting covers both. -->
+<!-- Top bar on every page of the course site (Primer theme hook: included in every page's <head>):
+     a link to the study app, and a light/dark theme toggle. The theme is stored under the same key as
+     the study app ("llc.theme"), so one setting covers both. -->
 <script>
   (function () {
     var t = "auto";
@@ -48,14 +49,16 @@
   .llc-check-progress button { font: inherit; font-size: 13px; margin-left: 8px; padding: 2px 10px; border-radius: 999px; cursor: pointer;
     border: 1px solid var(--llc-border, #e1e4e8); background: var(--llc-bg, #fff); color: var(--llc-text, #24292e); }
 
-  .llc-theme-bar { text-align: right; margin-bottom: 8px; }
-  .llc-theme-toggle {
+  .llc-theme-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .llc-theme-toggle, .markdown-body .llc-app-link {
     font: inherit; font-size: 14px; cursor: pointer;
     padding: 4px 12px; border-radius: 999px;
     border: 1px solid var(--llc-border, #e1e4e8);
     background: var(--llc-bg, #fff); color: var(--llc-text, #24292e);
   }
   .llc-theme-toggle:hover { border-color: var(--llc-link, #0366d6); }
+  .markdown-body .llc-app-link { display: inline-block; color: var(--llc-link, #0366d6); font-weight: 600; text-decoration: none; }
+  .markdown-body .llc-app-link:hover { border-color: var(--llc-link, #0366d6); text-decoration: none; }
 
   /* "Open the study app" button on the index page */
   .markdown-body .llc-app-cta { margin: 20px 0; }
@@ -88,6 +91,12 @@
       render();
     });
     render();
+    // relative_url adds the site's base path (/LLM-Language-Courses), so the link works from any page depth
+    var app = document.createElement("a");
+    app.className = "llc-app-link";
+    app.href = "{{ '/app/' | relative_url }}";
+    app.textContent = "📱 Study app";
+    bar.appendChild(app);
     bar.appendChild(btn);
     var body = document.querySelector(".markdown-body") || document.body;
     body.insertBefore(bar, body.firstChild);
