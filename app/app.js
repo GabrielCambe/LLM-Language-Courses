@@ -1004,6 +1004,406 @@ function setupAccentBar() {
   });
 }
 
+// ───────────────────────── tutor (Claude) ─────────────────────────
+// Bring-your-own-key chat with Claude, called straight from the browser with the
+// official Anthropic SDK (loaded from a CDN only when the Tutor is used). The key
+// stays on this device and is only ever sent to api.anthropic.com.
+const SDK_URL = "https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.131.0/+esm";
+// Outside PREFIX on purpose: progress backups (store.exportAll) never include the key.
+const KEY_NAME = "llc.secret.anthropicKey";
+// $ per million tokens (input, output, cache read); used only for the cost estimate.
+const TUTOR_MODELS = {
+  "claude-opus-5-5": { label: "Claude Opus 5.5 · best", in: 4, out: 20, cacheRead: 0.2, fallbacks: true },
+  "claude-sonnet-5-5": { label: "Claude Sonnet 5.5 · balanced", in: 2, out: 10, cacheRead: 0.2, fallbacks: true },
+  "claude-haiku-5-5": { label: "Claude Haiku 5.5 · cheapest", in: 0.1, out: 0.5, cacheRead: 0.01, fallbacks: false },
+};
+const SCENARIOS = [
+  "a barista in a café in Brussels",
+  "a new colleague at an AI startup in Paris",
+  "a friend I met at an Angèle concert",
+  "a shop assistant in a bakery",
+  "someone asking me for directions",
+];
+const MODE_PROMPTS = {
+  tutor: `MODE: Tutor.
+- Explain grammar explicitly and briefly: the rule, 3 examples, then the most common exception.
+- After explaining, quiz the learner immediately, one question at a time. Don't give the answer until they try (retrieval practice).
+- When they make a mistake, first give a hint so they can self-correct (e.g. "check the verb ending for nous"). If they fail twice, give the correct form and a one-line explanation.
+- Keep French at their level: words from their current unit plus the ~500 most common French words.
+- Start by offering a 3-question warm-up on the current unit, or ask what they want to practise.`,
+  corrector: `MODE: Corrector. The learner sends French text they wrote. Reply with:
+1. Their original with errors marked like this: ~~wrong~~ **right**
+2. A short list: error → rule → category (gender / agreement / conjugation / word choice / spelling / word order)
+3. ONE pattern they keep repeating that they should focus on.
+4. A more natural version a native speaker might write, at the same level.
+Don't rewrite their ideas, only their French. If they send English or a question instead, help briefly and ask for French text.`,
+  conversation: `MODE: Conversation partner. Role-play the scenario the learner gives you.
+- Speak ONLY French, short simple sentences at their level.
+- If they make a mistake, recast it naturally in your reply (say it correctly back to them) without stopping the conversation.
+- If they write "??", re-say your last line more simply.
+- After 10 exchanges, or when they write "stop", switch to English and give: 3 errors they made and 3 useful new phrases.
+Start the scene yourself with one line.`,
+  song: `MODE: Song explainer. The learner pastes a few lines of a French song (from YouTube Music or similar) and names the song and artist. For each line:
+- a literal translation and a natural translation,
+- grammar at their level (tenses, pronouns, negation, elision),
+- slang, Belgian/regional expressions, and places where the singer bends pronunciation or grammar for the rhythm,
+then list 3 chunks worth memorising. Work ONLY with the lines they paste: never continue, complete or invent lyrics.`,
+  reading: `MODE: Reading companion. The learner pastes one paragraph from a book or article and says what they're reading.
+1. A natural English translation.
+2. Verbs in the passé simple or other tenses above their level, with the passé composé equivalent.
+3. The 3 most useful chunks to memorise.
+4. Two short comprehension questions in French.
+Never summarise or reveal anything beyond the pasted paragraph (no spoilers).`,
+};
+const TUTOR_MODES = {
+  tutor: { label: "🧑‍🏫 Tutor", hint: "Explains this unit's rule and quizzes you, one question at a time.", kickoff: "Let's start the session." },
+  corrector: { label: "✍️ Corrector", hint: "Paste 3–5 sentences you wrote in French. You get corrections and the pattern to work on." },
+  conversation: { label: "🗣️ Conversation", hint: "Role-play in French. Mistakes are recast back to you; type ?? to make it simpler, stop for feedback." },
+  song: { label: "🎵 Song explainer", hint: "Paste 2–6 lines of a song and say which song it is." },
+  reading: { label: "📖 Reading", hint: "Paste one paragraph and say what you're reading." },
+};
+
+const tutor = Object.assign({ mode: "tutor", model: "claude-opus-5-5", lang: "English", remember: true }, store.get("tutor", {}));
+const saveTutor = () => store.set("tutor", { mode: tutor.mode, model: tutor.model, lang: tutor.lang, remember: tutor.remember });
+let tutorChats = store.get("tutorChats", {});
+let tutorStream = null;
+let memoryKey = "";
+
+const keyStore = {
+  get() {
+    try { return localStorage.getItem(KEY_NAME) || sessionStorage.getItem(KEY_NAME) || memoryKey; } catch (e) { return memoryKey; }
+  },
+  set(key, remember) {
+    memoryKey = key;
+    try {
+      localStorage.removeItem(KEY_NAME);
+      sessionStorage.removeItem(KEY_NAME);
+      (remember ? localStorage : sessionStorage).setItem(KEY_NAME, key);
+    } catch (e) { /* memory only */ }
+  },
+  clear() {
+    memoryKey = "";
+    try { localStorage.removeItem(KEY_NAME); sessionStorage.removeItem(KEY_NAME); } catch (e) { /* nothing stored */ }
+  },
+};
+
+function keyRemembered() {
+  try { return !!localStorage.getItem(KEY_NAME); } catch (e) { return false; }
+}
+function tutorLevel() {
+  return settings.unit === 0 ? "A0 (complete beginner)" : settings.unit <= 13 ? "A1" : "A2";
+}
+// The system prompt depends only on mode, unit and language, so it stays byte-stable
+// for a whole chat (good for prompt caching).
+function tutorSystem(mode) {
+  const u = UNITS[settings.unit];
+  return `You are a French tutor inside a self-study app.
+Learner: an adult who speaks ${tutor.lang}. Level: CEFR ${tutorLevel()}. Current unit: ${u[0]}, "${u[1]}". The course favours Belgian examples (the learner loves Angèle and Stromae), but teach standard French and mark regional usage.
+How to talk to them:
+- They have ADHD: keep replies short (about 8 lines or fewer unless they ask for more), use bullets, one task at a time.
+- If they drift off-topic, point it out kindly and offer to "park" it for later.
+- Use comparisons with ${tutor.lang} when they genuinely help.
+- Mark anything colloquial vs formal, and France vs Belgium/Switzerland/Québec.
+- Never invent song lyrics or quotes.
+- Format with simple Markdown only: **bold**, *italics*, bullet or numbered lists.
+
+${MODE_PROMPTS[mode]}`;
+}
+function chatFor(mode) {
+  if (!tutorChats[mode]) tutorChats[mode] = { messages: [], hidden: [], cost: 0 };
+  return tutorChats[mode];
+}
+const saveChats = () => store.set("tutorChats", tutorChats);
+
+function estimateCost(model, usage) {
+  const m = TUTOR_MODELS[model];
+  if (!m || !usage) return 0;
+  const cacheWrite = (usage.cache_creation_input_tokens || 0) * m.in * 1.25;
+  const cacheRead = (usage.cache_read_input_tokens || 0) * m.cacheRead;
+  return ((usage.input_tokens || 0) * m.in + (usage.output_tokens || 0) * m.out + cacheWrite + cacheRead) / 1e6;
+}
+
+// Minimal, safe Markdown: escape first, then add a few inline styles and lists.
+function renderMd(text) {
+  const inline = (s) => s
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/~~(.+?)~~/g, "<del>$1</del>")
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[^*])\*([^*\s][^*]*?)\*/g, "$1<em>$2</em>");
+  const out = [];
+  let list = null;
+  escapeHtml(text).split("\n").forEach((line) => {
+    const ul = line.match(/^\s*[-•*]\s+(.*)/);
+    const ol = line.match(/^\s*\d+[.)]\s+(.*)/);
+    const kind = ul ? "ul" : ol ? "ol" : null;
+    if (list && list !== kind) { out.push(`</${list}>`); list = null; }
+    if (kind) {
+      if (!list) { out.push(`<${kind}>`); list = kind; }
+      out.push(`<li>${inline((ul || ol)[1])}</li>`);
+    } else if (line.trim()) {
+      out.push(`<p>${inline(line)}</p>`);
+    }
+  });
+  if (list) out.push(`</${list}>`);
+  return out.join("");
+}
+const blocksText = (content) => (typeof content === "string" ? content
+  : content.filter((b) => b.type === "text").map((b) => b.text).join(""));
+
+let sdkPromise = null;
+function loadSdk() {
+  if (!sdkPromise) sdkPromise = import(SDK_URL).then((m) => m.default).catch((e) => { sdkPromise = null; throw e; });
+  return sdkPromise;
+}
+
+function claudeAiPrompt(mode) {
+  const kickoff = mode === "conversation" ? `Scenario: you are ${SCENARIOS[0]}.` : TUTOR_MODES[mode].kickoff || "I'll paste my text next.";
+  return `${tutorSystem(mode)}\n\n---\n${kickoff}`;
+}
+
+function renderTutor() {
+  const root = $("#tab-tutor");
+  const hasKey = !!keyStore.get();
+  const mode = TUTOR_MODES[tutor.mode];
+  root.innerHTML = `
+    <div class="panel">
+      <h2>Tutor <span class="muted" style="font-size:0.85rem;font-weight:400">· Unit ${settings.unit} · ${tutorLevel()}</span></h2>
+      <div class="picks" id="tm-modes">${Object.entries(TUTOR_MODES).map(([id, m]) =>
+        `<button class="small ${id === tutor.mode ? "primary" : ""}" data-mode="${id}">${m.label}</button>`).join("")}</div>
+      <p class="muted" style="margin-bottom:0">${escapeHtml(mode.hint)}</p>
+    </div>
+    ${hasKey ? `<div id="tm-chat" class="chat"></div><div class="panel" id="tm-compose"></div>` : tutorSetupHtml()}
+    <details class="panel" id="tm-settings">
+      <summary><b>Tutor settings</b></summary>
+      <div class="row" style="margin-top:12px">
+        <label>Model <select id="tm-model">${Object.entries(TUTOR_MODELS).map(([id, m]) =>
+          `<option value="${id}" ${id === tutor.model ? "selected" : ""}>${m.label} ($${m.in}/$${m.out} per M tokens)</option>`).join("")}</select></label>
+        <label>Your language <input type="text" id="tm-lang" value="${escapeHtml(tutor.lang)}" style="width:140px"></label>
+      </div>
+      <p class="muted">Opus is the strongest teacher; Haiku costs about 40× less per message. Replies use low effort for quick answers.</p>
+      ${hasKey ? `<p class="muted">API key saved ${keyRemembered() ? "on this device" : "for this browser tab only"}.
+        <button class="small" id="tm-forget">Forget key</button></p>` : ""}
+      <p><button class="small" id="tm-copy">📋 Copy this mode's prompt for Claude.ai</button>
+        <span class="muted">Works with a Claude Pro subscription, no key needed.</span></p>
+      <textarea id="tm-copybox" readonly style="display:none"></textarea>
+    </details>`;
+
+  $$("#tm-modes [data-mode]").forEach((b) => (b.onclick = () => { tutor.mode = b.dataset.mode; saveTutor(); renderTutor(); }));
+  $("#tm-model").onchange = (e) => { tutor.model = e.target.value; saveTutor(); };
+  $("#tm-lang").onchange = (e) => { tutor.lang = e.target.value.trim() || "English"; saveTutor(); };
+  $("#tm-copy").onclick = () => copyForClaudeAi(tutor.mode);
+  if ($("#tm-forget")) $("#tm-forget").onclick = () => { keyStore.clear(); renderTutor(); };
+  if (hasKey) { renderTutorChat(); renderCompose(); } else bindSetup();
+}
+
+function tutorSetupHtml() {
+  return `
+    <div class="panel" id="tm-setup">
+      <h3 style="margin-top:0">Two ways to use the tutor</h3>
+      <div class="grid">
+        <div>
+          <b>A · With your Claude Pro subscription</b>
+          <p class="muted">Copies a ready-made tutor prompt (with your unit) and opens Claude.ai. Paste it into the new chat.
+          A subscription can't be used inside other apps, so the chat happens on Claude.ai.</p>
+          <button id="tm-copy2">📋 Copy prompt &amp; open Claude.ai</button>
+        </div>
+        <div>
+          <b>B · Inside this app, with an API key</b>
+          <p class="muted">Create a key in the <a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener">Claude Console</a>.
+          It's billed separately from Pro (prepaid credits, pay per message: roughly 1–2 cents per message with Opus, a fraction of a cent with Haiku).
+          Set a monthly spend limit in the Console.</p>
+          <input type="password" id="tm-key" placeholder="sk-ant-…" autocomplete="off" style="width:100%">
+          <label class="check"><input type="checkbox" id="tm-remember" ${tutor.remember ? "checked" : ""}> Remember on this device</label>
+          <button class="primary" id="tm-save">Save key</button> <span id="tm-keymsg" class="muted"></span>
+          <p class="muted" style="font-size:0.8rem">The key is stored only in this browser and sent only to api.anthropic.com.
+          It's never included in progress backups. Don't use this on a shared computer.</p>
+        </div>
+      </div>
+    </div>`;
+}
+function bindSetup() {
+  $("#tm-copy2").onclick = () => copyForClaudeAi(tutor.mode, true);
+  $("#tm-save").onclick = () => {
+    const key = $("#tm-key").value.trim();
+    if (!/^sk-ant-/.test(key)) { $("#tm-keymsg").textContent = "That doesn't look like an Anthropic API key (it starts with sk-ant-)."; return; }
+    tutor.remember = $("#tm-remember").checked; saveTutor();
+    keyStore.set(key, tutor.remember);
+    renderTutor();
+  };
+}
+
+async function copyForClaudeAi(mode, open) {
+  const text = claudeAiPrompt(mode);
+  let copied = false;
+  try { await navigator.clipboard.writeText(text); copied = true; } catch (e) { /* show it instead */ }
+  const box = $("#tm-copybox");
+  if (!copied && box) {
+    $("#tm-settings").open = true;
+    box.style.display = "block"; box.value = text; box.select();
+  }
+  if (open) window.open("https://claude.ai/new", "_blank", "noopener");
+  if (copied) toast(open ? "Prompt copied. Paste it into the new Claude chat." : "Prompt copied.");
+}
+function toast(msg) {
+  const t = document.createElement("div");
+  t.className = "toast"; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function renderTutorChat() {
+  const box = $("#tm-chat");
+  if (!box) return;
+  const chat = chatFor(tutor.mode);
+  box.innerHTML = chat.messages.map((m, i) => {
+    if (chat.hidden.includes(i)) return `<div class="msg note">▶ Session started</div>`;
+    return m.role === "user"
+      ? `<div class="msg user">${renderMd(m.content)}</div>`
+      : `<div class="msg ai">${renderMd(blocksText(m.content))}</div>`;
+  }).join("");
+}
+
+function renderCompose() {
+  const box = $("#tm-compose");
+  const chat = chatFor(tutor.mode);
+  const empty = chat.messages.length === 0;
+  const starter = !empty ? "" : tutor.mode === "tutor"
+    ? `<button class="primary" id="tm-start">▶ Start a session on Unit ${settings.unit}</button>`
+    : tutor.mode === "conversation"
+      ? `<div class="row"><label>Scenario <select id="tm-scn">${SCENARIOS.map((s) => `<option>${escapeHtml(s)}</option>`).join("")}<option value="">Other…</option></select></label>
+         <input type="text" id="tm-scn-own" placeholder="or describe your own" style="flex:1;min-width:160px">
+         <button class="primary" id="tm-start">▶ Start</button></div>`
+      : "";
+  box.innerHTML = `
+    ${starter}
+    <textarea id="tm-input" placeholder="${empty && starter ? "…or just type" : "Write in French (or English)…"}" style="min-height:70px;margin-top:${starter ? "10px" : "0"}"></textarea>
+    <div class="row" style="justify-content:space-between;margin-top:8px">
+      <div class="row">
+        <button class="primary" id="tm-send">Send</button>
+        <button id="tm-stop" style="display:none">Stop</button>
+        <button class="small" id="tm-new">New chat</button>
+      </div>
+      <span class="muted" id="tm-cost">${chat.cost ? `≈ $${chat.cost.toFixed(3)} this chat` : ""}</span>
+    </div>
+    <div id="tm-status" class="muted"></div>`;
+  const input = $("#tm-input");
+  $("#tm-send").onclick = () => { const t = input.value.trim(); if (t) { input.value = ""; tutorSend(t); } };
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey && !e.isComposing) { e.preventDefault(); $("#tm-send").click(); }
+  });
+  $("#tm-stop").onclick = () => { if (tutorStream) tutorStream.abort(); };
+  $("#tm-new").onclick = () => { delete tutorChats[tutor.mode]; saveChats(); renderTutor(); };
+  if ($("#tm-start")) $("#tm-start").onclick = () => {
+    if (tutor.mode === "conversation") {
+      const own = $("#tm-scn-own").value.trim();
+      tutorSend(`Scenario: you are ${own || $("#tm-scn").value || SCENARIOS[0]}. Start the scene.`, { hidden: true });
+    } else {
+      tutorSend(TUTOR_MODES.tutor.kickoff, { hidden: true });
+    }
+  };
+}
+
+async function tutorSend(text, opts = {}) {
+  if (tutorStream) return; // one reply at a time
+  const mode = tutor.mode;
+  const model = tutor.model;
+  const chat = chatFor(mode);
+  chat.messages.push({ role: "user", content: text });
+  if (opts.hidden) chat.hidden.push(chat.messages.length - 1);
+  // The conversation is append-only: earlier turns (including Claude's own content
+  // blocks) are always sent back unchanged.
+  const rollback = () => {
+    chat.messages.pop();
+    if (opts.hidden) chat.hidden.pop();
+    saveChats();
+  };
+  renderTutorChat();
+  renderCompose(); // the chat is no longer empty, so the starter buttons go away
+  const chatBox = $("#tm-chat");
+  const bubble = document.createElement("div");
+  bubble.className = "msg ai pending";
+  bubble.textContent = "…";
+  chatBox.appendChild(bubble);
+  bubble.scrollIntoView({ block: "nearest" });
+  $("#tm-send").disabled = true;
+  $("#tm-stop").style.display = "";
+  $("#tm-status").textContent = "";
+
+  const info = TUTOR_MODELS[model];
+  const params = {
+    model,
+    max_tokens: 16000,
+    system: tutorSystem(mode),
+    messages: chat.messages,
+    output_config: { effort: "low" },
+    cache_control: { type: "ephemeral" },
+  };
+  if (info.fallbacks) {
+    // If Claude declines on a safety classifier, the API retries on its recommended fallback model.
+    params.betas = ["server-side-fallback-2026-07-01"];
+    params.fallbacks = "default";
+  }
+
+  let Anthropic;
+  try {
+    Anthropic = await loadSdk();
+  } catch (e) {
+    rollback(); bubble.remove(); finishSend();
+    $("#tm-status").textContent = "Couldn't load the Claude SDK. Check your internet connection.";
+    return;
+  }
+  const client = new Anthropic({ apiKey: keyStore.get(), dangerouslyAllowBrowser: true });
+  let acc = "";
+  try {
+    tutorStream = client.beta.messages.stream(params);
+    tutorStream.on("text", (delta) => {
+      acc += delta;
+      bubble.classList.remove("pending");
+      bubble.innerHTML = renderMd(acc);
+    });
+    const msg = await tutorStream.finalMessage();
+    if (msg.stop_reason === "refusal") {
+      // A declined turn isn't kept: drop any partial text and the question.
+      rollback();
+      bubble.className = "msg note";
+      bubble.textContent = "Claude declined to answer that one. Try rephrasing it.";
+      if (!opts.hidden) $("#tm-input").value = text;
+    } else {
+      chat.messages.push({ role: "assistant", content: msg.content });
+      chat.cost += estimateCost(model, msg.usage);
+      saveChats();
+      bubble.classList.remove("pending");
+      bubble.innerHTML = renderMd(blocksText(msg.content));
+      if (msg.content.some((b) => b.type === "fallback")) $("#tm-status").textContent = `Answered by a fallback model (${msg.model}).`;
+      if (msg.stop_reason === "max_tokens") $("#tm-status").textContent = "The reply was cut off. Ask Claude to continue.";
+      $("#tm-cost").textContent = `≈ $${chat.cost.toFixed(3)} this chat`;
+      markStudied();
+    }
+  } catch (err) {
+    rollback();
+    bubble.remove();
+    if (!opts.hidden) $("#tm-input").value = text;
+    $("#tm-status").textContent = tutorError(Anthropic, err);
+  } finally {
+    finishSend();
+  }
+}
+function finishSend() {
+  tutorStream = null;
+  if ($("#tm-send")) $("#tm-send").disabled = false;
+  if ($("#tm-stop")) $("#tm-stop").style.display = "none";
+}
+function tutorError(Anthropic, err) {
+  if (Anthropic.APIUserAbortError && err instanceof Anthropic.APIUserAbortError) return "Stopped.";
+  if (err instanceof Anthropic.AuthenticationError) return "The API key was rejected. Check it in Tutor settings → Forget key, then add it again.";
+  if (err instanceof Anthropic.PermissionDeniedError) return "This key isn't allowed to use that model. Try another model in Tutor settings.";
+  if (err instanceof Anthropic.RateLimitError) return "Too many requests right now. Wait a minute and try again.";
+  if (err instanceof Anthropic.BadRequestError) return `Request refused: ${err.message}`; // e.g. credit balance too low
+  if (err instanceof Anthropic.APIConnectionError) return "Couldn't reach Claude. Check your internet connection.";
+  if (err instanceof Anthropic.APIError) return `Claude API error ${err.status ?? ""}: ${err.message}`;
+  return `Something went wrong: ${err.message || err}`;
+}
+
 // ───────────────────────── theme ─────────────────────────
 // Auto (follow the device) → Light → Dark. Stored as "llc.theme", shared with the course site.
 const THEME_KEY = "llc.theme";
@@ -1028,7 +1428,7 @@ function setupThemeToggle() {
 }
 
 // ───────────────────────── boot ─────────────────────────
-const RENDER = { today: renderToday, cards: renderCards, conj: renderConj, gender: renderGender, numbers: renderNumbers, songs: renderSongs };
+const RENDER = { today: renderToday, cards: renderCards, conj: renderConj, gender: renderGender, numbers: renderNumbers, songs: renderSongs, tutor: renderTutor };
 function showTab(name) {
   $$("#tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
   $$(".tab").forEach((t) => t.classList.toggle("active", t.id === "tab-" + name));
@@ -1044,4 +1444,4 @@ try { startTab = sessionStorage.getItem(PREFIX + "tab") || "today"; } catch (e) 
 showTab(RENDER[startTab] ? startTab : "today");
 
 // Exposed for tests (see app/test.mjs)
-window.__fr = { schedule, frenchNumber, conjugate, genderHint, stripArticle, compare, tokenize };
+window.__fr = { schedule, frenchNumber, conjugate, genderHint, stripArticle, compare, tokenize, renderMd, tutorSystem, claudeAiPrompt, estimateCost, exportAll: () => store.exportAll() };

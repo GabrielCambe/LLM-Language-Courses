@@ -63,7 +63,8 @@ la table, la chambre, la porte, le téléphone, l'ordinateur (m), la rue, le mon
 - **App → Gender**: 3 rounds of 20. Read the rule hint after each answer, *especially when you're wrong*.
 - **App → Flashcards**: Unit 2.
 
-<details><summary>Self-test (answers)</summary>
+<details>
+<summary markdown="span">Self-test (answers)</summary>
 
 1. ___ télévision → **la** (-sion)
 2. ___ fromage → **le** (-age)
@@ -79,6 +80,8 @@ la table, la chambre, la porte, le téléphone, l'ordinateur (m), la rue, le mon
 - Paste 4–6 lines into the **Song Explainer** prompt for a breakdown.
 
 ## 🗣️ Use it
+> 💬 All of this works in **App → Tutor** (Corrector and Conversation modes), or paste the prompts into Claude.ai.
+
 - **Write:** describe your room or your desk in 5 sentences with *il y a* (*Il y a un ordinateur,
   des livres...*). Corrector prompt.
 - **Speak:** describe a photo on your phone to the Conversation Partner.

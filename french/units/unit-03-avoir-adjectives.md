@@ -80,7 +80,8 @@ bon(ne), mauvais(e), content(e), fatigué(e), heureux/heureuse, facile, difficil
 - **App → Conjugation**: *avoir*, then *être + avoir* mixed (interleaving).
 - **App → Flashcards**: Unit 3.
 
-<details><summary>Self-test (answers)</summary>
+<details>
+<summary markdown="span">Self-test (answers)</summary>
 
 1. *Elles ___ faim.* → **ont**
 2. *Elles ___ fatiguées.* → **sont**
@@ -96,6 +97,8 @@ bon(ne), mauvais(e), content(e), fatigué(e), heureux/heureuse, facile, difficil
 - **Hunt 2:** find adjectives and check their agreement.
 
 ## 🗣️ Use it
+> 💬 All of this works in **App → Tutor** (Corrector and Conversation modes), or paste the prompts into Claude.ai.
+
 - **Write:** describe 3 people you know (age, personality, appearance) with *avoir* + adjectives.
 - **Speak:** ask the Conversation Partner to play a friend, and tell them how you feel today
   (*J'ai faim, j'ai la flemme de travailler...*).

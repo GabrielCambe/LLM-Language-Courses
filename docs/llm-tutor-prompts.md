@@ -1,5 +1,10 @@
 # LLM tutor prompts
 
+> 💬 **These are built into the study app's Tutor tab** (Tutor, Corrector, Conversation, Song
+> explainer and Reading modes), already filled in with your current unit. With an API key, the
+> chat runs inside the app; with a Claude Pro subscription, the tab copies the prompt for Claude.ai.
+> The versions below are for any other chat app.
+
 Copy-paste these into Claude, ChatGPT, or any capable chat model. Each one is designed
 around a specific finding from [`learning-science.md`](learning-science.md).
 

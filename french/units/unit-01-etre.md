@@ -71,7 +71,8 @@ See the full [sentence map](../grammar/09-sentence-structure.md).
 - **App → Conjugation**: *être*, present tense, until ≥ 80% accuracy.
 - **App → Flashcards**: Unit 1 deck.
 
-<details><summary>Self-test (answers)</summary>
+<details>
+<summary markdown="span">Self-test (answers)</summary>
 
 1. *Nous ___ fatigués.* → **sommes**
 2. *Vous ___ française ?* → **êtes**
@@ -87,6 +88,8 @@ See the full [sentence map](../grammar/09-sentence-structure.md).
 - **Bonus:** **Angèle: *Bruxelles je t'aime*** again. You'll now catch *je suis* and *c'est*.
 
 ## 🗣️ Use it
+> 💬 All of this works in **App → Tutor** (Corrector and Conversation modes), or paste the prompts into Claude.ai.
+
 - **Write** 5 sentences introducing yourself (name, origin, job, *je suis + adjective*). Paste into
   the **Corrector** prompt ([`docs/llm-tutor-prompts.md`](../../docs/llm-tutor-prompts.md)).
 - **Speak:** Conversation Partner prompt, scenario: *you meet someone at a meetup in Brussels*.

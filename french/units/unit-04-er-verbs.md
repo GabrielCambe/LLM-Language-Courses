@@ -59,7 +59,8 @@ souvent, toujours, parfois, maintenant, aujourd'hui, beaucoup.*
 - **App → Conjugation**: tick all Unit 4 verbs + *être* + *avoir*. Mixed = interleaving.
 - **App → Flashcards**: Unit 4.
 
-<details><summary>Self-test (answers)</summary>
+<details>
+<summary markdown="span">Self-test (answers)</summary>
 
 1. *Nous ___ (manger) au restaurant.* → **mangeons**
 2. *Ils ___ (habiter) à Bruxelles.* → **habitent** (say: "eel-za-beet")
@@ -75,6 +76,8 @@ souvent, toujours, parfois, maintenant, aujourd'hui, beaucoup.*
 - **Shadow:** the chorus. Roméo Elvis raps faster, so pick 2 lines of his verse as a **stretch goal**.
 
 ## 🗣️ Use it
+> 💬 All of this works in **App → Tutor** (Corrector and Conversation modes), or paste the prompts into Claude.ai.
+
 - **Write:** "A normal week": 6 sentences using different -ER verbs and adverbs of frequency.
 - **Speak:** Conversation Partner as *a new colleague at an AI startup in Paris*: talk about what
   you work on (*Je développe des agents IA...*).

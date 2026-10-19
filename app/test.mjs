@@ -186,6 +186,88 @@ await stale.goto(url);
 eq("button still visible with a stale app.js", await stale.$eval("#theme-toggle", (b) => [b.textContent, b.offsetWidth > 40]), ["🌓 Auto", true]);
 await stale.close();
 
+// ── Tutor (Claude) against a mocked API: request shape, append-only history, errors ──
+{
+  const t = await browser.newPage({ viewport: { width: 390, height: 800 } });
+  const tErrors = [];
+  t.on("pageerror", (e) => tErrors.push(e.message));
+  const sent = [];
+  let mode = "ok";
+  const sse = (text) => [
+    ["message_start", { type: "message_start", message: { id: "msg_1", type: "message", role: "assistant", model: "claude-opus-5-5", content: [], stop_reason: null, stop_sequence: null, usage: { input_tokens: 1000, output_tokens: 1, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 } } }],
+    ["content_block_start", { type: "content_block_start", index: 0, content_block: { type: "text", text: "" } }],
+    ["content_block_delta", { type: "content_block_delta", index: 0, delta: { type: "text_delta", text } }],
+    ["content_block_stop", { type: "content_block_stop", index: 0 }],
+    ["message_delta", { type: "message_delta", delta: { stop_reason: "end_turn", stop_sequence: null }, usage: { output_tokens: 50 } }],
+    ["message_stop", { type: "message_stop" }],
+  ].map(([e, d]) => `event: ${e}\ndata: ${JSON.stringify(d)}\n\n`).join("");
+  const cors = { "access-control-allow-origin": "*", "access-control-allow-headers": "*", "access-control-allow-methods": "POST, OPTIONS" };
+  await t.route("https://api.anthropic.com/**", async (route) => {
+    const req = route.request();
+    if (req.method() === "OPTIONS") return route.fulfill({ status: 204, headers: cors });
+    sent.push({ headers: req.headers(), body: req.postDataJSON() });
+    if (mode === "401") {
+      return route.fulfill({ status: 401, headers: { ...cors, "content-type": "application/json" },
+        body: JSON.stringify({ type: "error", error: { type: "authentication_error", message: "invalid x-api-key" } }) });
+    }
+    return route.fulfill({ status: 200, headers: { ...cors, "content-type": "text/event-stream" }, body: sse(`**Bonjour** ! Reply ${sent.length}.`) });
+  });
+  await t.goto(url);
+  await t.click("#tabs button[data-tab=tutor]");
+  eq("tutor: setup shown without a key", !!(await t.$("#tm-setup")), true);
+  await t.fill("#tm-key", "not-a-key");
+  await t.click("#tm-save");
+  eq("tutor: rejects a malformed key", (await t.textContent("#tm-keymsg")).includes("sk-ant-"), true);
+  await t.fill("#tm-key", "sk-ant-test-123");
+  await t.click("#tm-save");
+  const stored = await t.evaluate(() => [localStorage.getItem("llc.secret.anthropicKey"), JSON.stringify(window.__fr.exportAll()).includes("sk-ant")]);
+  eq("tutor: key saved locally, never in backups", stored, ["sk-ant-test-123", false]);
+
+  await t.click("#tm-start");
+  await t.waitForSelector(".msg.ai:not(.pending) strong");
+  const r1 = sent[0];
+  eq("tutor: browser call carries key + direct-browser header", [r1.headers["x-api-key"], r1.headers["anthropic-dangerous-direct-browser-access"]], ["sk-ant-test-123", "true"]);
+  eq("tutor: Opus 5.5, streaming, low effort, default fallbacks",
+    [r1.body.model, r1.body.stream, r1.body.output_config.effort, r1.body.fallbacks, (r1.headers["anthropic-beta"] || "").includes("server-side-fallback-2026-07-01")],
+    ["claude-opus-5-5", true, "low", "default", true]);
+  eq("tutor: system prompt knows the unit", r1.body.system.includes('Current unit: 0, "The sound system"'), true);
+  eq("tutor: kickoff hidden in the chat", await t.$$eval(".msg", (m) => m.map((x) => x.className)), ["msg note", "msg ai"]);
+
+  await t.fill("#tm-input", "Merci <script>alert(1)</script>");
+  await t.press("#tm-input", "Enter");
+  await t.waitForFunction(() => document.querySelectorAll(".msg.ai:not(.pending)").length === 2);
+  const r2 = sent[1].body.messages;
+  eq("tutor: history is append-only (assistant content blocks echoed)",
+    [r2.length, r2[1].role, r2[1].content[0].type, r2[1].content[0].text], [3, "assistant", "text", "**Bonjour** ! Reply 1."]);
+  eq("tutor: user text is escaped", await t.$$eval(".msg.user script", (s) => s.length), 0);
+  eq("tutor: cost estimate shown", (await t.textContent("#tm-cost")).startsWith("≈ $"), true);
+
+  await t.evaluate(() => (document.querySelector("#tm-settings").open = true));
+  await t.selectOption("#tm-model", "claude-haiku-5-5");
+  await t.fill("#tm-input", "Encore");
+  await t.click("#tm-send");
+  await t.waitForFunction(() => document.querySelectorAll(".msg.ai:not(.pending)").length === 3);
+  eq("tutor: Haiku sends no fallbacks", [sent[2].body.model, "fallbacks" in sent[2].body], ["claude-haiku-5-5", false]);
+
+  mode = "401";
+  await t.fill("#tm-input", "Une question");
+  await t.click("#tm-send");
+  await t.waitForFunction(() => document.querySelector("#tm-status").textContent.length > 0);
+  eq("tutor: bad key → clear message, question kept for retry, history unchanged",
+    [(await t.textContent("#tm-status")).includes("rejected"), await t.inputValue("#tm-input"),
+     await t.evaluate(() => JSON.parse(localStorage.getItem("llc.fr.tutorChats")).tutor.messages.length)],
+    [true, "Une question", 6]);
+
+  await t.reload();
+  await t.click("#tabs button[data-tab=tutor]");
+  eq("tutor: chat survives a reload", await t.$$eval(".msg.ai", (m) => m.length), 3);
+  eq("tutor: Claude.ai prompt includes unit + mode", await t.evaluate(() => {
+    const p = window.__fr.claudeAiPrompt("corrector"); return p.includes("MODE: Corrector") && p.includes("Current unit: 0");
+  }), true);
+  eq("tutor: no page errors", tErrors, []);
+  await t.close();
+}
+
 eq("no page errors", errors, []);
 
 // ── Responsive: no horizontal scrolling on any tab, phone to desktop ──
@@ -193,7 +275,7 @@ for (const width of [320, 390, 768, 1280]) {
   const p = await browser.newPage({ viewport: { width, height: 800 } });
   await p.goto(url);
   const overflowing = [];
-  for (const tab of ["today", "cards", "conj", "gender", "numbers", "songs"]) {
+  for (const tab of ["today", "cards", "conj", "gender", "numbers", "songs", "tutor"]) {
     await p.click(`#tabs button[data-tab=${tab}]`);
     if ((await p.evaluate(() => document.documentElement.scrollWidth)) > width) overflowing.push(tab);
   }
