@@ -206,7 +206,7 @@ await stale.route(/app\.js/, (r) => r.fulfill({ contentType: "text/javascript", 
 await stale.goto(url);
 eq("button still visible with a stale app.js", await stale.$eval("#theme-toggle", (b) => [b.textContent, b.offsetWidth > 40]), ["🌓 Auto", true]);
 eq("course and language pickers still usable with a stale app.js",
-  [await stale.$eval("#course-select", (s) => s.options.length), await stale.$eval("#lang-select", (s) => [...s.options].map((o) => o.value))], [3, ["en", "pt-BR"]]);
+  [await stale.$eval("#course-select", (s) => s.options.length), await stale.$eval("#lang-select", (s) => [...s.options].map((o) => o.value))], [4, ["en", "pt-BR"]]);
 await stale.close();
 
 // ── Tutor (Claude) against a mocked API: request shape, append-only history, errors ──
@@ -380,7 +380,7 @@ for (const tab of ["conj", "numbers"]) {
   });
   await p.goto(url);
   eq("course picker lists the courses", await p.$$eval("#course-select option", (o) => o.map((x) => [x.value || "", x.disabled])),
-    [["fr", false], ["la", false], ["pl", false], ["xx", false], ["➕ More soon", true]]);
+    [["fr", false], ["la", false], ["pl", false], ["ja", false], ["xx", false], ["➕ More soon", true]]);
   eq("French is the default course", await p.inputValue("#course-select"), "fr");
   await p.evaluate(() => localStorage.setItem("llc.fr.days", JSON.stringify(["2026-01-01"])));
 
@@ -399,10 +399,11 @@ for (const tab of ["conj", "numbers"]) {
   await p.close();
 }
 
-// ── Latin and Polish starter courses ──
+// ── Latin, Polish and Japanese starter courses ──
 for (const [id, firstCard, voice, tutorLine] of [
   ["la", "salvē", "it-IT", "You are a Latin tutor"],
   ["pl", "cześć", "pl-PL", "You are a Polish tutor"],
+  ["ja", "こんにちは", "ja-JP", "You are a Japanese tutor"],
 ]) {
   const p = await browser.newPage();
   const pErrors = [];
@@ -411,7 +412,7 @@ for (const [id, firstCard, voice, tutorLine] of [
   await p.goto(url);
   eq(`${id}: course selected, starter tabs only`, [await p.inputValue("#course-select"),
     await p.$$eval("#tabs button", (b) => b.filter((x) => !x.hidden).map((x) => x.dataset.tab))], [id, ["today", "cards", "tutor"]]);
-  eq(`${id}: unit link goes to the course roadmap`, await p.$eval("#tab-today a", (a) => a.getAttribute("href")), `../${id === "la" ? "latin" : "polish"}/README.md`);
+  eq(`${id}: unit link goes to the course roadmap`, await p.$eval("#tab-today a", (a) => a.getAttribute("href")), `../${{ la: "latin", pl: "polish", ja: "japanese" }[id]}/README.md`);
   await p.click("#tabs button[data-tab=cards]");
   eq(`${id}: first card`, (await p.textContent("#fc-card .prompt")).trim().startsWith(firstCard), true);
   eq(`${id}: no "include the article" hint (no articles)`, await p.evaluate(() => {
@@ -424,6 +425,21 @@ for (const [id, firstCard, voice, tutorLine] of [
   await p.click("#tabs button[data-tab=tutor]");
   eq(`${id}: tutor tab renders`, !!(await p.$("#tm-setup")), true);
   eq(`${id}: no page errors`, pErrors, []);
+  await p.close();
+}
+
+// ── Japanese: kana answers, full-width input, accent keys ──
+{
+  const p = await browser.newPage();
+  await p.addInitScript(() => localStorage.setItem("llc.course", "ja"));
+  await p.goto(url);
+  eq("ja: kana answers compare correctly", await p.evaluate(() => {
+    const { compare } = window.__fr;
+    return [compare("ねこ", ["ねこ"]), compare("ねこ　", ["ねこ"]), compare("ねご", ["ねこ"]), compare("いぬ", ["ねこ"])];
+  }), ["ok", "ok", "no", "no"]);
+  eq("ja: no full-width punctuation in the deck (typed answers would never match)",
+    await p.evaluate(() => Object.values(window.JA_VOCAB).flat().filter((e) => /[。、？！]/.test(e[0])).map((e) => e[0])), []);
+  eq("ja: accent bar has the long mark and small kana", await p.$$eval("#accent-bar button", (b) => b.map((x) => x.textContent).slice(0, 2)), ["ー", "っ"]);
   await p.close();
 }
 

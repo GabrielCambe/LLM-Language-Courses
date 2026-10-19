@@ -20,6 +20,7 @@ Courses:
 - **French** 🇫🇷🇧🇪: the first and most complete one ([roadmap](french/README.md))
 - **Latin** 🏛️: starter, for reading ([roadmap](latin/README.md))
 - **Polish** 🇵🇱: starter ([roadmap](polish/README.md))
+- **Japanese** 🇯🇵: starter, kana first ([roadmap](japanese/README.md))
 
 🌐 **Website (phone & computer):** https://gabrielcambe.github.io/LLM-Language-Courses/
 📱 **Study app:** https://gabrielcambe.github.io/LLM-Language-Courses/app/ (add it to your phone's home screen)
@@ -46,7 +47,7 @@ french/
   units/                  Unit-by-unit lessons (rules + vocab + media + tasks)
   grammar/                Grammar reference, one rule family per file (incl. sentence structure)
   media/                  Music (Angèle first!), films, series, podcasts, reading ladder, sorted by level
-latin/, polish/
+latin/, polish/, japanese/
   README.md               Starter roadmaps (lesson pages get generated as you go)
 app/
   index.html              Offline study app: SRS flashcards, conjugation, gender, numbers, song workshop

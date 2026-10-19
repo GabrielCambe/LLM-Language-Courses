@@ -18,10 +18,11 @@ long-press a letter on the phone keyboard (e → é è ê).
 The first visit follows your device language. The tutor's "your language" follows it too, unless you typed your own.
 Only the app's interface is translated: card meanings and the course pages are still in English.
 
-**Course:** the menu with the flag (top left) picks the course: French, Latin or Polish.
+**Course:** the menu with the flag (top left) picks the course: French, Latin, Polish or Japanese.
 Each course keeps its own progress, so switching never touches another course's cards.
-Latin and Polish are starters: Today, Flashcards (units 0–3) and the Tutor. Conjugation, Gender,
+Latin, Polish and Japanese are starters: Today, Flashcards (units 0–3) and the Tutor. Conjugation, Gender,
 Numbers and the Song Workshop are French-only for now. Latin audio uses an Italian voice (there are no Latin voices).
+For Japanese, type answers with your device's Japanese keyboard; the accent keys add the long mark ー and small kana (っ ゃ ゅ ょ).
 
 **Light / dark mode:** the button in the top bar cycles 🌓 Auto (follows your device) → ☀️ Light → 🌙 Dark.
 The course website has the same button, and one choice applies to both.
@@ -64,7 +65,7 @@ The course website has the same button, and one choice applies to both.
 - **Lyrics** stay in your browser's local storage only. Don't commit them.
 
 ## Developing
-- Vocabulary: `data/vocab.js` (French, by unit), `data/latin.js`, `data/polish.js`. French verbs: `data/verbs.js`.
+- Vocabulary: `data/vocab.js` (French, by unit), `data/latin.js`, `data/polish.js`, `data/japanese.js`. French verbs: `data/verbs.js`.
 - Courses: `data/courses.js` (units, voice, accent keys, which tabs exist, where progress is stored).
   A new course is a new entry there plus its own data files. Conjugation, Gender, Numbers and the Song Workshop
   are written for French, so list only the tabs a course really supports. The Tutor works for any course:
