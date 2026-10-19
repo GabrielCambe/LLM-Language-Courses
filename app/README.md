@@ -14,6 +14,15 @@ Works on phones and computers: the layout adapts down to 320 px wide. On phones 
 short names (Cards, Verbs, Songs), and the accent keys appear only while you're typing. You can also
 long-press a letter on the phone keyboard (e → é è ê).
 
+**Language:** the 🌐 menu in the top bar switches the interface between **English** and **Português (BR)**.
+The first visit follows your device language. The tutor's "your language" follows it too, unless you typed your own.
+Only the app's interface is translated: card meanings and the course pages are still in English.
+
+**Course:** the menu with the flag (top left) picks the course: French, Latin or Polish.
+Each course keeps its own progress, so switching never touches another course's cards.
+Latin and Polish are starters: Today, Flashcards (units 0–3) and the Tutor. Conjugation, Gender,
+Numbers and the Song Workshop are French-only for now. Latin audio uses an Italian voice (there are no Latin voices).
+
 **Light / dark mode:** the button in the top bar cycles 🌓 Auto (follows your device) → ☀️ Light → 🌙 Dark.
 The course website has the same button, and one choice applies to both.
 
@@ -55,7 +64,12 @@ The course website has the same button, and one choice applies to both.
 - **Lyrics** stay in your browser's local storage only. Don't commit them.
 
 ## Developing
-- Vocabulary: `data/vocab.js` (by unit). Verbs: `data/verbs.js`.
+- Vocabulary: `data/vocab.js` (French, by unit), `data/latin.js`, `data/polish.js`. French verbs: `data/verbs.js`.
+- Courses: `data/courses.js` (units, voice, accent keys, which tabs exist, where progress is stored).
+  A new course is a new entry there plus its own data files. Conjugation, Gender, Numbers and the Song Workshop
+  are written for French, so list only the tabs a course really supports. The Tutor works for any course:
+  its course-specific lines and role-play scenarios are in the course's `tutor` and `scenarios` fields.
+- Interface text: `i18n.js`, one block per language. Add every new key to both blocks (the tests check this).
 - Don't rename existing French entries: the French text is the card ID.
 - **When you change any app file, bump the `?v=` date in `index.html`** (all links share one value).
   Phones cache each file separately, so without it they can mix new and old files. The tests enforce one shared value.

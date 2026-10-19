@@ -13,20 +13,31 @@
     })();
   </script>
   <!-- ?v= forces phones to fetch all files fresh after an update: bump it whenever app files change -->
-  <link rel="stylesheet" href="style.css?v=2026-10-19.2">
+  <link rel="stylesheet" href="style.css?v=2026-10-19.6">
 </head>
 <body>
   <header class="topbar">
-    <h1>🇫🇷 French Study</h1>
-    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Theme. Click to change.">🌓 Auto</button>
+    <!-- Course and language pickers have static options so they still show with a stale cached app.js -->
+    <h1><select id="course-select" class="course-select" aria-label="Course">
+      <option value="fr">🇫🇷 French</option>
+      <option value="la">🏛️ Latin</option>
+      <option value="pl">🇵🇱 Polish</option>
+    </select></h1>
+    <div class="top-controls">
+      <select id="lang-select" class="lang-select" aria-label="Interface language">
+        <option value="en">🌐 English</option>
+        <option value="pt-BR">🌐 Português</option>
+      </select>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Theme. Click to change.">🌓 Auto</button>
+    </div>
     <nav id="tabs" role="tablist">
-      <button data-tab="today" class="active">Today</button>
-      <button data-tab="cards"><span class="long">Flashcards</span><span class="short">Cards</span></button>
-      <button data-tab="conj"><span class="long">Conjugation</span><span class="short">Verbs</span></button>
-      <button data-tab="gender">Gender</button>
-      <button data-tab="numbers">Numbers</button>
-      <button data-tab="songs"><span class="long">Song Workshop</span><span class="short">Songs</span></button>
-      <button data-tab="tutor">💬 Tutor</button>
+      <button data-tab="today" class="active" data-i18n="tab.today">Today</button>
+      <button data-tab="cards"><span class="long" data-i18n="tab.cards">Flashcards</span><span class="short" data-i18n="tab.cardsShort">Cards</span></button>
+      <button data-tab="conj"><span class="long" data-i18n="tab.conj">Conjugation</span><span class="short" data-i18n="tab.conjShort">Verbs</span></button>
+      <button data-tab="gender" data-i18n="tab.gender">Gender</button>
+      <button data-tab="numbers" data-i18n="tab.numbers">Numbers</button>
+      <button data-tab="songs"><span class="long" data-i18n="tab.songs">Song Workshop</span><span class="short" data-i18n="tab.songsShort">Songs</span></button>
+      <button data-tab="tutor" data-i18n="tab.tutor">💬 Tutor</button>
     </nav>
   </header>
 
@@ -41,16 +52,20 @@
   </main>
 
   <div id="accent-bar" class="accent-bar" aria-label="Accent keyboard">
-    <span>Accents:</span>
+    <span data-i18n="accents">Accents:</span>
   </div>
 
-  <footer class="foot">
+  <footer class="foot" data-i18n-html="footer">
     Progress is saved in this browser only. Use <b>Today → Backup</b> to export it.
     · Lyrics you paste stay local; never commit them to the repo.
   </footer>
 
-  <script src="data/vocab.js?v=2026-10-19.2"></script>
-  <script src="data/verbs.js?v=2026-10-19.2"></script>
-  <script src="app.js?v=2026-10-19.2"></script>
+  <script src="data/vocab.js?v=2026-10-19.6"></script>
+  <script src="data/verbs.js?v=2026-10-19.6"></script>
+  <script src="data/latin.js?v=2026-10-19.6"></script>
+  <script src="data/polish.js?v=2026-10-19.6"></script>
+  <script src="data/courses.js?v=2026-10-19.6"></script>
+  <script src="i18n.js?v=2026-10-19.6"></script>
+  <script src="app.js?v=2026-10-19.6"></script>
 </body>
 </html>

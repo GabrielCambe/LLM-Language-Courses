@@ -142,6 +142,27 @@ await page.click("#tabs button[data-tab=conj]");
 await page.fill("#conj-in", "zzz");
 await page.keyboard.press("Enter");
 eq("conj feedback shown", (await page.$eval("#conj-fb", (el) => el.textContent)).includes("Not quite"), true);
+eq("conj score updates as soon as the answer is checked", await page.textContent("#conj-score"), "score 0/1 (0%)");
+eq("conj button turns into Next", await page.textContent("#conj-go"), "Next (Enter)");
+await page.click("#conj-go");
+eq("Next button gives a new question", [await page.textContent("#conj-fb"), await page.textContent("#conj-go"), await page.inputValue("#conj-in")], ["", "Check (Enter)", ""]);
+await page.fill("#conj-in", "zzz");
+await page.click("#conj-go");
+eq("Check button checks without Enter", (await page.textContent("#conj-fb")).includes("Not quite"), true);
+
+// Numbers: the same Check → Next button
+await page.click("#tabs button[data-tab=numbers]");
+await page.click("#num-go");
+eq("numbers: Check with an empty answer does nothing", [await page.textContent("#num-fb"), await page.textContent("#num-go")], ["", "Check (Enter)"]);
+await page.fill("#num-in", "123456");
+await page.click("#num-go");
+eq("numbers: Check button shows the answer", [(await page.textContent("#num-fb")).includes("="), await page.textContent("#num-go")], [true, "Next (Enter)"]);
+await page.click("#num-go");
+eq("numbers: score updates on check", (await page.textContent("#num-score")).includes("/1 ("), true);
+eq("numbers: Next button gives a new number", [await page.textContent("#num-fb"), await page.inputValue("#num-in")], ["", ""]);
+await page.fill("#num-in", "1");
+await page.keyboard.press("Enter");
+eq("numbers: Enter still works", await page.textContent("#num-go"), "Next (Enter)");
 
 // Song workshop: add a song, cloze renders, HTML is escaped
 await page.click("#tabs button[data-tab=songs]");
@@ -184,6 +205,8 @@ const stale = await browser.newPage({ viewport: { width: 360, height: 700 } });
 await stale.route(/app\.js/, (r) => r.fulfill({ contentType: "text/javascript", body: "/* old cached app.js */" }));
 await stale.goto(url);
 eq("button still visible with a stale app.js", await stale.$eval("#theme-toggle", (b) => [b.textContent, b.offsetWidth > 40]), ["🌓 Auto", true]);
+eq("course and language pickers still usable with a stale app.js",
+  [await stale.$eval("#course-select", (s) => s.options.length), await stale.$eval("#lang-select", (s) => [...s.options].map((o) => o.value))], [3, ["en", "pt-BR"]]);
 await stale.close();
 
 // ── Tutor (Claude) against a mocked API: request shape, append-only history, errors ──
@@ -270,16 +293,151 @@ await stale.close();
 
 eq("no page errors", errors, []);
 
-// ── Responsive: no horizontal scrolling on any tab, phone to desktop ──
-for (const width of [320, 390, 768, 1280]) {
+// Gender: the score updates right after answering
+await page.click("#tabs button[data-tab=gender]");
+await page.click("#gen-card .gender-btns button[data-g=m]");
+eq("gender score updates on answer", (await page.textContent("#gen-score")).includes("/1 ("), true);
+
+// ── Phone: the feedback isn't hidden behind the accent bar while typing ──
+for (const tab of ["conj", "numbers"]) {
+  // 420 px tall ≈ a phone with its on-screen keyboard open
+  const p = await browser.newPage({ viewport: { width: 360, height: 420 } });
+  await p.goto(url);
+  await p.click(`#tabs button[data-tab=${tab}]`);
+  const input = tab === "conj" ? "#conj-in" : "#num-in";
+  await p.fill(input, "1");
+  await p.click(tab === "conj" ? "#conj-go" : "#num-go");
+  const [fbBottom, barTop, typing] = await p.evaluate((sel) => [
+    document.querySelector(sel).getBoundingClientRect().bottom,
+    document.querySelector("#accent-bar").getBoundingClientRect().top,
+    document.body.classList.contains("typing"),
+  ], tab === "conj" ? "#conj-fb" : "#num-fb");
+  eq(`${tab}: feedback sits above the accent bar on a phone`, [typing, fbBottom <= barTop], [true, true]);
+  await p.close();
+}
+
+// ── Interface language: English ↔ Português (BR) ──
+{
+  const p = await browser.newPage();
+  const pErrors = [];
+  p.on("pageerror", (e) => pErrors.push(e.message));
+  await p.goto(url);
+  const keys = await p.evaluate(() => [Object.keys(window.LLC_I18N.en), Object.keys(window.LLC_I18N["pt-BR"])]);
+  eq("pt-BR has every English key", keys[0].filter((k) => !keys[1].includes(k)), []);
+  eq("pt-BR has no extra keys", keys[1].filter((k) => !keys[0].includes(k)), []);
+  eq("English by default (device in English)", [await p.textContent("#tabs [data-tab=today]"), await p.inputValue("#lang-select")], ["Today", "en"]);
+
+  await p.selectOption("#lang-select", "pt-BR");
+  eq("switching language translates the page without a reload",
+    [await p.textContent("#tabs [data-tab=today]"), await p.evaluate(() => [document.documentElement.lang, document.title]),
+     (await p.textContent("#tab-today")).includes("Unidade atual"), await p.textContent("#theme-toggle")],
+    ["Hoje", ["pt-BR", "Estudo de francês"], true, "🌓 Auto"]);
+  eq("tutor answers in the interface language", await p.evaluate(() => window.__fr.tutorSystem("tutor").includes("speaks Brazilian Portuguese")), true);
+  eq("tutor prompt to Claude stays in English", await p.evaluate(() => window.__fr.tutorSystem("tutor").includes('Current unit: 0, "The sound system"')), true);
+
+  // No tab shows a raw key like "cards.deck" (a missing translation).
+  const allKeys = keys[0];
+  const leaks = [];
+  for (const tab of ["today", "cards", "conj", "gender", "numbers", "songs", "tutor"]) {
+    await p.click(`#tabs button[data-tab=${tab}]`);
+    const text = await p.evaluate(() => document.body.innerText + [...document.querySelectorAll("[placeholder], [aria-label], option")]
+      .map((el) => [el.placeholder, el.getAttribute("aria-label"), el.textContent].join(" ")).join(" "));
+    allKeys.filter((k) => k.includes(".") && text.includes(k)).forEach((k) => leaks.push(`${tab}: ${k}`));
+  }
+  eq("no untranslated keys on any tab", leaks, []);
+  await p.click("#tabs button[data-tab=cards]");
+  await p.keyboard.press("Enter");
+  eq("rating buttons translated", await p.$$eval("#fc-back .rate button", (b) => b.map((x) => x.firstChild.textContent)), ["De novo", "Difícil", "Bom", "Fácil"]);
+  eq("gender hint translated", await p.evaluate(() => window.__fr.genderHint("plage", "f")), "<b>Exceção!</b> Palavras terminadas em -age costumam ser masculinas, mas esta é feminina.");
+
+  await p.reload();
+  eq("language remembered after reload", [await p.textContent("#tabs [data-tab=today]"), await p.inputValue("#lang-select")], ["Hoje", "pt-BR"]);
+  await p.selectOption("#lang-select", "en");
+  eq("back to English", [await p.textContent("#tabs [data-tab=today]"), await p.evaluate(() => window.__fr.tutorSystem("tutor").includes("speaks English"))], ["Today", true]);
+  eq("language: no page errors", pErrors, []);
+  await p.close();
+
+  const ptDevice = await browser.newPage({ locale: "pt-BR" });
+  await ptDevice.goto(url);
+  eq("first visit on a Portuguese device opens in Portuguese", await ptDevice.textContent("#tabs [data-tab=today]"), "Hoje");
+  await ptDevice.close();
+}
+
+// ── Course selector: progress, units and tabs are per course ──
+{
+  const p = await browser.newPage();
+  const pErrors = [];
+  p.on("pageerror", (e) => pErrors.push(e.message));
+  // A made-up second course, appended to the real registry.
+  await p.route(/data\/courses\.js/, async (route) => {
+    const body = readFileSync(path.join(here, "data", "courses.js"), "utf8") + `
+      window.LLC_COURSES.push({ id: "xx", flag: "🏳️", label: { en: "Testish", "pt-BR": "Testês" }, name: { en: "Testish", "pt-BR": "testês" },
+        folder: "testish", storagePrefix: "llc.xx.", voiceLang: "es-ES", voiceSample: "Hola", accents: "á ñ",
+        tabs: ["today", "cards", "songs"], vocab: { 0: [["el gato", "cat", "m", ""]] }, verbs: [], tenses: [],
+        units: [{ en: "Test unit", "pt-BR": "Unidade teste" }], a1Until: 1,
+        tutor: { course: "", mark: "", song: "", reading: "" }, scenarios: { en: ["a test"] } });`;
+    await route.fulfill({ contentType: "text/javascript", body });
+  });
+  await p.goto(url);
+  eq("course picker lists the courses", await p.$$eval("#course-select option", (o) => o.map((x) => [x.value || "", x.disabled])),
+    [["fr", false], ["la", false], ["pl", false], ["xx", false], ["➕ More soon", true]]);
+  eq("French is the default course", await p.inputValue("#course-select"), "fr");
+  await p.evaluate(() => localStorage.setItem("llc.fr.days", JSON.stringify(["2026-01-01"])));
+
+  await Promise.all([p.waitForEvent("load"), p.selectOption("#course-select", "xx")]);
+  eq("switching course reloads into it", [await p.inputValue("#course-select"), await p.title()], ["xx", "Testish Study App"]);
+  eq("only the course's own tabs are shown", await p.$$eval("#tabs button", (b) => b.filter((x) => !x.hidden).map((x) => x.dataset.tab)), ["today", "cards", "songs"]);
+  eq("units come from the course", (await p.textContent("#tab-today")).includes("Unit 0: Test unit"), true);
+  eq("progress starts fresh for a new course", await p.evaluate(() => localStorage.getItem("llc.xx.days")), null);
+  await p.click("#tabs button[data-tab=cards]");
+  eq("the course's deck is used", (await p.textContent("#fc-card .prompt")).trim().startsWith("el gato"), true);
+  eq("accent keys come from the course", await p.$$eval("#accent-bar button", (b) => b.map((x) => x.textContent)), ["á", "ñ"]);
+
+  await Promise.all([p.waitForEvent("load"), p.selectOption("#course-select", "fr")]);
+  eq("French progress untouched", await p.evaluate(() => localStorage.getItem("llc.fr.days")), JSON.stringify(["2026-01-01"]));
+  eq("course: no page errors", pErrors, []);
+  await p.close();
+}
+
+// ── Latin and Polish starter courses ──
+for (const [id, firstCard, voice, tutorLine] of [
+  ["la", "salvē", "it-IT", "You are a Latin tutor"],
+  ["pl", "cześć", "pl-PL", "You are a Polish tutor"],
+]) {
+  const p = await browser.newPage();
+  const pErrors = [];
+  p.on("pageerror", (e) => pErrors.push(e.message));
+  await p.addInitScript((c) => localStorage.setItem("llc.course", c), id);
+  await p.goto(url);
+  eq(`${id}: course selected, starter tabs only`, [await p.inputValue("#course-select"),
+    await p.$$eval("#tabs button", (b) => b.filter((x) => !x.hidden).map((x) => x.dataset.tab))], [id, ["today", "cards", "tutor"]]);
+  eq(`${id}: unit link goes to the course roadmap`, await p.$eval("#tab-today a", (a) => a.getAttribute("href")), `../${id === "la" ? "latin" : "polish"}/README.md`);
+  await p.click("#tabs button[data-tab=cards]");
+  eq(`${id}: first card`, (await p.textContent("#fc-card .prompt")).trim().startsWith(firstCard), true);
+  eq(`${id}: no "include the article" hint (no articles)`, await p.evaluate(() => {
+    const deck = window.LLC_COURSES.find((c) => c.id === localStorage.getItem("llc.course")).vocab;
+    return Object.values(deck).flat().filter((e) => e[2] !== null).length;
+  }), 0);
+  eq(`${id}: speaks with the course voice`, await p.$eval("#fc-card .speak", (b) => b.dataset.lang), voice);
+  const sys = await p.evaluate(() => [window.__fr.tutorSystem("conversation"), window.__fr.claudeAiPrompt("conversation")]);
+  eq(`${id}: tutor is about the course language, not French`, [sys[0].includes(tutorLine), /French|Belgi|Angèle/.test(sys.join(" "))], [true, false]);
+  await p.click("#tabs button[data-tab=tutor]");
+  eq(`${id}: tutor tab renders`, !!(await p.$("#tm-setup")), true);
+  eq(`${id}: no page errors`, pErrors, []);
+  await p.close();
+}
+
+// ── Responsive: no horizontal scrolling on any tab, phone to desktop, in both languages ──
+for (const [width, lang] of [[320, "en"], [390, "en"], [768, "en"], [1280, "en"], [320, "pt-BR"], [390, "pt-BR"], [1280, "pt-BR"]]) {
   const p = await browser.newPage({ viewport: { width, height: 800 } });
+  await p.addInitScript((l) => localStorage.setItem("llc.lang", l), lang);
   await p.goto(url);
   const overflowing = [];
   for (const tab of ["today", "cards", "conj", "gender", "numbers", "songs", "tutor"]) {
     await p.click(`#tabs button[data-tab=${tab}]`);
     if ((await p.evaluate(() => document.documentElement.scrollWidth)) > width) overflowing.push(tab);
   }
-  eq(`no horizontal scroll at ${width}px`, overflowing, []);
+  eq(`no horizontal scroll at ${width}px (${lang})`, overflowing, []);
   await p.close();
 }
 await browser.close();
