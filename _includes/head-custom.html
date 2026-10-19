@@ -39,6 +39,15 @@
   .text-gray { color: var(--llc-muted, #586069) !important; }
   .border-top { border-color: var(--llc-border, #e1e4e8) !important; }
 
+  /* Unit checklists: Markdown renders them as disabled checkboxes; the script below makes them tappable */
+  .markdown-body .task-list-item { list-style: none; margin-left: -1.2em; cursor: pointer; padding: 6px 0; -webkit-tap-highlight-color: transparent; }
+  .markdown-body .task-list-item-checkbox { width: 1.25em; height: 1.25em; vertical-align: -0.2em; margin: 0 0.55em 0 0; cursor: pointer;
+    accent-color: var(--llc-link, #0366d6); }
+  .markdown-body .task-list-item.llc-done { color: var(--llc-muted, #6a737d); }
+  .llc-check-progress { font-size: 14px; color: var(--llc-muted, #586069); margin: 4px 0 8px; }
+  .llc-check-progress button { font: inherit; font-size: 13px; margin-left: 8px; padding: 2px 10px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--llc-border, #e1e4e8); background: var(--llc-bg, #fff); color: var(--llc-text, #24292e); }
+
   .llc-theme-bar { text-align: right; margin-bottom: 8px; }
   .llc-theme-toggle {
     font: inherit; font-size: 14px; cursor: pointer;
@@ -74,5 +83,64 @@
     bar.appendChild(btn);
     var body = document.querySelector(".markdown-body") || document.body;
     body.insertBefore(bar, body.firstChild);
+  });
+</script>
+<script>
+  // Make unit checklists tappable and remember them on this device (per page, per item text).
+  document.addEventListener("DOMContentLoaded", function () {
+    var KEY = "llc.checklists";
+    var page = location.pathname;
+    var all = {};
+    try { all = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) {}
+    var state = all[page] || {};
+    var save = function () {
+      all[page] = state;
+      try { localStorage.setItem(KEY, JSON.stringify(all)); } catch (e) {}
+    };
+    var lists = [];
+    document.querySelectorAll(".markdown-body .task-list-item-checkbox").forEach(function (cb) {
+      var li = cb.closest("li");
+      var list = li.parentElement;
+      if (lists.indexOf(list) === -1) lists.push(list);
+      var id = li.textContent.trim().slice(0, 80);
+      cb.disabled = false;
+      cb.removeAttribute("disabled");
+      cb.checked = !!state[id];
+      li.classList.toggle("llc-done", cb.checked);
+      cb.addEventListener("change", function () {
+        if (cb.checked) state[id] = true; else delete state[id];
+        li.classList.toggle("llc-done", cb.checked);
+        save();
+        lists.forEach(updateProgress);
+      });
+      // The whole line is a tap target (much easier on a phone), except links inside it.
+      li.addEventListener("click", function (e) {
+        if (e.target === cb || e.target.closest("a")) return;
+        cb.click();
+      });
+    });
+    function updateProgress(list) {
+      var boxes = list.querySelectorAll(":scope > li > .task-list-item-checkbox");
+      var done = Array.prototype.filter.call(boxes, function (b) { return b.checked; }).length;
+      var bar = list.previousElementSibling;
+      if (!bar || !bar.classList.contains("llc-check-progress")) {
+        bar = document.createElement("p");
+        bar.className = "llc-check-progress";
+        list.parentNode.insertBefore(bar, list);
+      }
+      bar.textContent = (done === boxes.length ? "🎉 All done! " : "") + done + " / " + boxes.length + " done · saved on this device";
+      if (done > 0) {
+        var reset = document.createElement("button");
+        reset.type = "button";
+        reset.textContent = "Reset";
+        reset.addEventListener("click", function () {
+          list.querySelectorAll(":scope > li > .task-list-item-checkbox").forEach(function (b) {
+            if (b.checked) b.click();
+          });
+        });
+        bar.appendChild(reset);
+      }
+    }
+    lists.forEach(updateProgress);
   });
 </script>
