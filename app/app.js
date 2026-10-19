@@ -33,6 +33,10 @@ function t(key, vars = {}) {
 // Progress is kept per course.
 const PREFIX = COURSE.storagePrefix;
 const memoryStore = {};
+// The course site's unit-page checklists: one key outside PREFIX, shared by every course
+// ({ page path: { item text: true } }, see _includes/head-custom.html). Backups carry it as SITE_BACKUP_KEY.
+const SITE_CHECKLISTS = "llc.checklists";
+const SITE_BACKUP_KEY = "site.checklists";
 const store = {
   get(key, fallback) {
     try {
@@ -54,9 +58,21 @@ const store = {
         if (k.startsWith(PREFIX)) out[k.slice(PREFIX.length)] = JSON.parse(localStorage.getItem(k));
       }
     } catch (e) { Object.assign(out, memoryStore); }
+    try {
+      const site = JSON.parse(localStorage.getItem(SITE_CHECKLISTS));
+      if (site) out[SITE_BACKUP_KEY] = site;
+    } catch (e) { /* unreadable: back up the rest */ }
     return out;
   },
 };
+// Restoring site checklists adds the backup's ticks to this device's: an older backup never unticks anything.
+function mergeSiteChecklists(pages) {
+  try {
+    const all = JSON.parse(localStorage.getItem(SITE_CHECKLISTS)) || {};
+    Object.keys(pages || {}).forEach((page) => { all[page] = Object.assign({}, all[page], pages[page]); });
+    localStorage.setItem(SITE_CHECKLISTS, JSON.stringify(all));
+  } catch (e) { /* storage blocked: nothing to restore into */ }
+}
 
 const DEFAULT_SETTINGS = { unit: 0, newPerDay: 10, fr2en: true, en2fr: true, autoSpeak: true, rate: 0.9 };
 const settings = Object.assign({}, DEFAULT_SETTINGS, store.get("settings", {}));
@@ -969,7 +985,7 @@ function renderToday() {
     f.text().then((txt) => {
       const data = JSON.parse(txt);
       if (!confirm(t("today.confirmImport"))) return;
-      Object.keys(data).forEach((k) => store.set(k, data[k]));
+      Object.keys(data).forEach((k) => (k === SITE_BACKUP_KEY ? mergeSiteChecklists(data[k]) : store.set(k, data[k])));
       location.reload();
     }).catch((err) => alert(t("today.importFailed", { msg: err.message })));
   };
@@ -1446,7 +1462,9 @@ const THEME_ORDER = ["auto", "light", "dark"];
 let theme = readGlobal(THEME_KEY) || "auto";
 function renderThemeButton() {
   const btn = $("#theme-toggle");
-  btn.textContent = t("theme." + theme);
+  // "🌓 Auto" → icon + label, so small phones can hide the label
+  const [icon, ...words] = t("theme." + theme).split(" ");
+  btn.innerHTML = `<span aria-hidden="true">${icon}</span> <span class="theme-label">${escapeHtml(words.join(" "))}</span>`;
   btn.setAttribute("aria-label", t("theme.aria", { theme: t("theme." + theme) }));
 }
 function setupThemeToggle() {

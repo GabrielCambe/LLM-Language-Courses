@@ -14,6 +14,7 @@
   --warn: #b7791f;
   --warn-soft: #fdf3e1;
   --radius: 12px;
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%236b6b70' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   color-scheme: light;
 }
 /* Dark palette: follows the device ("Auto") unless the theme toggle forced Light or Dark */
@@ -34,6 +35,7 @@
     --bad-soft: #3c2220;
     --warn: #f0b85a;
     --warn-soft: #3a2f1c;
+    --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%239a9aa5' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   }
 }
 :root[data-theme="dark"] {
@@ -52,6 +54,7 @@
   --bad-soft: #3c2220;
   --warn: #f0b85a;
   --warn-soft: #3a2f1c;
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5 6 8l3.5-3.5' fill='none' stroke='%239a9aa5' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
 }
 
 * { box-sizing: border-box; }
@@ -75,21 +78,37 @@ h3 { font-size: 1rem; margin: 16px 0 8px; }
   display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
 }
 /* Row 1: course picker (left), language + theme (right). Row 2: tabs. */
-#tabs { display: flex; gap: 4px; overflow-x: auto; max-width: 100%; order: 4; flex-basis: 100%; }
 .top-controls { margin-left: auto; display: flex; gap: 6px; align-items: center; }
-.theme-toggle { padding: 4px 12px; border-radius: 999px; font-size: 0.9rem; white-space: nowrap; }
-.lang-select { padding: 4px 8px; border-radius: 999px; font-size: 0.9rem; background: var(--panel); cursor: pointer; }
-/* The course picker doubles as the page title */
-.course-select {
-  font: inherit; font-weight: 700; color: var(--text); background: transparent;
-  border-color: transparent; padding: 2px 6px; margin-left: -6px; cursor: pointer;
+/* Course picker, language picker and theme button share one pill style */
+.course-select, .lang-select, .theme-toggle {
+  height: 36px; padding: 0 14px; border: 1px solid var(--line); border-radius: 999px;
+  background-color: var(--bg); color: var(--text); font: inherit; font-size: 0.9rem; cursor: pointer;
+  white-space: nowrap; transition: border-color 0.15s, background-color 0.15s;
 }
-.course-select:hover, .course-select:focus { border-color: var(--line); }
+.course-select:hover, .lang-select:hover, .theme-toggle:hover { border-color: var(--accent); }
+.course-select:focus-visible, .lang-select:focus-visible, .theme-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Selects: our own chevron instead of the browser's, and sized to the chosen option where supported
+   (otherwise a select is as wide as its longest option, "➕ More soon") */
+.course-select, .lang-select {
+  appearance: none; -webkit-appearance: none; field-sizing: content;
+  padding-right: 32px; background-image: var(--chevron); background-repeat: no-repeat; background-position: right 12px center;
+}
+/* The course picker doubles as the page title */
+.course-select { font-size: 1.05rem; font-weight: 700; padding-left: 12px; }
+/* Tabs: a segmented control. Hidden tabs keep the [hidden] attribute, so never set display on the buttons. */
+#tabs {
+  display: flex; gap: 2px; overflow-x: auto; max-width: 100%; order: 4; flex-basis: 100%;
+  padding: 3px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px;
+}
+/* Tablets and laptops: tabs fill their own row. Wide screens: one row, course | tabs | language + theme. */
+@media (min-width: 601px) { #tabs button { flex: 1 0 auto; } }
+@media (min-width: 1200px) { #tabs { order: 2; flex-basis: auto; } .top-controls { order: 3; } }
 #tabs button {
   border: 0; background: transparent; color: var(--muted);
-  padding: 6px 10px; border-radius: 8px; cursor: pointer; white-space: nowrap; font: inherit;
+  padding: 6px 12px; border-radius: 9px; cursor: pointer; white-space: nowrap; font: inherit;
 }
-#tabs button.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+#tabs button:hover { color: var(--text); }
+#tabs button.active { background: var(--panel); color: var(--accent); font-weight: 600; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
 
 main { max-width: 860px; margin: 0 auto; padding: 16px; }
 .tab { display: none; }
@@ -210,12 +229,16 @@ details > summary { cursor: pointer; }
 @media (max-width: 600px) {
   body { font-size: 15px; padding-bottom: 24px; }
   .topbar { position: static; padding: 10px 12px; }
-  #tabs { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; overflow: visible; order: 4; }
-  .topbar h1 { flex: 1; }
-  #tabs button { padding: 8px 4px; text-align: center; }
+  /* Up to 4 tabs per row; each row stretches to the full width (3 tabs = one even row) */
+  #tabs { flex-wrap: wrap; overflow: visible; }
+  #tabs button { flex: 1 1 22%; padding: 8px 4px; text-align: center; }
   #tabs .short { display: inline; }
   #tabs .long { display: none; }
   main { padding: 12px 12px; }
+  .course-select, .lang-select, .theme-toggle { height: 34px; }
+  .course-select, .lang-select { padding-right: 28px; background-position: right 10px center; }
+  .lang-select, .theme-toggle { padding-left: 10px; }
+  .theme-toggle { padding-right: 10px; }
   .panel { padding: 14px; }
   .card { padding: 20px 8px; min-height: 0; }
   .card .prompt { font-size: 1.6rem; overflow-wrap: anywhere; }
@@ -234,4 +257,9 @@ details > summary { cursor: pointer; }
   body.typing { padding-bottom: 140px; }
   .accent-bar span { display: none; }
   .accent-bar button { min-width: 0; flex: 1 0 28px; padding: 6px 0; }
+}
+
+/* Small phones: the theme button shows only its icon, so the top bar stays on one row */
+@media (max-width: 420px) {
+  .theme-toggle .theme-label { display: none; }
 }
