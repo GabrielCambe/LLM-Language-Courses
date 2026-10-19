@@ -142,6 +142,25 @@ await page.click("#tabs button[data-tab=conj]");
 await page.fill("#conj-in", "zzz");
 await page.keyboard.press("Enter");
 eq("conj feedback shown", (await page.$eval("#conj-fb", (el) => el.textContent)).includes("Not quite"), true);
+eq("conj button turns into Next", await page.textContent("#conj-go"), "Next (Enter)");
+await page.click("#conj-go");
+eq("Next button gives a new question", [await page.textContent("#conj-fb"), await page.textContent("#conj-go"), await page.inputValue("#conj-in")], ["", "Check (Enter)", ""]);
+await page.fill("#conj-in", "zzz");
+await page.click("#conj-go");
+eq("Check button checks without Enter", (await page.textContent("#conj-fb")).includes("Not quite"), true);
+
+// Numbers: the same Check → Next button
+await page.click("#tabs button[data-tab=numbers]");
+await page.click("#num-go");
+eq("numbers: Check with an empty answer does nothing", [await page.textContent("#num-fb"), await page.textContent("#num-go")], ["", "Check (Enter)"]);
+await page.fill("#num-in", "123456");
+await page.click("#num-go");
+eq("numbers: Check button shows the answer", [(await page.textContent("#num-fb")).includes("="), await page.textContent("#num-go")], [true, "Next (Enter)"]);
+await page.click("#num-go");
+eq("numbers: Next button gives a new number", [await page.textContent("#num-fb"), await page.inputValue("#num-in")], ["", ""]);
+await page.fill("#num-in", "1");
+await page.keyboard.press("Enter");
+eq("numbers: Enter still works", await page.textContent("#num-go"), "Next (Enter)");
 
 // Song workshop: add a song, cloze renders, HTML is escaped
 await page.click("#tabs button[data-tab=songs]");

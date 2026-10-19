@@ -400,6 +400,16 @@ document.addEventListener("keydown", (e) => {
   else if (!fc.revealed && (e.key === " " || e.key === "Enter") && fc.current) { e.preventDefault(); reveal(); }
 });
 
+// ───────────────────────── drill button ─────────────────────────
+// Typed drills advance with Enter or this button: "Check" until answered, then "Next".
+const drillButton = (id) => `<button class="primary" id="${id}" type="button">${t("common.check")}</button>`;
+function bindDrillButton(id, advance) {
+  const b = $("#" + id);
+  // Keep focus in the answer box, so a phone keyboard stays open between questions.
+  b.addEventListener("mousedown", (e) => e.preventDefault());
+  b.onclick = advance;
+}
+
 // ───────────────────────── conjugation ─────────────────────────
 const PERSONS = ["je", "tu", "il/elle/on", "nous", "vous", "ils/elles"];
 const AVOIR = ["ai", "as", "a", "avons", "avez", "ont"];
@@ -500,14 +510,17 @@ function newConjQ() {
       <span class="muted">· ${t("common.score", { right: conj.right, total: conj.total })}${conj.total ? ` (${acc}%)` : ""}</span></div>
     <div class="prompt">${subjectFor(p, res.display)} ___ <small class="muted">(${v.inf})</small></div>
     <input type="text" id="conj-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t("conj.placeholder")}">
+    ${drillButton("conj-go")}
     <div id="conj-fb"></div>`;
+  const advance = () => { if (conj.checked) newConjQ(); else checkConj(); };
   const input = $("#conj-in");
   input.focus();
   input.addEventListener("keydown", (e) => {
     if (e.key !== "Enter") return;
     e.preventDefault();
-    if (conj.checked) newConjQ(); else checkConj();
+    advance();
   });
+  bindDrillButton("conj-go", advance);
 }
 
 function checkConj() {
@@ -515,6 +528,7 @@ function checkConj() {
   const typed = stripPronoun($("#conj-in").value);
   if (!typed) return;
   conj.checked = true;
+  $("#conj-go").textContent = t("common.next");
   const r = compare(typed, res.answers);
   conj.total++;
   if (r === "ok") conj.right++;
@@ -523,8 +537,7 @@ function checkConj() {
     <div class="feedback ${r === "ok" ? "ok" : r === "accent" ? "warn" : "no"}">
       ${r === "ok" ? t("conj.correct") : r === "accent" ? t("conj.accent") : t("conj.wrong")}: <b>${escapeHtml(full)}</b> ${speakBtn(full.replace(/\(e\)|\(s\)/g, ""))}
     </div>
-    ${conj.q.tense === "passeCompose" && v.aux === "être" ? `<p class="muted">${t("conj.etre", { verb: v.inf })}</p>` : ""}
-    <p class="muted">${t("common.enterNext")}</p>`;
+    ${conj.q.tense === "passeCompose" && v.aux === "être" ? `<p class="muted">${t("conj.etre", { verb: v.inf })}</p>` : ""}`;
   if (r === "ok") markStudied();
 }
 
@@ -680,17 +693,17 @@ function nextNumber() {
     <div class="muted">${t("common.score", { right: num.right, total: num.total })}</div>
     ${prompt}
     <input type="text" id="num-in" autocomplete="off" spellcheck="false" placeholder="${num.mode === "write" ? "en français…" : t("num.digits")}">
+    ${drillButton("num-go")}
     <div id="num-fb"></div>`;
   if (num.mode === "listen") tts.speak(words, voiceLang);
   const input = $("#num-in");
   input.focus();
-  input.addEventListener("keydown", (e) => {
-    if (e.key !== "Enter") return;
-    e.preventDefault();
+  const advance = () => {
     if (num.checked) { nextNumber(); return; }
     if (!input.value.trim()) return;
     num.checked = true;
     num.total++;
+    $("#num-go").textContent = t("common.next");
     let r;
     if (num.mode === "write") {
       // Hyphens and spaces are interchangeable (1990 spelling reform allows hyphens everywhere).
@@ -701,9 +714,14 @@ function nextNumber() {
     }
     if (r === "ok") { num.right++; markStudied(); }
     $("#num-fb").innerHTML = `
-      <div class="feedback ${r === "ok" ? "ok" : r === "accent" ? "warn" : "no"}">${r === "ok" ? "✅" : r === "accent" ? t("num.accents") : "❌"} <b>${num.n}</b> = ${escapeHtml(words)} ${speakBtn(words, voiceLang)}</div>
-      <p class="muted">${t("common.enterNext")}</p>`;
+      <div class="feedback ${r === "ok" ? "ok" : r === "accent" ? "warn" : "no"}">${r === "ok" ? "✅" : r === "accent" ? t("num.accents") : "❌"} <b>${num.n}</b> = ${escapeHtml(words)} ${speakBtn(words, voiceLang)}</div>`;
+  };
+  input.addEventListener("keydown", (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    advance();
   });
+  bindDrillButton("num-go", advance);
 }
 
 // ───────────────────────── song workshop ─────────────────────────
