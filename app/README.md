@@ -41,6 +41,8 @@ The course website has the same button, and one choice applies to both.
 ## Developing
 - Vocabulary: `data/vocab.js` (by unit). Verbs: `data/verbs.js`.
 - Don't rename existing French entries: the French text is the card ID.
+- **When you change any app file, bump the `?v=` date in `index.html`** (all links share one value).
+  Phones cache each file separately, so without it they can mix new and old files. The tests enforce one shared value.
 - Tests: `node app/test.mjs` (needs Playwright: `npm i -D playwright`, or a global install with
   `NODE_PATH="$(npm root -g)"`).
 
