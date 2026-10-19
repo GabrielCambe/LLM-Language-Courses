@@ -1,12 +1,37 @@
-/* French Study App: plain JS, no build step, works from file://.
- * Sections: storage · helpers · TTS · units · SRS flashcards · conjugation ·
- * gender · numbers · song workshop · today · boot
+/* Language Study App: plain JS, no build step, works from file://.
+ * Sections: course & language · storage · helpers · TTS · units · SRS flashcards ·
+ * conjugation · gender · numbers · song workshop · today · tutor · theme · pickers · boot
  */
 "use strict";
 
+// ───────────────────────── course & language ─────────────────────────
+// Both choices apply to every course, like the theme: "llc.course" and "llc.lang".
+// Courses live in data/courses.js, interface text in i18n.js.
+const LANGS = ["en", "pt-BR"];
+function readGlobal(key) {
+  try { return localStorage.getItem(key); } catch (e) { return null; }
+}
+function writeGlobal(key, value) {
+  try { localStorage.setItem(key, value); } catch (e) { /* this page only */ }
+}
+const COURSE = window.LLC_COURSES.find((c) => c.id === readGlobal("llc.course")) || window.LLC_COURSES[0];
+// First visit: Portuguese if the device is set to it, otherwise English.
+let lang = LANGS.includes(readGlobal("llc.lang")) ? readGlobal("llc.lang") : /^pt/i.test(navigator.language || "") ? "pt-BR" : "en";
+// Pick the current language's value from a { en, "pt-BR" } object.
+const local = (obj) => obj[lang] || obj.en;
+// Interface text for a key, with {placeholders} filled in from vars.
+function t(key, vars = {}) {
+  const dict = window.LLC_I18N;
+  const s = dict[lang][key] ?? dict.en[key] ?? key;
+  if (typeof s !== "string") return s;
+  const all = Object.assign({ course: local(COURSE.name), Course: local(COURSE.label) }, vars);
+  return s.replace(/\{(\w+)\}/g, (m, k) => (k in all ? all[k] : m));
+}
+
 // ───────────────────────── storage ─────────────────────────
 // localStorage can throw (private mode, blocked storage): fall back to memory.
-const PREFIX = "llc.fr.";
+// Progress is kept per course.
+const PREFIX = COURSE.storagePrefix;
 const memoryStore = {};
 const store = {
   get(key, fallback) {
@@ -78,11 +103,12 @@ function markStudied() {
 }
 
 // ───────────────────────── TTS ─────────────────────────
+const VOICE_PREFIX = COURSE.voiceLang.slice(0, 2).toLowerCase();
 const tts = {
   voices: [],
   init() {
     if (!("speechSynthesis" in window)) return;
-    const load = () => { this.voices = speechSynthesis.getVoices().filter((v) => v.lang.toLowerCase().startsWith("fr")); };
+    const load = () => { this.voices = speechSynthesis.getVoices().filter((v) => v.lang.toLowerCase().startsWith(VOICE_PREFIX)); };
     load();
     speechSynthesis.onvoiceschanged = load;
   },
@@ -90,45 +116,33 @@ const tts = {
   clean(text) {
     return text.replace(/\(.*?\)/g, "").replace(/[…]/g, "").replace(/\s*\/\s*/g, ", ").replace(/\+/g, "").trim();
   },
-  speak(text, lang = "fr-FR") {
+  speak(text, voiceLang = COURSE.voiceLang) {
     if (!("speechSynthesis" in window)) return;
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(this.clean(text));
-    u.lang = lang;
-    const voice = this.voices.find((v) => v.lang.replace("_", "-") === lang) || this.voices.find((v) => v.lang.startsWith("fr"));
+    u.lang = voiceLang;
+    const voice = this.voices.find((v) => v.lang.replace("_", "-") === voiceLang) || this.voices.find((v) => v.lang.toLowerCase().startsWith(VOICE_PREFIX));
     if (voice) u.voice = voice;
     u.rate = settings.rate;
     speechSynthesis.speak(u);
   },
 };
-const speakBtn = (text, lang) => `<button class="small speak" data-say="${escapeHtml(text)}" data-lang="${lang || "fr-FR"}" title="Listen">🔊</button>`;
+const speakBtn = (text, voiceLang) => `<button class="small speak" data-say="${escapeHtml(text)}" data-lang="${voiceLang || COURSE.voiceLang}" title="🔊">🔊</button>`;
 document.addEventListener("click", (e) => {
   const b = e.target.closest("button.speak");
   if (b) tts.speak(b.dataset.say, b.dataset.lang);
 });
 
 // ───────────────────────── units ─────────────────────────
-const UNITS = [
-  [0, "The sound system", "units/unit-00-sounds.md"],
-  [1, "Bonjour! Who are you? (être)", "units/unit-01-etre.md"],
-  [2, "Things and people (gender & articles)", "units/unit-02-gender-articles.md"],
-  [3, "Having and describing (avoir + adjectives)", "units/unit-03-avoir-adjectives.md"],
-  [4, "Doing things (-ER verbs)", "units/unit-04-er-verbs.md"],
-  [5, "Saying no, asking why"], [6, "Mine, yours, theirs"], [7, "Going places"],
-  [8, "Numbers, time and dates"], [9, "Want, can, must"], [10, "Food and quantities"],
-  [11, "Tell me what to do"], [12, "Near future and near past"], [13, "A1 review + milestone"],
-  [14, "Passé composé (avoir)"], [15, "Passé composé (être)"], [16, "Daily routine"],
-  [17, "Object pronouns"], [18, "Imparfait"], [19, "Telling a story"], [20, "y and en"],
-  [21, "Comparisons"], [22, "Futur simple"], [23, "Relative pronouns"], [24, "Conditionnel"],
-  [25, "Subjonctif (intro)"], [26, "A2 milestone"],
-];
+// Index = unit number; each unit is { en, "pt-BR", page? } (see data/courses.js).
+const UNITS = COURSE.units;
 // Links to the course's Markdown pages. GitHub Pages renders .md as .html
 // (and README.md as the folder index), so adjust links when hosted there.
 function docLink(path) {
   if (!location.hostname.endsWith("github.io")) return path;
   return path.replace(/README\.md$/, "").replace(/\.md$/, ".html");
 }
-const unitLink = (u) => docLink("../french/" + (UNITS[u][2] || "README.md"));
+const unitLink = (u) => docLink(`../${COURSE.folder}/` + (UNITS[u].page || "README.md"));
 
 // ───────────────────────── SRS flashcards ─────────────────────────
 // SM-2-style scheduler (same family as Anki's classic algorithm).
@@ -158,17 +172,17 @@ function schedule(prev, rating, now = Date.now()) {
   return s;
 }
 function formatDelay(ms) {
-  if (ms < 60 * MIN) return Math.max(1, Math.round(ms / MIN)) + " min";
+  if (ms < 60 * MIN) return Math.max(1, Math.round(ms / MIN)) + " " + t("delay.min");
   const days = Math.round((ms + 4 * 60 * MIN) / DAY);
-  if (days < 30) return days + " d";
-  if (days < 365) return Math.round(days / 30) + " mo";
-  return (days / 365).toFixed(1) + " y";
+  if (days < 30) return days + " " + t("delay.d");
+  if (days < 365) return Math.round(days / 30) + " " + t("delay.mo");
+  return (days / 365).toLocaleString(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " " + t("delay.y");
 }
 
 function allEntries() {
   const list = [];
-  Object.keys(window.FR_VOCAB).forEach((u) => {
-    window.FR_VOCAB[u].forEach(([fr, en, gender, note]) => list.push({ fr, en, gender, note, unit: Number(u) }));
+  Object.keys(COURSE.vocab).forEach((u) => {
+    COURSE.vocab[u].forEach(([fr, en, gender, note]) => list.push({ fr, en, gender, note, unit: Number(u) }));
   });
   store.get("custom", []).forEach(([fr, en, gender, note]) => list.push({ fr, en, gender: gender || null, note: note || "", unit: "custom" }));
   return list;
@@ -226,29 +240,31 @@ const fc = { queue: [], current: null, revealed: false, done: 0 };
 function renderCards() {
   const root = $("#tab-cards");
   const c = cardCounts();
+  const code = COURSE.id.toUpperCase();
   root.innerHTML = `
     <div class="panel">
       <div class="row" style="justify-content:space-between">
-        <div><b>Unit ${settings.unit}</b> deck · <span class="muted">${c.seen}/${c.total} cards seen</span></div>
+        <div>${t("cards.deck", { n: settings.unit })} · <span class="muted">${t("cards.seen", { seen: c.seen, total: c.total })}</span></div>
         <div class="row">
-          <span class="tag">${c.due} due</span><span class="tag">${c.newLeft} new</span>
-          <button class="small" id="fc-start">${fc.queue.length ? "Restart" : "Start session"}</button>
+          <span class="tag">${t("cards.due", { n: c.due })}</span><span class="tag">${t("cards.new", { n: c.newLeft })}</span>
+          <button class="small" id="fc-start">${fc.queue.length ? t("cards.restart") : t("cards.startSession")}</button>
         </div>
       </div>
     </div>
     <div class="panel card" id="fc-card"></div>
     <details class="panel">
-      <summary><b>Deck settings & import</b></summary>
+      <summary><b>${t("cards.settings")}</b></summary>
       <div class="row" style="margin-top:12px">
-        <label><input type="checkbox" id="fc-fr2en" ${settings.fr2en ? "checked" : ""}> FR → EN (recognise)</label>
-        <label><input type="checkbox" id="fc-en2fr" ${settings.en2fr ? "checked" : ""}> EN → FR (produce)</label>
-        <label><input type="checkbox" id="fc-auto" ${settings.autoSpeak ? "checked" : ""}> Auto-speak French</label>
-        <label>New cards/day <input type="number" id="fc-new" min="0" max="50" value="${settings.newPerDay}" style="width:70px"></label>
+        <label><input type="checkbox" id="fc-fr2en" ${settings.fr2en ? "checked" : ""}> ${code} → EN (${t("cards.recognise")})</label>
+        <label><input type="checkbox" id="fc-en2fr" ${settings.en2fr ? "checked" : ""}> EN → ${code} (${t("cards.produce")})</label>
+        <label><input type="checkbox" id="fc-auto" ${settings.autoSpeak ? "checked" : ""}> ${t("cards.autoSpeak")}</label>
+        <label>${t("cards.newPerDay")} <input type="number" id="fc-new" min="0" max="50" value="${settings.newPerDay}" style="width:70px"></label>
       </div>
-      <h3>Import cards (JSON from the Flashcard Maker prompt)</h3>
-      <p class="muted">Format: <code>[{"fr":"la chanson","en":"song","gender":"f","note":"..."}]</code>. Imported cards are always active.</p>
+      ${t("cards.meaningsNote") ? `<p class="muted">${t("cards.meaningsNote")}</p>` : ""}
+      <h3>${t("cards.importTitle")}</h3>
+      <p class="muted">${t("cards.importFormat", { format: '<code>[{"fr":"la chanson","en":"song","gender":"f","note":"..."}]</code>' })}</p>
       <textarea id="fc-import" placeholder='[{"fr": "avoir la flemme", "en": "to not be bothered", "gender": null, "note": "colloquial"}]'></textarea>
-      <div class="row"><button id="fc-import-btn">Import</button><span id="fc-import-msg" class="muted"></span></div>
+      <div class="row"><button id="fc-import-btn">${t("cards.import")}</button><span id="fc-import-msg" class="muted"></span></div>
     </details>`;
 
   $("#fc-start").onclick = () => { fc.queue = buildQueue(); fc.done = 0; nextCard(); };
@@ -269,7 +285,7 @@ function importCards() {
   const msg = $("#fc-import-msg");
   try {
     const data = JSON.parse($("#fc-import").value);
-    if (!Array.isArray(data)) throw new Error("Expected a JSON array");
+    if (!Array.isArray(data)) throw new Error(t("cards.importArray"));
     const custom = store.get("custom", []);
     const known = new Set(allEntries().map((e) => e.fr));
     let added = 0;
@@ -281,11 +297,11 @@ function importCards() {
       }
     });
     store.set("custom", custom);
-    msg.textContent = `Added ${added} card(s).`;
+    msg.textContent = t("cards.imported", { n: added });
     fc.queue = []; fc.current = null;
     setTimeout(renderCards, 800);
   } catch (e) {
-    msg.textContent = "Couldn't parse: " + e.message;
+    msg.textContent = t("cards.importFailed", { msg: e.message });
   }
 }
 
@@ -303,23 +319,24 @@ function drawCard() {
     const counts = cardCounts();
     if (fc.done > 0) { markStudied(); tickChecklist("flash"); }
     box.innerHTML = fc.done > 0
-      ? `<div class="prompt">🎉 Session done!</div><p>${fc.done} reviews. Minimum viable day ✅</p>
-         <p class="muted">Next: the unit's rule drill, or the song for this unit.</p>`
+      ? `<div class="prompt">${t("cards.sessionDone")}</div><p>${t("cards.reviews", { n: fc.done })}</p>
+         <p class="muted">${t("cards.nextStep")}</p>`
       : counts.total === 0
-        ? `<p>No cards active. Turn on a direction in Deck settings.</p>`
-        : `<div class="prompt">Nothing due 🌿</div><p class="muted">Come back later, or raise "new cards/day", or move to the next unit on the Today tab.</p>`;
+        ? `<p>${t("cards.noneActive")}</p>`
+        : `<div class="prompt">${t("cards.nothingDue")}</div><p class="muted">${t("cards.comeBack")}</p>`;
     return;
   }
   const isFr = c.dir === "fr2en";
   const promptText = isFr ? c.fr : c.en;
-  const hint = !isFr && c.gender ? `<span class="tag">noun: include the article</span>` : "";
-  const unitTag = `<span class="tag">${c.unit === "custom" ? "custom" : "unit " + c.unit}</span>`;
+  const hint = !isFr && c.gender ? `<span class="tag">${t("cards.includeArticle")}</span>` : "";
+  const unitTag = `<span class="tag">${c.unit === "custom" ? t("common.custom") : t("common.unitLower", { n: c.unit })}</span>`;
+  const code = COURSE.id.toUpperCase();
   box.innerHTML = `
-    <div class="row">${unitTag} <span class="muted">${isFr ? "FR → EN" : "EN → FR"}</span> <span class="muted">· ${fc.queue.length} left</span></div>
+    <div class="row">${unitTag} <span class="muted">${isFr ? `${code} → EN` : `EN → ${code}`}</span> <span class="muted">${t("cards.left", { n: fc.queue.length })}</span></div>
     <div class="prompt">${escapeHtml(promptText)} ${isFr ? speakBtn(c.fr) : ""}</div>
     ${hint}
-    <input type="text" id="fc-typed" placeholder="Type your answer (optional), then Enter" autocomplete="off" autocapitalize="off" spellcheck="false">
-    <button class="primary" id="fc-reveal">Show answer (Enter)</button>
+    <input type="text" id="fc-typed" placeholder="${t("cards.typePlaceholder")}" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <button class="primary" id="fc-reveal">${t("cards.show")}</button>
     <div id="fc-back"></div>`;
   const typed = $("#fc-typed");
   if (isFr && settings.autoSpeak) tts.speak(c.fr);
@@ -339,20 +356,20 @@ function reveal() {
   if (typedVal.trim()) {
     const expected = isFr ? c.en.split(/[,/]/).map((s) => s.trim()) : [c.fr, c.fr.replace(/\(.*?\)/g, "")].concat(c.fr.split("/").map((s) => s.trim()));
     const r = compare(typedVal, expected);
-    fb = r === "ok" ? `<div class="feedback ok">✅ Matches</div>`
-      : r === "accent" ? `<div class="feedback warn">Almost: check the accents</div>`
-      : `<div class="feedback no">You typed: ${escapeHtml(typedVal)}. Compare carefully (meaning may still be right)</div>`;
+    fb = r === "ok" ? `<div class="feedback ok">${t("cards.matches")}</div>`
+      : r === "accent" ? `<div class="feedback warn">${t("cards.checkAccents")}</div>`
+      : `<div class="feedback no">${t("cards.youTyped", { typed: escapeHtml(typedVal) })}</div>`;
   }
   const prev = store.get("srs", {})[c.id];
   const now = Date.now();
-  const labels = ["Again", "Hard", "Good", "Easy"];
+  const labels = [t("cards.again"), t("cards.hard"), t("cards.good"), t("cards.easy")];
   const cls = ["again", "", "good", ""];
   $("#fc-reveal").remove();
   $("#fc-back").innerHTML = `
     <div class="answer">${escapeHtml(isFr ? c.en : c.fr)} ${!isFr ? speakBtn(c.fr) : ""}</div>
     ${c.note ? `<div class="note">${escapeHtml(c.note)}</div>` : ""}
     ${fb}
-    <p class="muted">How well did you know it? (keys 1–4)</p>
+    <p class="muted">${t("cards.howWell")}</p>
     <div class="rate">${labels.map((l, i) => `<button class="${cls[i]}" data-r="${i}">${l}<small>${formatDelay(schedule(prev, i, now).due - now)}</small></button>`).join("")}</div>`;
   $$("#fc-back .rate button").forEach((b) => (b.onclick = () => rate(Number(b.dataset.r))));
   if (!isFr && settings.autoSpeak) tts.speak(c.fr);
@@ -435,23 +452,23 @@ const conj = {
 
 function renderConj() {
   const root = $("#tab-conj");
-  const verbs = window.FR_VERBS;
+  const verbs = COURSE.verbs;
   if (!conj.verbs) conj.verbs = verbs.filter((v) => v.unit <= Math.max(1, settings.unit)).map((v) => v.inf);
-  if (!conj.tenses) conj.tenses = window.FR_TENSES.filter((t) => t.unit <= Math.max(1, settings.unit)).map((t) => t.id);
-  const tenseNames = window.FR_TENSES.filter((t) => conj.tenses.includes(t.id)).map((t) => t.label).join(", ") || "none";
+  if (!conj.tenses) conj.tenses = COURSE.tenses.filter((t) => t.unit <= Math.max(1, settings.unit)).map((t) => t.id);
+  const tenseNames = COURSE.tenses.filter((t) => conj.tenses.includes(t.id)).map((x) => x.label).join(", ") || t("conj.none");
   root.innerHTML = `
     <div class="panel">
-      <h2>Conjugation drill</h2>
-      <p class="muted">Type only the verb form (e.g. <i>suis</i>, <i>ai parlé</i>). Mixing verbs and tenses is harder but works better: that's <b>interleaving</b>.</p>
+      <h2>${t("conj.title")}</h2>
+      <p class="muted">${t("conj.intro")}</p>
     </div>
     <div class="panel card" id="conj-card"></div>
     <details class="panel" id="conj-opts">
-      <summary><b>Choose verbs & tenses</b> <span class="muted">(${conj.verbs.length} verbs · ${escapeHtml(tenseNames)})</span></summary>
-      <h3>Tenses</h3>
-      <div class="picks" id="conj-tenses">${window.FR_TENSES.map((t) => `
-        <label class="${t.unit > settings.unit ? "locked" : ""}"><input type="checkbox" value="${t.id}" ${conj.tenses.includes(t.id) ? "checked" : ""}> ${t.label}${t.unit > settings.unit ? ` <small>(unit ${t.unit})</small>` : ""}</label>`).join("")}
+      <summary><b>${t("conj.choose")}</b> <span class="muted">${t("conj.summary", { n: conj.verbs.length, tenses: escapeHtml(tenseNames) })}</span></summary>
+      <h3>${t("conj.tenses")}</h3>
+      <div class="picks" id="conj-tenses">${COURSE.tenses.map((x) => `
+        <label class="${x.unit > settings.unit ? "locked" : ""}"><input type="checkbox" value="${x.id}" ${conj.tenses.includes(x.id) ? "checked" : ""}> ${x.label}${x.unit > settings.unit ? ` <small>(${t("common.unitLower", { n: x.unit })})</small>` : ""}</label>`).join("")}
       </div>
-      <h3>Verbs <button class="small" id="conj-unit">Select verbs up to my unit</button> <button class="small" id="conj-all">All</button></h3>
+      <h3>${t("conj.verbs")} <button class="small" id="conj-unit">${t("conj.upToUnit")}</button> <button class="small" id="conj-all">${t("conj.all")}</button></h3>
       <div class="picks" id="conj-verbs">${verbs.map((v) => `
         <label class="${v.unit > settings.unit ? "locked" : ""}"><input type="checkbox" value="${v.inf}" ${conj.verbs.includes(v.inf) ? "checked" : ""}> ${v.inf}</label>`).join("")}
       </div>
@@ -465,9 +482,9 @@ function renderConj() {
 
 function newConjQ() {
   const box = $("#conj-card");
-  const pool = window.FR_VERBS.filter((v) => conj.verbs.includes(v.inf));
+  const pool = COURSE.verbs.filter((v) => conj.verbs.includes(v.inf));
   if (!pool.length || !conj.tenses.length) {
-    box.innerHTML = `<p>Pick at least one verb and one tense.</p>`;
+    box.innerHTML = `<p>${t("conj.pickOne")}</p>`;
     return;
   }
   const v = pick(pool);
@@ -476,13 +493,13 @@ function newConjQ() {
   const res = conjugate(v, tense, p);
   conj.q = { v, tense, p, res };
   conj.checked = false;
-  const tLabel = window.FR_TENSES.find((t) => t.id === tense).label;
+  const tLabel = COURSE.tenses.find((x) => x.id === tense).label;
   const acc = conj.total ? Math.round((100 * conj.right) / conj.total) : 0;
   box.innerHTML = `
     <div class="row"><span class="tag">${tLabel}</span><span class="muted">${v.inf}: ${v.en}</span>
-      <span class="muted">· score ${conj.right}/${conj.total}${conj.total ? ` (${acc}%)` : ""}</span></div>
+      <span class="muted">· ${t("common.score", { right: conj.right, total: conj.total })}${conj.total ? ` (${acc}%)` : ""}</span></div>
     <div class="prompt">${subjectFor(p, res.display)} ___ <small class="muted">(${v.inf})</small></div>
-    <input type="text" id="conj-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="verb form, then Enter">
+    <input type="text" id="conj-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t("conj.placeholder")}">
     <div id="conj-fb"></div>`;
   const input = $("#conj-in");
   input.focus();
@@ -504,10 +521,10 @@ function checkConj() {
   const full = `${subjectFor(p, res.display)}${subjectFor(p, res.display) === "j'" ? "" : " "}${res.display}`;
   $("#conj-fb").innerHTML = `
     <div class="feedback ${r === "ok" ? "ok" : r === "accent" ? "warn" : "no"}">
-      ${r === "ok" ? "✅ Correct" : r === "accent" ? "Almost: accent missing" : "❌ Not quite"}: <b>${escapeHtml(full)}</b> ${speakBtn(full.replace(/\(e\)|\(s\)/g, ""))}
+      ${r === "ok" ? t("conj.correct") : r === "accent" ? t("conj.accent") : t("conj.wrong")}: <b>${escapeHtml(full)}</b> ${speakBtn(full.replace(/\(e\)|\(s\)/g, ""))}
     </div>
-    ${conj.q.tense === "passeCompose" && v.aux === "être" ? `<p class="muted">${v.inf} uses <b>être</b> → the participle agrees with the subject.</p>` : ""}
-    <p class="muted">Enter for next</p>`;
+    ${conj.q.tense === "passeCompose" && v.aux === "être" ? `<p class="muted">${t("conj.etre", { verb: v.inf })}</p>` : ""}
+    <p class="muted">${t("common.enterNext")}</p>`;
   if (r === "ok") markStudied();
 }
 
@@ -524,12 +541,10 @@ function stripArticle(fr) {
 function genderHint(word, gender) {
   const w = word.split(" ")[0].toLowerCase();
   const rule = GENDER_RULES.find(([end]) => w.endsWith(end));
-  if (!rule) return "No reliable ending rule: memorise it with its article.";
+  if (!rule) return t("gender.noRule");
   const [end, g] = rule;
-  const name = (x) => (x === "m" ? "masculine" : "feminine");
-  return g === gender
-    ? `Rule: words ending in <b>-${end}</b> are usually ${name(g)} ✓`
-    : `<b>Exception!</b> Words ending in -${end} are usually ${name(g)}, but this one is ${name(gender)}.`;
+  const usual = t(`gender.${g}Plural`);
+  return g === gender ? t("gender.rule", { end, usual }) : t("gender.exception", { end, usual, actual: t(`gender.${gender}`) });
 }
 const gen = { pool: [], cur: null, answered: false, right: 0, total: 0, allUnits: false };
 
@@ -538,9 +553,9 @@ function renderGender() {
   gen.pool = allEntries().filter((e) => e.gender && !e.fr.startsWith("les ") && (gen.allUnits || e.unit === "custom" || e.unit <= settings.unit));
   root.innerHTML = `
     <div class="panel">
-      <h2>Masculine or feminine?</h2>
-      <p class="muted">Keys: <b>M</b> / ← for masculine, <b>F</b> / → for feminine. Read the rule hint after each answer, especially when you're wrong.</p>
-      <label><input type="checkbox" id="gen-all" ${gen.allUnits ? "checked" : ""}> Include nouns from all units (${allEntries().filter((e) => e.gender).length})</label>
+      <h2>${t("gender.title")}</h2>
+      <p class="muted">${t("gender.keys")}</p>
+      <label><input type="checkbox" id="gen-all" ${gen.allUnits ? "checked" : ""}> ${t("gender.allUnits", { n: allEntries().filter((e) => e.gender).length })}</label>
     </div>
     <div class="panel" id="gen-card"></div>`;
   $("#gen-all").onchange = (e) => { gen.allUnits = e.target.checked; renderGender(); };
@@ -549,7 +564,7 @@ function renderGender() {
 function nextGender() {
   const box = $("#gen-card");
   if (!gen.pool.length) {
-    box.innerHTML = `<p>No nouns yet at your unit. Nouns start in Unit 0 and 2. Tick "all units" to practise anyway.</p>`;
+    box.innerHTML = `<p>${t("gender.noNouns")}</p>`;
     return;
   }
   gen.cur = pick(gen.pool);
@@ -557,7 +572,7 @@ function nextGender() {
   const word = stripArticle(gen.cur.fr);
   const acc = gen.total ? ` (${Math.round((100 * gen.right) / gen.total)}%)` : "";
   box.innerHTML = `
-    <div class="row muted">score ${gen.right}/${gen.total}${acc}</div>
+    <div class="row muted">${t("common.score", { right: gen.right, total: gen.total })}${acc}</div>
     <div class="gender-word">${escapeHtml(word)} ${speakBtn(word)}</div>
     <div class="gender-btns"><button data-g="m">le / un · masc.</button><button data-g="f">la / une · fém.</button></div>
     <div id="gen-fb" style="margin-top:12px"></div>`;
@@ -576,7 +591,7 @@ function answerGender(g) {
   $("#gen-fb").innerHTML = `
     <div class="feedback ${ok ? "ok" : "no"}">${ok ? "✅" : "❌"} <b>${escapeHtml(c.fr)}</b> (${article}): ${escapeHtml(c.en)} ${speakBtn(c.fr)}</div>
     <p>${genderHint(word, c.gender)}</p>
-    <button class="primary" id="gen-next">Next (Enter)</button>`;
+    <button class="primary" id="gen-next">${t("common.next")}</button>`;
   $("#gen-next").onclick = nextGender;
   tts.speak(c.fr);
 }
@@ -635,18 +650,14 @@ function renderNumbers() {
   const root = $("#tab-numbers");
   root.innerHTML = `
     <div class="panel">
-      <h2>Numbers</h2>
-      <p class="muted">Numbers are the classic listening blind spot. Train until 70–99 feels automatic.</p>
+      <h2>${t("num.title")}</h2>
+      <p class="muted">${t("num.intro")}</p>
       <div class="row">
-        <label>Range <select id="num-range">${Object.keys(NUM_RANGES).map((k) => `<option ${k === num.range ? "selected" : ""}>${k}</option>`).join("")}</select></label>
-        <label>Variant <select id="num-var">
-          <option value="fr" ${num.variant === "fr" ? "selected" : ""}>🇫🇷 France</option>
-          <option value="be" ${num.variant === "be" ? "selected" : ""}>🇧🇪 Belgium</option>
-          <option value="ch" ${num.variant === "ch" ? "selected" : ""}>🇨🇭 Switzerland</option></select></label>
-        <label>Mode <select id="num-mode">
-          <option value="listen" ${num.mode === "listen" ? "selected" : ""}>🔊 Listen → type digits</option>
-          <option value="read" ${num.mode === "read" ? "selected" : ""}>👀 Read words → type digits</option>
-          <option value="write" ${num.mode === "write" ? "selected" : ""}>✍️ See digits → write in French</option></select></label>
+        <label>${t("num.range")} <select id="num-range">${Object.keys(NUM_RANGES).map((k) => `<option value="${k}" ${k === num.range ? "selected" : ""}>${k === "years" ? t("num.years") : k}</option>`).join("")}</select></label>
+        <label>${t("num.variant")} <select id="num-var">${["fr", "be", "ch"].map((v) => `
+          <option value="${v}" ${num.variant === v ? "selected" : ""}>${t("num." + v)}</option>`).join("")}</select></label>
+        <label>${t("num.mode")} <select id="num-mode">${["listen", "read", "write"].map((m) => `
+          <option value="${m}" ${num.mode === m ? "selected" : ""}>${t("num." + m)}</option>`).join("")}</select></label>
       </div>
     </div>
     <div class="panel card" id="num-card"></div>`;
@@ -660,17 +671,17 @@ function nextNumber() {
   num.n = lo + Math.floor(Math.random() * (hi - lo + 1));
   num.checked = false;
   const words = frenchNumber(num.n, num.variant);
-  const lang = VARIANT_LANG[num.variant];
+  const voiceLang = VARIANT_LANG[num.variant];
   const box = $("#num-card");
-  const prompt = num.mode === "listen" ? `<button class="primary speak" data-say="${escapeHtml(words)}" data-lang="${lang}">🔊 Play again</button>`
+  const prompt = num.mode === "listen" ? `<button class="primary speak" data-say="${escapeHtml(words)}" data-lang="${voiceLang}">${t("num.playAgain")}</button>`
     : num.mode === "read" ? `<div class="prompt">${escapeHtml(words)}</div>`
     : `<div class="prompt">${num.n}</div>`;
   box.innerHTML = `
-    <div class="muted">score ${num.right}/${num.total}</div>
+    <div class="muted">${t("common.score", { right: num.right, total: num.total })}</div>
     ${prompt}
-    <input type="text" id="num-in" autocomplete="off" spellcheck="false" placeholder="${num.mode === "write" ? "en français…" : "digits"}">
+    <input type="text" id="num-in" autocomplete="off" spellcheck="false" placeholder="${num.mode === "write" ? "en français…" : t("num.digits")}">
     <div id="num-fb"></div>`;
-  if (num.mode === "listen") tts.speak(words, lang);
+  if (num.mode === "listen") tts.speak(words, voiceLang);
   const input = $("#num-in");
   input.focus();
   input.addEventListener("keydown", (e) => {
@@ -690,8 +701,8 @@ function nextNumber() {
     }
     if (r === "ok") { num.right++; markStudied(); }
     $("#num-fb").innerHTML = `
-      <div class="feedback ${r === "ok" ? "ok" : r === "accent" ? "warn" : "no"}">${r === "ok" ? "✅" : r === "accent" ? "Almost (accents)" : "❌"} <b>${num.n}</b> = ${escapeHtml(words)} ${speakBtn(words, lang)}</div>
-      <p class="muted">Enter for next</p>`;
+      <div class="feedback ${r === "ok" ? "ok" : r === "accent" ? "warn" : "no"}">${r === "ok" ? "✅" : r === "accent" ? t("num.accents") : "❌"} <b>${num.n}</b> = ${escapeHtml(words)} ${speakBtn(words, voiceLang)}</div>
+      <p class="muted">${t("common.enterNext")}</p>`;
   });
 }
 
@@ -710,14 +721,13 @@ function renderSongs() {
   const s = songs.list.find((x) => x.id === songs.sel);
   root.innerHTML = `
     <div class="panel">
-      <h2>Song Workshop</h2>
-      <p class="muted">Paste lyrics from YouTube Music (or Genius) for a song you're studying. <b>They stay in this browser only</b>.
-      Don't commit lyrics to the repo (copyright). Method: <a href="${docLink("../french/media/music.md")}">6-step song study</a>.</p>
+      <h2>${t("songs.title")}</h2>
+      <p class="muted">${t("songs.intro", { link: docLink(`../${COURSE.folder}/media/music.md`) })}</p>
     </div>
     <div class="songs-layout">
       <div class="panel song-list">
         ${songs.list.map((x) => `<button data-id="${x.id}" class="${x.id === songs.sel ? "active" : ""}">${escapeHtml(x.title)}<br><small class="muted">${escapeHtml(x.artist)}</small></button>`).join("")}
-        <button id="song-new" class="${songs.sel === null ? "active" : ""}">＋ New song</button>
+        <button id="song-new" class="${songs.sel === null ? "active" : ""}">${t("songs.new")}</button>
       </div>
       <div class="panel" id="song-main"></div>
     </div>`;
@@ -729,15 +739,15 @@ function renderSongs() {
     <div class="row" style="justify-content:space-between">
       <div><b>${escapeHtml(s.title)}</b> · ${escapeHtml(s.artist)}</div>
       <div class="row">
-        <button class="small ${songs.mode === "read" ? "primary" : ""}" data-mode="read">📖 Read</button>
-        <button class="small ${songs.mode === "cloze" ? "primary" : ""}" data-mode="cloze">✏️ Cloze</button>
+        <button class="small ${songs.mode === "read" ? "primary" : ""}" data-mode="read">${t("songs.read")}</button>
+        <button class="small ${songs.mode === "cloze" ? "primary" : ""}" data-mode="cloze">${t("songs.cloze")}</button>
         <button class="small" id="song-del">🗑️</button>
       </div>
     </div>
     <div id="song-body" style="margin-top:12px"></div>`;
   $$("#song-main [data-mode]").forEach((b) => (b.onclick = () => { songs.mode = b.dataset.mode; songs.blanks = null; renderSongs(); }));
   $("#song-del").onclick = () => {
-    if (!confirm(`Delete "${s.title}" from this browser?`)) return;
+    if (!confirm(t("songs.confirmDelete", { title: s.title }))) return;
     songs.list = songs.list.filter((x) => x.id !== s.id); saveSongs(); songs.sel = null; renderSongs();
   };
   if (songs.mode === "read") renderSongRead(s); else renderSongCloze(s);
@@ -745,15 +755,15 @@ function renderSongs() {
 
 function renderSongForm(main) {
   main.innerHTML = `
-    <h3>Add a song</h3>
-    <div class="row"><input type="text" id="sf-title" placeholder="Title (e.g. Flemme)"><input type="text" id="sf-artist" placeholder="Artist (e.g. Angèle)"></div>
-    <p class="muted">Tip: start with just the chorus + one verse.</p>
-    <textarea id="sf-lyrics" placeholder="Paste lyrics here, one line per line"></textarea>
-    <button class="primary" id="sf-save">Save</button>`;
+    <h3>${t("songs.add")}</h3>
+    <div class="row"><input type="text" id="sf-title" placeholder="${t("songs.titlePh")}"><input type="text" id="sf-artist" placeholder="${t("songs.artistPh")}"></div>
+    <p class="muted">${t("songs.tip")}</p>
+    <textarea id="sf-lyrics" placeholder="${t("songs.lyricsPh")}"></textarea>
+    <button class="primary" id="sf-save">${t("common.save")}</button>`;
   $("#sf-save").onclick = () => {
     const title = $("#sf-title").value.trim();
     const lyrics = $("#sf-lyrics").value.trim();
-    if (!title || !lyrics) { alert("Title and lyrics are needed."); return; }
+    if (!title || !lyrics) { alert(t("songs.needed")); return; }
     const song = { id: String(Date.now()), title, artist: $("#sf-artist").value.trim(), lyrics };
     songs.list.push(song); saveSongs(); songs.sel = song.id; songs.mode = "read"; renderSongs();
   };
@@ -762,13 +772,13 @@ function renderSongForm(main) {
 function renderSongRead(s) {
   const body = $("#song-body");
   body.innerHTML = `
-    <p class="muted">Click a word to make a flashcard (you can extend it to a chunk, e.g. <i>avoir la flemme</i>). 🔊 reads a line with the computer voice. Use it for checking words, not as a model of the singer's pronunciation.</p>
+    <p class="muted">${t("songs.readHelp")}</p>
     <div class="panel" id="song-addcard" style="display:none">
       <div class="row">
-        <input type="text" id="sa-fr" placeholder="French (with article for nouns)">
-        <input type="text" id="sa-en" placeholder="English meaning">
-        <select id="sa-g"><option value="">no gender</option><option value="m">m.</option><option value="f">f.</option></select>
-        <button class="primary small" id="sa-add">Add card</button><span id="sa-msg" class="muted"></span>
+        <input type="text" id="sa-fr" placeholder="${t("songs.wordPh")}">
+        <input type="text" id="sa-en" placeholder="${t("songs.meaningPh")}">
+        <select id="sa-g"><option value="">${t("songs.noGender")}</option><option value="m">m.</option><option value="f">f.</option></select>
+        <button class="primary small" id="sa-add">${t("songs.addCard")}</button><span id="sa-msg" class="muted"></span>
       </div>
     </div>
     <div class="lyrics">${s.lyrics.split("\n").map((line) => `
@@ -785,11 +795,11 @@ function renderSongRead(s) {
     const en = $("#sa-en").value.trim();
     if (!fr || !en) return;
     const custom = store.get("custom", []);
-    if (allEntries().some((e) => e.fr === fr)) { $("#sa-msg").textContent = "Already in your deck."; return; }
-    custom.push([fr, en, $("#sa-g").value || null, `from "${s.title}"`]);
+    if (allEntries().some((e) => e.fr === fr)) { $("#sa-msg").textContent = t("songs.already"); return; }
+    custom.push([fr, en, $("#sa-g").value || null, t("songs.fromSong", { title: s.title })]);
     store.set("custom", custom);
     fc.queue = []; fc.current = null;
-    $("#sa-msg").textContent = `✅ Added "${fr}"`;
+    $("#sa-msg").textContent = t("songs.added", { word: fr });
     $("#sa-en").value = "";
   };
 }
@@ -810,15 +820,15 @@ function renderSongCloze(s) {
   }
   body.innerHTML = `
     <div class="row">
-      <label>Gaps <select id="cz-density">
-        <option value="0.1">Easy (10%)</option><option value="0.2">Medium (20%)</option><option value="0.35">Hard (35%)</option>
-        <option value="func">Grammar words (le, ne, que, est…)</option></select></label>
-      <button class="small" id="cz-new">🔀 New gaps</button>
-      <button class="small primary" id="cz-check">Check</button>
-      <button class="small" id="cz-reveal">Reveal</button>
+      <label>${t("songs.gaps")} <select id="cz-density">
+        <option value="0.1">${t("songs.easy")}</option><option value="0.2">${t("songs.medium")}</option><option value="0.35">${t("songs.hard")}</option>
+        <option value="func">${t("songs.func")}</option></select></label>
+      <button class="small" id="cz-new">${t("songs.newGaps")}</button>
+      <button class="small primary" id="cz-check">${t("songs.check")}</button>
+      <button class="small" id="cz-reveal">${t("songs.reveal")}</button>
       <span id="cz-score" class="muted"></span>
     </div>
-    <p class="muted">Play the song and fill the gaps <i>while listening</i>. Accents count, capitals don't.</p>
+    <p class="muted">${t("songs.clozeHelp")}</p>
     <div class="lyrics">${lines.map((toks, li) => `<div class="line"><span>${toks.map((t, ti) => songs.blanks.has(`${li}:${ti}`)
       ? `<input class="gap" data-a="${escapeHtml(t)}" style="width:${Math.max(3, t.length + 1)}ch" autocomplete="off" spellcheck="false">`
       : escapeHtml(t)).join("")}</span></div>`).join("")}
@@ -835,19 +845,15 @@ function renderSongCloze(s) {
       g.classList.toggle("no", !right && g.value.trim() !== "");
       if (right) ok++;
     });
-    $("#cz-score").textContent = `${ok}/${gaps.length} correct`;
+    $("#cz-score").textContent = t("songs.score", { ok, n: gaps.length });
     if (ok) markStudied();
   };
   $("#cz-reveal").onclick = () => $$("#song-body input.gap").forEach((g) => { if (norm(g.value) !== norm(g.dataset.a)) { g.value = g.dataset.a; g.classList.add("no"); } });
 }
 
 // ───────────────────────── today ─────────────────────────
-const CHECK_ITEMS = [
-  ["flash", "🟢 Flashcards (minimum viable day)"],
-  ["rule", "📐 Rule of the unit + drill"],
-  ["media", "🎧 Media + Hunt task"],
-  ["output", "🗣️ Output: write/speak and get corrected"],
-];
+// Labels: "today.<id>" in i18n.js
+const CHECK_ITEMS = ["flash", "rule", "media", "output"];
 function tickChecklist(id) {
   const all = store.get("checklist", {});
   const k = todayKey();
@@ -866,40 +872,40 @@ function renderToday() {
     <div class="panel">
       <div class="row" style="justify-content:space-between">
         <div>
-          <div class="muted">Current unit</div>
-          <h2 style="margin:0">Unit ${u[0]}: ${escapeHtml(u[1])}</h2>
-          <a href="${unitLink(settings.unit)}" target="_blank">Open the unit →</a>
+          <div class="muted">${t("today.currentUnit")}</div>
+          <h2 style="margin:0">${t("today.unitTitle", { n: settings.unit, title: escapeHtml(local(u)) })}</h2>
+          <a href="${unitLink(settings.unit)}" target="_blank">${t("today.openUnit")}</a>
         </div>
-        <label class="unit-pick">Change unit <select id="t-unit">${UNITS.map(([n, t]) => `<option value="${n}" ${n === settings.unit ? "selected" : ""}>${n}: ${escapeHtml(t)}</option>`).join("")}</select></label>
+        <label class="unit-pick">${t("today.changeUnit")} <select id="t-unit">${UNITS.map((x, n) => `<option value="${n}" ${n === settings.unit ? "selected" : ""}>${n}: ${escapeHtml(local(x))}</option>`).join("")}</select></label>
       </div>
     </div>
     <div class="grid">
-      <div class="panel"><div class="muted">Due now</div><div class="big-stat">${c.due}</div><div class="muted">+ ${c.newLeft} new today</div>
-        <button class="primary" id="t-go" style="margin-top:8px">Start flashcards</button></div>
-      <div class="panel"><div class="muted">Days studied (total, not a streak)</div><div class="big-stat">${days.length}</div>
-        <div class="muted">Missed a day? Nothing is lost. Just come back.</div></div>
-      <div class="panel"><div class="muted">Focus block</div><div class="timer" id="t-timer"></div>
-        <div class="row"><button id="t-start">Start</button><button id="t-reset">Reset</button>
+      <div class="panel"><div class="muted">${t("today.dueNow")}</div><div class="big-stat">${c.due}</div><div class="muted">${t("today.newToday", { n: c.newLeft })}</div>
+        <button class="primary" id="t-go" style="margin-top:8px">${t("today.startCards")}</button></div>
+      <div class="panel"><div class="muted">${t("today.days")}</div><div class="big-stat">${days.length}</div>
+        <div class="muted">${t("today.missed")}</div></div>
+      <div class="panel"><div class="muted">${t("today.focus")}</div><div class="timer" id="t-timer"></div>
+        <div class="row"><button id="t-start">${t("common.start")}</button><button id="t-reset">${t("today.reset")}</button>
         <select id="t-len"><option value="5">5 min</option><option value="25" selected>25 min</option><option value="45">45 min</option></select></div></div>
     </div>
     <div class="panel">
-      <h3 style="margin-top:0">Today's session</h3>
-      ${CHECK_ITEMS.map(([id, label]) => `<label class="check"><input type="checkbox" data-c="${id}" ${check[id] ? "checked" : ""}> ${label}</label>`).join("")}
-      <p class="muted">Only the first one is required. The others are bonuses.</p>
+      <h3 style="margin-top:0">${t("today.session")}</h3>
+      ${CHECK_ITEMS.map((id) => `<label class="check"><input type="checkbox" data-c="${id}" ${check[id] ? "checked" : ""}> ${t("today." + id)}</label>`).join("")}
+      <p class="muted">${t("today.onlyFirst")}</p>
     </div>
     <div class="panel">
-      <h3 style="margin-top:0">🅿️ Parking lot</h3>
-      <p class="muted">Had an idea or a tangent mid-session ("I should build…", "let me research…")? Write it here and get back to studying. Review it on Sunday.</p>
-      <textarea id="t-park" placeholder="- idea...">${escapeHtml(store.get("parking", ""))}</textarea>
+      <h3 style="margin-top:0">${t("today.parking")}</h3>
+      <p class="muted">${t("today.parkingHelp")}</p>
+      <textarea id="t-park" placeholder="${t("today.parkingPh")}">${escapeHtml(store.get("parking", ""))}</textarea>
     </div>
     <details class="panel">
-      <summary><b>Backup & settings</b></summary>
-      <p class="muted">Your progress lives in this browser's storage. Export it now and then (e.g. into your repo, it's not secret).</p>
+      <summary><b>${t("today.backup")}</b></summary>
+      <p class="muted">${t("today.backupHelp")}</p>
       <div class="row">
-        <button id="t-export">⬇️ Export progress</button>
-        <label class="btn">⬆️ Import <input type="file" id="t-import" accept="application/json" hidden></label>
-        <label>Voice speed <input type="range" id="t-rate" min="0.5" max="1.2" step="0.05" value="${settings.rate}"></label>
-        <button class="small speak" data-say="Bonjour ! Je m'appelle Angèle, et j'habite à Bruxelles.">Test voice</button>
+        <button id="t-export">${t("today.export")}</button>
+        <label class="btn">${t("today.import")} <input type="file" id="t-import" accept="application/json" hidden></label>
+        <label>${t("today.voiceSpeed")} <input type="range" id="t-rate" min="0.5" max="1.2" step="0.05" value="${settings.rate}"></label>
+        <button class="small speak" data-say="${escapeHtml(COURSE.voiceSample)}">${t("today.testVoice")}</button>
       </div>
       <p class="muted" id="t-voice"></p>
     </details>`;
@@ -921,7 +927,7 @@ function renderToday() {
     const blob = new Blob([JSON.stringify(store.exportAll(), null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `french-progress-${todayKey()}.json`;
+    a.download = `${COURSE.folder}-progress-${todayKey()}.json`;
     a.click();
   };
   $("#t-import").onchange = (e) => {
@@ -929,22 +935,22 @@ function renderToday() {
     if (!f) return;
     f.text().then((txt) => {
       const data = JSON.parse(txt);
-      if (!confirm("Replace current progress with this backup?")) return;
+      if (!confirm(t("today.confirmImport"))) return;
       Object.keys(data).forEach((k) => store.set(k, data[k]));
       location.reload();
-    }).catch((err) => alert("Import failed: " + err.message));
+    }).catch((err) => alert(t("today.importFailed", { msg: err.message })));
   };
   $("#t-rate").oninput = (e) => { settings.rate = Number(e.target.value); saveSettings(); };
   $("#t-voice").textContent = "speechSynthesis" in window
-    ? (tts.voices.length ? `French voices found: ${tts.voices.map((v) => v.name + " (" + v.lang + ")").join(", ")}` : "No French voice found yet. Install one in your OS speech settings for 🔊 to sound French.")
-    : "This browser has no speech synthesis, so 🔊 buttons won't work.";
+    ? (tts.voices.length ? t("today.voices", { list: tts.voices.map((v) => v.name + " (" + v.lang + ")").join(", ") }) : t("today.noVoice"))
+    : t("today.noSpeech");
 
   // Timer
   const draw = () => {
     const el = $("#t-timer");
     if (el) el.textContent = `${String(Math.floor(timer.left / 60)).padStart(2, "0")}:${String(timer.left % 60).padStart(2, "0")}`;
     const b = $("#t-start");
-    if (b) b.textContent = timer.handle ? "Pause" : "Start";
+    if (b) b.textContent = timer.handle ? t("today.pause") : t("common.start");
   };
   $("#t-len").value = String(timer.total / 60);
   $("#t-len").onchange = (e) => { if (!timer.handle) { timer.total = timer.left = Number(e.target.value) * 60; draw(); } };
@@ -955,7 +961,7 @@ function renderToday() {
       if (timer.left <= 0) {
         clearInterval(timer.handle); timer.handle = null; timer.left = timer.total;
         chime();
-        alert("⏰ Focus block done! Take a 5-minute break. Bravo !");
+        alert(t("today.timerDone"));
       }
       draw();
     }, 1000);
@@ -987,7 +993,7 @@ document.addEventListener("focusout", (e) => {
 });
 function setupAccentBar() {
   const bar = $("#accent-bar");
-  "é è ê à â ç ù û ô î ï ë œ".split(" ").forEach((ch) => {
+  COURSE.accents.split(" ").forEach((ch) => {
     const b = document.createElement("button");
     b.textContent = ch;
     b.type = "button";
@@ -1012,18 +1018,15 @@ const SDK_URL = "https://cdn.jsdelivr.net/npm/@anthropic-ai/sdk@0.131.0/+esm";
 // Outside PREFIX on purpose: progress backups (store.exportAll) never include the key.
 const KEY_NAME = "llc.secret.anthropicKey";
 // $ per million tokens (input, output, cache read); used only for the cost estimate.
+// tier: label key "tutor.tier.<tier>" in i18n.js
 const TUTOR_MODELS = {
-  "claude-opus-5-5": { label: "Claude Opus 5.5 · best", in: 4, out: 20, cacheRead: 0.2, fallbacks: true },
-  "claude-sonnet-5-5": { label: "Claude Sonnet 5.5 · balanced", in: 2, out: 10, cacheRead: 0.2, fallbacks: true },
-  "claude-haiku-5-5": { label: "Claude Haiku 5.5 · cheapest", in: 0.1, out: 0.5, cacheRead: 0.01, fallbacks: false },
+  "claude-opus-5-5": { name: "Claude Opus 5.5", tier: "best", in: 4, out: 20, cacheRead: 0.2, fallbacks: true },
+  "claude-sonnet-5-5": { name: "Claude Sonnet 5.5", tier: "balanced", in: 2, out: 10, cacheRead: 0.2, fallbacks: true },
+  "claude-haiku-5-5": { name: "Claude Haiku 5.5", tier: "cheapest", in: 0.1, out: 0.5, cacheRead: 0.01, fallbacks: false },
 };
-const SCENARIOS = [
-  "a barista in a café in Brussels",
-  "a new colleague at an AI startup in Paris",
-  "a friend I met at an Angèle concert",
-  "a shop assistant in a bakery",
-  "someone asking me for directions",
-];
+// Role-play scenarios, in the interface language (the learner reads and picks them).
+const scenarios = () => t("tutor.scenarios");
+// Instructions for Claude, kept in English. Written for the French course: a new course needs its own.
 const MODE_PROMPTS = {
   tutor: `MODE: Tutor.
 - Explain grammar explicitly and briefly: the rule, 3 examples, then the most common exception.
@@ -1055,15 +1058,16 @@ then list 3 chunks worth memorising. Work ONLY with the lines they paste: never 
 4. Two short comprehension questions in French.
 Never summarise or reveal anything beyond the pasted paragraph (no spoilers).`,
 };
+// Labels and hints: "tutor.mode.<id>" and "tutor.hint.<id>" in i18n.js. The kickoff is sent to Claude.
 const TUTOR_MODES = {
-  tutor: { label: "🧑‍🏫 Tutor", hint: "Explains this unit's rule and quizzes you, one question at a time.", kickoff: "Let's start the session." },
-  corrector: { label: "✍️ Corrector", hint: "Paste 3–5 sentences you wrote in French. You get corrections and the pattern to work on." },
-  conversation: { label: "🗣️ Conversation", hint: "Role-play in French. Mistakes are recast back to you; type ?? to make it simpler, stop for feedback." },
-  song: { label: "🎵 Song explainer", hint: "Paste 2–6 lines of a song and say which song it is." },
-  reading: { label: "📖 Reading", hint: "Paste one paragraph and say what you're reading." },
+  tutor: { kickoff: "Let's start the session." },
+  corrector: {},
+  conversation: {},
+  song: {},
+  reading: {},
 };
 
-const tutor = Object.assign({ mode: "tutor", model: "claude-opus-5-5", lang: "English", remember: true }, store.get("tutor", {}));
+const tutor = Object.assign({ mode: "tutor", model: "claude-opus-5-5", lang: t("tutor.defaultLang"), remember: true }, store.get("tutor", {}));
 const saveTutor = () => store.set("tutor", { mode: tutor.mode, model: tutor.model, lang: tutor.lang, remember: tutor.remember });
 let tutorChats = store.get("tutorChats", {});
 let tutorStream = null;
@@ -1098,7 +1102,7 @@ function tutorLevel() {
 function tutorSystem(mode) {
   const u = UNITS[settings.unit];
   return `You are a French tutor inside a self-study app.
-Learner: an adult who speaks ${tutor.lang}. Level: CEFR ${tutorLevel()}. Current unit: ${u[0]}, "${u[1]}". The course favours Belgian examples (the learner loves Angèle and Stromae), but teach standard French and mark regional usage.
+Learner: an adult who speaks ${tutor.lang}. Level: CEFR ${tutorLevel()}. Current unit: ${settings.unit}, "${u.en}". The course favours Belgian examples (the learner loves Angèle and Stromae), but teach standard French and mark regional usage.
 How to talk to them:
 - They have ADHD: keep replies short (about 8 lines or fewer unless they ask for more), use bullets, one task at a time.
 - If they drift off-topic, point it out kindly and offer to "park" it for later.
@@ -1157,40 +1161,40 @@ function loadSdk() {
 }
 
 function claudeAiPrompt(mode) {
-  const kickoff = mode === "conversation" ? `Scenario: you are ${SCENARIOS[0]}.` : TUTOR_MODES[mode].kickoff || "I'll paste my text next.";
+  const kickoff = mode === "conversation" ? `Scenario: you are ${scenarios()[0]}.` : TUTOR_MODES[mode].kickoff || "I'll paste my text next.";
   return `${tutorSystem(mode)}\n\n---\n${kickoff}`;
 }
 
 function renderTutor() {
   const root = $("#tab-tutor");
   const hasKey = !!keyStore.get();
-  const mode = TUTOR_MODES[tutor.mode];
+  const level = settings.unit === 0 ? t("tutor.beginner") : tutorLevel();
   root.innerHTML = `
     <div class="panel">
-      <h2>Tutor <span class="muted" style="font-size:0.85rem;font-weight:400">· Unit ${settings.unit} · ${tutorLevel()}</span></h2>
-      <div class="picks" id="tm-modes">${Object.entries(TUTOR_MODES).map(([id, m]) =>
-        `<button class="small ${id === tutor.mode ? "primary" : ""}" data-mode="${id}">${m.label}</button>`).join("")}</div>
-      <p class="muted" style="margin-bottom:0">${escapeHtml(mode.hint)}</p>
+      <h2>${t("tutor.title")} <span class="muted" style="font-size:0.85rem;font-weight:400">· ${t("common.unit", { n: settings.unit })} · ${level}</span></h2>
+      <div class="picks" id="tm-modes">${Object.keys(TUTOR_MODES).map((id) =>
+        `<button class="small ${id === tutor.mode ? "primary" : ""}" data-mode="${id}">${t("tutor.mode." + id)}</button>`).join("")}</div>
+      <p class="muted" style="margin-bottom:0">${escapeHtml(t("tutor.hint." + tutor.mode))}</p>
     </div>
     ${hasKey ? `<div id="tm-chat" class="chat"></div><div class="panel" id="tm-compose"></div>` : tutorSetupHtml()}
     <details class="panel" id="tm-settings">
-      <summary><b>Tutor settings</b></summary>
+      <summary><b>${t("tutor.settings")}</b></summary>
       <div class="row" style="margin-top:12px">
-        <label>Model <select id="tm-model">${Object.entries(TUTOR_MODELS).map(([id, m]) =>
-          `<option value="${id}" ${id === tutor.model ? "selected" : ""}>${m.label} ($${m.in}/$${m.out} per M tokens)</option>`).join("")}</select></label>
-        <label>Your language <input type="text" id="tm-lang" value="${escapeHtml(tutor.lang)}" style="width:140px"></label>
+        <label>${t("tutor.model")} <select id="tm-model">${Object.entries(TUTOR_MODELS).map(([id, m]) =>
+          `<option value="${id}" ${id === tutor.model ? "selected" : ""}>${m.name} · ${t("tutor.tier." + m.tier)} ${t("tutor.price", { in: m.in, out: m.out })}</option>`).join("")}</select></label>
+        <label>${t("tutor.yourLang")} <input type="text" id="tm-lang" value="${escapeHtml(tutor.lang)}" style="width:140px"></label>
       </div>
-      <p class="muted">Opus is the strongest teacher; Haiku costs about 40× less per message. Replies use low effort for quick answers.</p>
-      ${hasKey ? `<p class="muted">API key saved ${keyRemembered() ? "on this device" : "for this browser tab only"}.
-        <button class="small" id="tm-forget">Forget key</button></p>` : ""}
-      <p><button class="small" id="tm-copy">📋 Copy this mode's prompt for Claude.ai</button>
-        <span class="muted">Works with a Claude Pro subscription, no key needed.</span></p>
+      <p class="muted">${t("tutor.modelHelp")}</p>
+      ${hasKey ? `<p class="muted">${keyRemembered() ? t("tutor.keyDevice") : t("tutor.keyTab")}
+        <button class="small" id="tm-forget">${t("tutor.forget")}</button></p>` : ""}
+      <p><button class="small" id="tm-copy">${t("tutor.copy")}</button>
+        <span class="muted">${t("tutor.copyHelp")}</span></p>
       <textarea id="tm-copybox" readonly style="display:none"></textarea>
     </details>`;
 
   $$("#tm-modes [data-mode]").forEach((b) => (b.onclick = () => { tutor.mode = b.dataset.mode; saveTutor(); renderTutor(); }));
   $("#tm-model").onchange = (e) => { tutor.model = e.target.value; saveTutor(); };
-  $("#tm-lang").onchange = (e) => { tutor.lang = e.target.value.trim() || "English"; saveTutor(); };
+  $("#tm-lang").onchange = (e) => { tutor.lang = e.target.value.trim() || t("tutor.defaultLang"); saveTutor(); };
   $("#tm-copy").onclick = () => copyForClaudeAi(tutor.mode);
   if ($("#tm-forget")) $("#tm-forget").onclick = () => { keyStore.clear(); renderTutor(); };
   if (hasKey) { renderTutorChat(); renderCompose(); } else bindSetup();
@@ -1199,24 +1203,20 @@ function renderTutor() {
 function tutorSetupHtml() {
   return `
     <div class="panel" id="tm-setup">
-      <h3 style="margin-top:0">Two ways to use the tutor</h3>
+      <h3 style="margin-top:0">${t("tutor.twoWays")}</h3>
       <div class="grid">
         <div>
-          <b>A · With your Claude Pro subscription</b>
-          <p class="muted">Copies a ready-made tutor prompt (with your unit) and opens Claude.ai. Paste it into the new chat.
-          A subscription can't be used inside other apps, so the chat happens on Claude.ai.</p>
-          <button id="tm-copy2">📋 Copy prompt &amp; open Claude.ai</button>
+          <b>${t("tutor.wayA")}</b>
+          <p class="muted">${t("tutor.wayAHelp")}</p>
+          <button id="tm-copy2">${t("tutor.copyOpen")}</button>
         </div>
         <div>
-          <b>B · Inside this app, with an API key</b>
-          <p class="muted">Create a key in the <a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener">Claude Console</a>.
-          It's billed separately from Pro (prepaid credits, pay per message: roughly 1–2 cents per message with Opus, a fraction of a cent with Haiku).
-          Set a monthly spend limit in the Console.</p>
+          <b>${t("tutor.wayB")}</b>
+          <p class="muted">${t("tutor.wayBHelp", { console: '<a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener">Claude Console</a>' })}</p>
           <input type="password" id="tm-key" placeholder="sk-ant-…" autocomplete="off" style="width:100%">
-          <label class="check"><input type="checkbox" id="tm-remember" ${tutor.remember ? "checked" : ""}> Remember on this device</label>
-          <button class="primary" id="tm-save">Save key</button> <span id="tm-keymsg" class="muted"></span>
-          <p class="muted" style="font-size:0.8rem">The key is stored only in this browser and sent only to api.anthropic.com.
-          It's never included in progress backups. Don't use this on a shared computer.</p>
+          <label class="check"><input type="checkbox" id="tm-remember" ${tutor.remember ? "checked" : ""}> ${t("tutor.remember")}</label>
+          <button class="primary" id="tm-save">${t("tutor.saveKey")}</button> <span id="tm-keymsg" class="muted"></span>
+          <p class="muted" style="font-size:0.8rem">${t("tutor.keyPrivacy")}</p>
         </div>
       </div>
     </div>`;
@@ -1225,7 +1225,7 @@ function bindSetup() {
   $("#tm-copy2").onclick = () => copyForClaudeAi(tutor.mode, true);
   $("#tm-save").onclick = () => {
     const key = $("#tm-key").value.trim();
-    if (!/^sk-ant-/.test(key)) { $("#tm-keymsg").textContent = "That doesn't look like an Anthropic API key (it starts with sk-ant-)."; return; }
+    if (!/^sk-ant-/.test(key)) { $("#tm-keymsg").textContent = t("tutor.badKey"); return; }
     tutor.remember = $("#tm-remember").checked; saveTutor();
     keyStore.set(key, tutor.remember);
     renderTutor();
@@ -1242,7 +1242,7 @@ async function copyForClaudeAi(mode, open) {
     box.style.display = "block"; box.value = text; box.select();
   }
   if (open) window.open("https://claude.ai/new", "_blank", "noopener");
-  if (copied) toast(open ? "Prompt copied. Paste it into the new Claude chat." : "Prompt copied.");
+  if (copied) toast(open ? t("tutor.copiedOpen") : t("tutor.copied"));
 }
 function toast(msg) {
   const t = document.createElement("div");
@@ -1256,7 +1256,7 @@ function renderTutorChat() {
   if (!box) return;
   const chat = chatFor(tutor.mode);
   box.innerHTML = chat.messages.map((m, i) => {
-    if (chat.hidden.includes(i)) return `<div class="msg note">▶ Session started</div>`;
+    if (chat.hidden.includes(i)) return `<div class="msg note">${t("tutor.started")}</div>`;
     return m.role === "user"
       ? `<div class="msg user">${renderMd(m.content)}</div>`
       : `<div class="msg ai">${renderMd(blocksText(m.content))}</div>`;
@@ -1268,22 +1268,22 @@ function renderCompose() {
   const chat = chatFor(tutor.mode);
   const empty = chat.messages.length === 0;
   const starter = !empty ? "" : tutor.mode === "tutor"
-    ? `<button class="primary" id="tm-start">▶ Start a session on Unit ${settings.unit}</button>`
+    ? `<button class="primary" id="tm-start">${t("tutor.startUnit", { n: settings.unit })}</button>`
     : tutor.mode === "conversation"
-      ? `<div class="row"><label>Scenario <select id="tm-scn">${SCENARIOS.map((s) => `<option>${escapeHtml(s)}</option>`).join("")}<option value="">Other…</option></select></label>
-         <input type="text" id="tm-scn-own" placeholder="or describe your own" style="flex:1;min-width:160px">
-         <button class="primary" id="tm-start">▶ Start</button></div>`
+      ? `<div class="row"><label>${t("tutor.scenario")} <select id="tm-scn">${scenarios().map((s) => `<option>${escapeHtml(s)}</option>`).join("")}<option value="">${t("tutor.other")}</option></select></label>
+         <input type="text" id="tm-scn-own" placeholder="${t("tutor.ownPh")}" style="flex:1;min-width:160px">
+         <button class="primary" id="tm-start">${t("tutor.start")}</button></div>`
       : "";
   box.innerHTML = `
     ${starter}
-    <textarea id="tm-input" placeholder="${empty && starter ? "…or just type" : "Write in French (or English)…"}" style="min-height:70px;margin-top:${starter ? "10px" : "0"}"></textarea>
+    <textarea id="tm-input" placeholder="${empty && starter ? t("tutor.orType") : t("tutor.writePh")}" style="min-height:70px;margin-top:${starter ? "10px" : "0"}"></textarea>
     <div class="row" style="justify-content:space-between;margin-top:8px">
       <div class="row">
-        <button class="primary" id="tm-send">Send</button>
-        <button id="tm-stop" style="display:none">Stop</button>
-        <button class="small" id="tm-new">New chat</button>
+        <button class="primary" id="tm-send">${t("tutor.send")}</button>
+        <button id="tm-stop" style="display:none">${t("tutor.stop")}</button>
+        <button class="small" id="tm-new">${t("tutor.newChat")}</button>
       </div>
-      <span class="muted" id="tm-cost">${chat.cost ? `≈ $${chat.cost.toFixed(3)} this chat` : ""}</span>
+      <span class="muted" id="tm-cost">${chat.cost ? t("tutor.cost", { cost: chat.cost.toFixed(3) }) : ""}</span>
     </div>
     <div id="tm-status" class="muted"></div>`;
   const input = $("#tm-input");
@@ -1296,7 +1296,7 @@ function renderCompose() {
   if ($("#tm-start")) $("#tm-start").onclick = () => {
     if (tutor.mode === "conversation") {
       const own = $("#tm-scn-own").value.trim();
-      tutorSend(`Scenario: you are ${own || $("#tm-scn").value || SCENARIOS[0]}. Start the scene.`, { hidden: true });
+      tutorSend(`Scenario: you are ${own || $("#tm-scn").value || scenarios()[0]}. Start the scene.`, { hidden: true });
     } else {
       tutorSend(TUTOR_MODES.tutor.kickoff, { hidden: true });
     }
@@ -1349,7 +1349,7 @@ async function tutorSend(text, opts = {}) {
     Anthropic = await loadSdk();
   } catch (e) {
     rollback(); bubble.remove(); finishSend();
-    $("#tm-status").textContent = "Couldn't load the Claude SDK. Check your internet connection.";
+    $("#tm-status").textContent = t("tutor.sdkFailed");
     return;
   }
   const client = new Anthropic({ apiKey: keyStore.get(), dangerouslyAllowBrowser: true });
@@ -1366,7 +1366,7 @@ async function tutorSend(text, opts = {}) {
       // A declined turn isn't kept: drop any partial text and the question.
       rollback();
       bubble.className = "msg note";
-      bubble.textContent = "Claude declined to answer that one. Try rephrasing it.";
+      bubble.textContent = t("tutor.declined");
       if (!opts.hidden) $("#tm-input").value = text;
     } else {
       chat.messages.push({ role: "assistant", content: msg.content });
@@ -1374,9 +1374,9 @@ async function tutorSend(text, opts = {}) {
       saveChats();
       bubble.classList.remove("pending");
       bubble.innerHTML = renderMd(blocksText(msg.content));
-      if (msg.content.some((b) => b.type === "fallback")) $("#tm-status").textContent = `Answered by a fallback model (${msg.model}).`;
-      if (msg.stop_reason === "max_tokens") $("#tm-status").textContent = "The reply was cut off. Ask Claude to continue.";
-      $("#tm-cost").textContent = `≈ $${chat.cost.toFixed(3)} this chat`;
+      if (msg.content.some((b) => b.type === "fallback")) $("#tm-status").textContent = t("tutor.fallback", { model: msg.model });
+      if (msg.stop_reason === "max_tokens") $("#tm-status").textContent = t("tutor.cutOff");
+      $("#tm-cost").textContent = t("tutor.cost", { cost: chat.cost.toFixed(3) });
       markStudied();
     }
   } catch (err) {
@@ -1394,54 +1394,87 @@ function finishSend() {
   if ($("#tm-stop")) $("#tm-stop").style.display = "none";
 }
 function tutorError(Anthropic, err) {
-  if (Anthropic.APIUserAbortError && err instanceof Anthropic.APIUserAbortError) return "Stopped.";
-  if (err instanceof Anthropic.AuthenticationError) return "The API key was rejected. Check it in Tutor settings → Forget key, then add it again.";
-  if (err instanceof Anthropic.PermissionDeniedError) return "This key isn't allowed to use that model. Try another model in Tutor settings.";
-  if (err instanceof Anthropic.RateLimitError) return "Too many requests right now. Wait a minute and try again.";
-  if (err instanceof Anthropic.BadRequestError) return `Request refused: ${err.message}`; // e.g. credit balance too low
-  if (err instanceof Anthropic.APIConnectionError) return "Couldn't reach Claude. Check your internet connection.";
-  if (err instanceof Anthropic.APIError) return `Claude API error ${err.status ?? ""}: ${err.message}`;
-  return `Something went wrong: ${err.message || err}`;
+  if (Anthropic.APIUserAbortError && err instanceof Anthropic.APIUserAbortError) return t("tutor.err.stopped");
+  if (err instanceof Anthropic.AuthenticationError) return t("tutor.err.auth");
+  if (err instanceof Anthropic.PermissionDeniedError) return t("tutor.err.permission");
+  if (err instanceof Anthropic.RateLimitError) return t("tutor.err.rate");
+  if (err instanceof Anthropic.BadRequestError) return t("tutor.err.bad", { msg: err.message }); // e.g. credit balance too low
+  if (err instanceof Anthropic.APIConnectionError) return t("tutor.err.connection");
+  if (err instanceof Anthropic.APIError) return t("tutor.err.api", { status: err.status ?? "", msg: err.message });
+  return t("tutor.err.other", { msg: err.message || err });
 }
 
 // ───────────────────────── theme ─────────────────────────
 // Auto (follow the device) → Light → Dark. Stored as "llc.theme", shared with the course site.
 const THEME_KEY = "llc.theme";
 const THEME_ORDER = ["auto", "light", "dark"];
-const THEME_LABEL = { auto: "🌓 Auto", light: "☀️ Light", dark: "🌙 Dark" };
-function setupThemeToggle() {
+let theme = readGlobal(THEME_KEY) || "auto";
+function renderThemeButton() {
   const btn = $("#theme-toggle");
-  let current = "auto";
-  try { current = localStorage.getItem(THEME_KEY) || "auto"; } catch (e) { /* default */ }
-  const render = () => {
-    btn.textContent = THEME_LABEL[current];
-    btn.setAttribute("aria-label", `Theme: ${current}. Click to change.`);
+  btn.textContent = t("theme." + theme);
+  btn.setAttribute("aria-label", t("theme.aria", { theme: t("theme." + theme) }));
+}
+function setupThemeToggle() {
+  $("#theme-toggle").onclick = () => {
+    theme = THEME_ORDER[(THEME_ORDER.indexOf(theme) + 1) % THEME_ORDER.length];
+    writeGlobal(THEME_KEY, theme);
+    if (theme === "auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", theme);
+    renderThemeButton();
   };
-  btn.onclick = () => {
-    current = THEME_ORDER[(THEME_ORDER.indexOf(current) + 1) % THEME_ORDER.length];
-    try { localStorage.setItem(THEME_KEY, current); } catch (e) { /* this page only */ }
-    if (current === "auto") document.documentElement.removeAttribute("data-theme");
-    else document.documentElement.setAttribute("data-theme", current);
-    render();
-  };
-  render();
+}
+
+// ───────────────────────── course & language pickers ─────────────────────────
+function setupPickers() {
+  // Switching course reloads: all state above is built for one course.
+  $("#course-select").onchange = (e) => { writeGlobal("llc.course", e.target.value); location.reload(); };
+  $("#lang-select").onchange = (e) => setLang(e.target.value);
+}
+// Static text in index.html, the pickers and the theme button, in the current language.
+function applyLanguage() {
+  document.documentElement.lang = lang;
+  document.title = t("app.title");
+  $$("[data-i18n]").forEach((el) => (el.textContent = t(el.dataset.i18n)));
+  $$("[data-i18n-html]").forEach((el) => (el.innerHTML = t(el.dataset.i18nHtml)));
+  const cs = $("#course-select");
+  cs.innerHTML = window.LLC_COURSES.map((c) => `<option value="${c.id}" ${c === COURSE ? "selected" : ""}>${c.flag} ${escapeHtml(local(c.label))}</option>`).join("")
+    + `<option disabled>${t("top.moreCourses")}</option>`;
+  cs.setAttribute("aria-label", t("top.course"));
+  $("#lang-select").value = lang;
+  $("#lang-select").setAttribute("aria-label", t("top.language"));
+  renderThemeButton();
+}
+function setLang(next) {
+  // The tutor's "your language" follows the interface unless the learner typed their own.
+  const followsInterface = tutor.lang === t("tutor.defaultLang");
+  lang = LANGS.includes(next) ? next : "en";
+  writeGlobal("llc.lang", lang);
+  if (followsInterface) { tutor.lang = t("tutor.defaultLang"); saveTutor(); }
+  applyLanguage();
+  showTab(currentTab);
 }
 
 // ───────────────────────── boot ─────────────────────────
 const RENDER = { today: renderToday, cards: renderCards, conj: renderConj, gender: renderGender, numbers: renderNumbers, songs: renderSongs, tutor: renderTutor };
+let currentTab = "today";
 function showTab(name) {
+  currentTab = name;
   $$("#tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
   $$(".tab").forEach((t) => t.classList.toggle("active", t.id === "tab-" + name));
   try { sessionStorage.setItem(PREFIX + "tab", name); } catch (e) { /* ignore */ }
   RENDER[name]();
 }
 $$("#tabs button").forEach((b) => (b.onclick = () => showTab(b.dataset.tab)));
+// Only show the drills this course has.
+$$("#tabs button").forEach((b) => (b.hidden = !COURSE.tabs.includes(b.dataset.tab)));
 tts.init();
 setupAccentBar();
 setupThemeToggle();
+setupPickers();
+applyLanguage();
 let startTab = "today";
 try { startTab = sessionStorage.getItem(PREFIX + "tab") || "today"; } catch (e) { /* ignore */ }
-showTab(RENDER[startTab] ? startTab : "today");
+showTab(RENDER[startTab] && COURSE.tabs.includes(startTab) ? startTab : "today");
 
 // Exposed for tests (see app/test.mjs)
-window.__fr = { schedule, frenchNumber, conjugate, genderHint, stripArticle, compare, tokenize, renderMd, tutorSystem, claudeAiPrompt, estimateCost, exportAll: () => store.exportAll() };
+window.__fr = { schedule, frenchNumber, conjugate, genderHint, stripArticle, compare, tokenize, renderMd, tutorSystem, claudeAiPrompt, estimateCost, formatDelay, exportAll: () => store.exportAll() };

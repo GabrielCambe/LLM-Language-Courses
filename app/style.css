@@ -74,8 +74,17 @@ h3 { font-size: 1rem; margin: 16px 0 8px; }
   padding: 10px 16px;
   display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
 }
-#tabs { display: flex; gap: 4px; overflow-x: auto; max-width: 100%; }
-.theme-toggle { margin-left: auto; order: 3; padding: 4px 12px; border-radius: 999px; font-size: 0.9rem; white-space: nowrap; }
+/* Row 1: course picker (left), language + theme (right). Row 2: tabs. */
+#tabs { display: flex; gap: 4px; overflow-x: auto; max-width: 100%; order: 4; flex-basis: 100%; }
+.top-controls { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+.theme-toggle { padding: 4px 12px; border-radius: 999px; font-size: 0.9rem; white-space: nowrap; }
+.lang-select { padding: 4px 8px; border-radius: 999px; font-size: 0.9rem; background: var(--panel); cursor: pointer; }
+/* The course picker doubles as the page title */
+.course-select {
+  font: inherit; font-weight: 700; color: var(--text); background: transparent;
+  border-color: transparent; padding: 2px 6px; margin-left: -6px; cursor: pointer;
+}
+.course-select:hover, .course-select:focus { border-color: var(--line); }
 #tabs button {
   border: 0; background: transparent; color: var(--muted);
   padding: 6px 10px; border-radius: 8px; cursor: pointer; white-space: nowrap; font: inherit;
