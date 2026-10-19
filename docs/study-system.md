@@ -25,6 +25,7 @@ more than any single long session.
 ### 🔵 Deep day (45–60 min, weekends or high-energy days)
 Normal day, plus one of:
 - a full episode / film segment with French subtitles (re-watch one scene twice),
+- **15 minutes of your current book** from the [reading ladder](../french/media/reading.md) (with the audiobook if you have it),
 - a 10-minute **conversation** with the LLM (voice mode if possible),
 - **shadowing** a song chorus or podcast clip 5×,
 - Duolingo, *only if you enjoy it*, as dessert.

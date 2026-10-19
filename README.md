@@ -41,8 +41,8 @@ docs/
 french/
   README.md               Roadmap A0 → A2 (+ how to move to B1)
   units/                  Unit-by-unit lessons (rules + vocab + media + tasks)
-  grammar/                Grammar reference, one rule family per file
-  media/                  Music (Angèle first!), films, series, podcasts, sorted by level
+  grammar/                Grammar reference, one rule family per file (incl. sentence structure)
+  media/                  Music (Angèle first!), films, series, podcasts, reading ladder, sorted by level
 app/
   index.html              Offline study app: SRS flashcards, conjugation, gender, numbers, song workshop
 ```

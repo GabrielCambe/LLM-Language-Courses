@@ -42,6 +42,10 @@
 *Je suis brésilien / brésilienne. Je viens du Brésil.* (*venir de* comes properly in Unit 9; learn
 *je viens de...* as a chunk for now.) Nationalities are **lowercase** in French: *français, belge*.
 
+### 📍 Where it goes in the sentence
+**Subject + être + description**: *Je suis développeur.* French has no "do": a question is just *Tu es belge ?*
+See the full [sentence map](../grammar/09-sentence-structure.md).
+
 ## ⚠️ Common traps
 - ❌ *Je suis un ingénieur.* → ✅ *Je suis ingénieur.* / *C'est un ingénieur.*
 - ❌ *Il est un bon ami.* → ✅ *C'est un bon ami.*

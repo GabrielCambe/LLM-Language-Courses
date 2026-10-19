@@ -14,9 +14,12 @@
   --warn: #b7791f;
   --warn-soft: #fdf3e1;
   --radius: 12px;
+  color-scheme: light;
 }
+/* Dark palette: follows the device ("Auto") unless the theme toggle forced Light or Dark */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
     --bg: #15161a;
     --panel: #1f2026;
     --text: #ececf0;
@@ -32,6 +35,23 @@
     --warn: #f0b85a;
     --warn-soft: #3a2f1c;
   }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #15161a;
+  --panel: #1f2026;
+  --text: #ececf0;
+  --muted: #9a9aa5;
+  --line: #33343c;
+  --accent: #7ea2ff;
+  --accent-soft: #263152;
+  --on-accent: #0d1530;
+  --good: #5ccf8a;
+  --good-soft: #1d3527;
+  --bad: #ff7b6e;
+  --bad-soft: #3c2220;
+  --warn: #f0b85a;
+  --warn-soft: #3a2f1c;
 }
 
 * { box-sizing: border-box; }
@@ -55,6 +75,7 @@ h3 { font-size: 1rem; margin: 16px 0 8px; }
   display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
 }
 #tabs { display: flex; gap: 4px; overflow-x: auto; max-width: 100%; }
+.theme-toggle { margin-left: auto; order: 3; padding: 4px 12px; border-radius: 999px; font-size: 0.9rem; white-space: nowrap; }
 #tabs button {
   border: 0; background: transparent; color: var(--muted);
   padding: 6px 10px; border-radius: 8px; cursor: pointer; white-space: nowrap; font: inherit;
@@ -166,7 +187,8 @@ details > summary { cursor: pointer; }
 @media (max-width: 600px) {
   body { font-size: 15px; padding-bottom: 24px; }
   .topbar { position: static; padding: 10px 12px; }
-  #tabs { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; overflow: visible; }
+  #tabs { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; overflow: visible; order: 4; }
+  .topbar h1 { flex: 1; }
   #tabs button { padding: 8px 4px; text-align: center; }
   #tabs .short { display: inline; }
   #tabs .long { display: none; }

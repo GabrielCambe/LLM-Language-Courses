@@ -1,0 +1,78 @@
+<!-- Light/dark theme toggle for the course site (Primer theme hook: included in every page's <head>).
+     The choice is stored under the same key as the study app ("llc.theme"), so one setting covers both. -->
+<script>
+  (function () {
+    var t = "auto";
+    try { t = localStorage.getItem("llc.theme") || "auto"; } catch (e) {}
+    if (t !== "auto") document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
+<style>
+  :root { color-scheme: light; }
+  /* Dark palette: follows the device unless the reader picked Light, or forced via the toggle */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --llc-bg: #15161a; --llc-text: #e6e6eb; --llc-muted: #9a9aa5; --llc-link: #7ea2ff;
+      --llc-border: #33343c; --llc-table-border: #3a3b44; --llc-stripe: #1c1d22;
+      --llc-code-bg: rgba(255, 255, 255, 0.08); --llc-pre-bg: #1f2026;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --llc-bg: #15161a; --llc-text: #e6e6eb; --llc-muted: #9a9aa5; --llc-link: #7ea2ff;
+    --llc-border: #33343c; --llc-table-border: #3a3b44; --llc-stripe: #1c1d22;
+    --llc-code-bg: rgba(255, 255, 255, 0.08); --llc-pre-bg: #1f2026;
+  }
+  /* Each rule falls back to Primer's own light value when no dark palette is active */
+  html, body { background: var(--llc-bg, #fff); color: var(--llc-text, #24292e); }
+  .markdown-body { color: var(--llc-text, #24292e); }
+  .markdown-body a { color: var(--llc-link, #0366d6); }
+  .markdown-body h1, .markdown-body h2 { border-bottom-color: var(--llc-border, #eaecef); }
+  .markdown-body hr { background-color: var(--llc-border, #e1e4e8); }
+  .markdown-body table tr { background-color: var(--llc-bg, #fff); border-top-color: var(--llc-table-border, #c6cbd1); }
+  .markdown-body table tr:nth-child(2n) { background-color: var(--llc-stripe, #f6f8fa); }
+  .markdown-body table th, .markdown-body table td { border-color: var(--llc-table-border, #dfe2e5); }
+  .markdown-body code { background-color: var(--llc-code-bg, rgba(27, 31, 35, 0.05)); }
+  .markdown-body pre, .markdown-body .highlight pre { background-color: var(--llc-pre-bg, #f6f8fa); color: var(--llc-text, #24292e); }
+  .markdown-body blockquote { color: var(--llc-muted, #6a737d); border-left-color: var(--llc-border, #dfe2e5); }
+  .text-gray { color: var(--llc-muted, #586069) !important; }
+  .border-top { border-color: var(--llc-border, #e1e4e8) !important; }
+
+  .llc-theme-bar { text-align: right; margin-bottom: 8px; }
+  .llc-theme-toggle {
+    font: inherit; font-size: 14px; cursor: pointer;
+    padding: 4px 12px; border-radius: 999px;
+    border: 1px solid var(--llc-border, #e1e4e8);
+    background: var(--llc-bg, #fff); color: var(--llc-text, #24292e);
+  }
+  .llc-theme-toggle:hover { border-color: var(--llc-link, #0366d6); }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var KEY = "llc.theme", ORDER = ["auto", "light", "dark"];
+    var LABEL = { auto: "🌓 Auto", light: "☀️ Light", dark: "🌙 Dark" };
+    var current = "auto";
+    try { current = localStorage.getItem(KEY) || "auto"; } catch (e) {}
+    var bar = document.createElement("div");
+    bar.className = "llc-theme-bar";
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "llc-theme-toggle";
+    var render = function () {
+      btn.textContent = LABEL[current];
+      btn.setAttribute("aria-label", "Theme: " + current + ". Click to change.");
+    };
+    btn.addEventListener("click", function () {
+      current = ORDER[(ORDER.indexOf(current) + 1) % ORDER.length];
+      try { localStorage.setItem(KEY, current); } catch (e) {}
+      if (current === "auto") document.documentElement.removeAttribute("data-theme");
+      else document.documentElement.setAttribute("data-theme", current);
+      render();
+    });
+    render();
+    bar.appendChild(btn);
+    var body = document.querySelector(".markdown-body") || document.body;
+    body.insertBefore(bar, body.firstChild);
+  });
+</script>

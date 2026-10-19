@@ -153,6 +153,24 @@ await page.click("[data-mode=cloze]");
 await page.selectOption("#cz-density", "func");
 eq("cloze page renders", await page.$eval("#song-body .lyrics", (el) => el.textContent.includes("pourquoi") || el.querySelectorAll("input.gap").length > 0), true);
 
+// Theme toggle: Auto → Light → Dark → Auto, applied to the page and remembered
+const bg = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+eq("theme starts on Auto", await page.$eval("#theme-toggle", (b) => b.textContent), "🌓 Auto");
+await page.click("#theme-toggle");
+eq("Light forced", await page.evaluate(() => document.documentElement.dataset.theme), "light");
+await page.click("#theme-toggle");
+eq("Dark forced", await page.evaluate(() => document.documentElement.dataset.theme), "dark");
+eq("dark background applied", await bg(), "rgb(21, 22, 26)");
+await page.reload();
+eq("dark remembered after reload", [await page.evaluate(() => document.documentElement.dataset.theme), await bg()], ["dark", "rgb(21, 22, 26)"]);
+await page.click("#theme-toggle");
+eq("back to Auto", [await page.evaluate(() => document.documentElement.hasAttribute("data-theme")), await page.$eval("#theme-toggle", (b) => b.textContent)], [false, "🌓 Auto"]);
+const darkDevice = await browser.newPage({ colorScheme: "dark" });
+await darkDevice.addInitScript(() => localStorage.setItem("llc.theme", "light"));
+await darkDevice.goto(url);
+eq("Light overrides a dark device", await darkDevice.evaluate(() => getComputedStyle(document.body).backgroundColor), "rgb(247, 245, 240)");
+await darkDevice.close();
+
 eq("no page errors", errors, []);
 
 // ── Responsive: no horizontal scrolling on any tab, phone to desktop ──
