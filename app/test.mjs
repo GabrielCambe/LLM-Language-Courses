@@ -171,6 +171,21 @@ await darkDevice.goto(url);
 eq("Light overrides a dark device", await darkDevice.evaluate(() => getComputedStyle(document.body).backgroundColor), "rgb(247, 245, 240)");
 await darkDevice.close();
 
+// Stale-cache safety: browsers cache each file separately (GitHub Pages: 10 min), so a phone can
+// combine a new index.html with an old app.js. The toggle must be visible without JS, and all
+// local assets must share one ?v= tag so an update refetches them together.
+const { readFileSync } = await import("fs");
+const html = readFileSync(path.join(here, "index.html"), "utf8");
+eq("theme button has a label without JS", /<button id="theme-toggle"[^>]*>[^<]+<\/button>/.test(html), true);
+const assets = [...html.matchAll(/(?:src|href)="((?!https?:)[^"]+\.(?:js|css)[^"]*)"/g)].map((m) => m[1]);
+const versions = new Set(assets.map((a) => (a.match(/\?v=([^"&]+)/) || [])[1]));
+eq(`all ${assets.length} local assets share one ?v= tag`, [versions.size, versions.has(undefined)], [1, false]);
+const stale = await browser.newPage({ viewport: { width: 360, height: 700 } });
+await stale.route(/app\.js/, (r) => r.fulfill({ contentType: "text/javascript", body: "/* old cached app.js */" }));
+await stale.goto(url);
+eq("button still visible with a stale app.js", await stale.$eval("#theme-toggle", (b) => [b.textContent, b.offsetWidth > 40]), ["🌓 Auto", true]);
+await stale.close();
+
 eq("no page errors", errors, []);
 
 // ── Responsive: no horizontal scrolling on any tab, phone to desktop ──
