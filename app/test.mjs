@@ -142,6 +142,7 @@ await page.click("#tabs button[data-tab=conj]");
 await page.fill("#conj-in", "zzz");
 await page.keyboard.press("Enter");
 eq("conj feedback shown", (await page.$eval("#conj-fb", (el) => el.textContent)).includes("Not quite"), true);
+eq("conj score updates as soon as the answer is checked", await page.textContent("#conj-score"), "score 0/1 (0%)");
 eq("conj button turns into Next", await page.textContent("#conj-go"), "Next (Enter)");
 await page.click("#conj-go");
 eq("Next button gives a new question", [await page.textContent("#conj-fb"), await page.textContent("#conj-go"), await page.inputValue("#conj-in")], ["", "Check (Enter)", ""]);
@@ -157,6 +158,7 @@ await page.fill("#num-in", "123456");
 await page.click("#num-go");
 eq("numbers: Check button shows the answer", [(await page.textContent("#num-fb")).includes("="), await page.textContent("#num-go")], [true, "Next (Enter)"]);
 await page.click("#num-go");
+eq("numbers: score updates on check", (await page.textContent("#num-score")).includes("/1 ("), true);
 eq("numbers: Next button gives a new number", [await page.textContent("#num-fb"), await page.inputValue("#num-in")], ["", ""]);
 await page.fill("#num-in", "1");
 await page.keyboard.press("Enter");
@@ -290,6 +292,29 @@ await stale.close();
 }
 
 eq("no page errors", errors, []);
+
+// Gender: the score updates right after answering
+await page.click("#tabs button[data-tab=gender]");
+await page.click("#gen-card .gender-btns button[data-g=m]");
+eq("gender score updates on answer", (await page.textContent("#gen-score")).includes("/1 ("), true);
+
+// ── Phone: the feedback isn't hidden behind the accent bar while typing ──
+for (const tab of ["conj", "numbers"]) {
+  // 420 px tall ≈ a phone with its on-screen keyboard open
+  const p = await browser.newPage({ viewport: { width: 360, height: 420 } });
+  await p.goto(url);
+  await p.click(`#tabs button[data-tab=${tab}]`);
+  const input = tab === "conj" ? "#conj-in" : "#num-in";
+  await p.fill(input, "1");
+  await p.click(tab === "conj" ? "#conj-go" : "#num-go");
+  const [fbBottom, barTop, typing] = await p.evaluate((sel) => [
+    document.querySelector(sel).getBoundingClientRect().bottom,
+    document.querySelector("#accent-bar").getBoundingClientRect().top,
+    document.body.classList.contains("typing"),
+  ], tab === "conj" ? "#conj-fb" : "#num-fb");
+  eq(`${tab}: feedback sits above the accent bar on a phone`, [typing, fbBottom <= barTop], [true, true]);
+  await p.close();
+}
 
 // ── Interface language: English ↔ Português (BR) ──
 {

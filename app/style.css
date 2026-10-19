@@ -230,6 +230,8 @@ details > summary { cursor: pointer; }
   /* Accent keys only while typing; they wrap instead of scrolling off-screen */
   .accent-bar { display: none; flex-wrap: wrap; justify-content: center; padding: 6px 8px; }
   body.typing .accent-bar { display: flex; }
+  /* Room to scroll the feedback above the accent bar (up to two rows of keys) */
+  body.typing { padding-bottom: 140px; }
   .accent-bar span { display: none; }
   .accent-bar button { min-width: 0; flex: 1 0 28px; padding: 6px 0; }
 }

@@ -400,6 +400,18 @@ document.addEventListener("keydown", (e) => {
   else if (!fc.revealed && (e.key === " " || e.key === "Enter") && fc.current) { e.preventDefault(); reveal(); }
 });
 
+// ───────────────────────── drill helpers ─────────────────────────
+// "score 3/4 (75%)": updated as soon as an answer is checked, not on the next question.
+function scoreText(right, total) {
+  return t("common.score", { right, total }) + (total ? ` (${Math.round((100 * right) / total)}%)` : "");
+}
+// Scroll feedback into view above the accent bar, which covers the bottom of a phone screen while typing.
+function showAboveAccentBar(el) {
+  const barTop = innerHeight - $("#accent-bar").offsetHeight; // the bar is 0 px tall when hidden
+  const hidden = el.getBoundingClientRect().bottom + 12 - barTop;
+  if (hidden > 0) scrollBy(0, hidden);
+}
+
 // ───────────────────────── drill button ─────────────────────────
 // Typed drills advance with Enter or this button: "Check" until answered, then "Next".
 const drillButton = (id) => `<button class="primary" id="${id}" type="button">${t("common.check")}</button>`;
@@ -504,10 +516,9 @@ function newConjQ() {
   conj.q = { v, tense, p, res };
   conj.checked = false;
   const tLabel = COURSE.tenses.find((x) => x.id === tense).label;
-  const acc = conj.total ? Math.round((100 * conj.right) / conj.total) : 0;
   box.innerHTML = `
     <div class="row"><span class="tag">${tLabel}</span><span class="muted">${v.inf}: ${v.en}</span>
-      <span class="muted">· ${t("common.score", { right: conj.right, total: conj.total })}${conj.total ? ` (${acc}%)` : ""}</span></div>
+      <span class="muted">· <span id="conj-score">${scoreText(conj.right, conj.total)}</span></span></div>
     <div class="prompt">${subjectFor(p, res.display)} ___ <small class="muted">(${v.inf})</small></div>
     <input type="text" id="conj-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t("conj.placeholder")}">
     ${drillButton("conj-go")}
@@ -532,12 +543,14 @@ function checkConj() {
   const r = compare(typed, res.answers);
   conj.total++;
   if (r === "ok") conj.right++;
+  $("#conj-score").textContent = scoreText(conj.right, conj.total);
   const full = `${subjectFor(p, res.display)}${subjectFor(p, res.display) === "j'" ? "" : " "}${res.display}`;
   $("#conj-fb").innerHTML = `
     <div class="feedback ${r === "ok" ? "ok" : r === "accent" ? "warn" : "no"}">
       ${r === "ok" ? t("conj.correct") : r === "accent" ? t("conj.accent") : t("conj.wrong")}: <b>${escapeHtml(full)}</b> ${speakBtn(full.replace(/\(e\)|\(s\)/g, ""))}
     </div>
     ${conj.q.tense === "passeCompose" && v.aux === "être" ? `<p class="muted">${t("conj.etre", { verb: v.inf })}</p>` : ""}`;
+  showAboveAccentBar($("#conj-fb"));
   if (r === "ok") markStudied();
 }
 
@@ -583,9 +596,8 @@ function nextGender() {
   gen.cur = pick(gen.pool);
   gen.answered = false;
   const word = stripArticle(gen.cur.fr);
-  const acc = gen.total ? ` (${Math.round((100 * gen.right) / gen.total)}%)` : "";
   box.innerHTML = `
-    <div class="row muted">${t("common.score", { right: gen.right, total: gen.total })}${acc}</div>
+    <div class="row muted" id="gen-score">${scoreText(gen.right, gen.total)}</div>
     <div class="gender-word">${escapeHtml(word)} ${speakBtn(word)}</div>
     <div class="gender-btns"><button data-g="m">le / un · masc.</button><button data-g="f">la / une · fém.</button></div>
     <div id="gen-fb" style="margin-top:12px"></div>`;
@@ -599,6 +611,7 @@ function answerGender(g) {
   const ok = g === c.gender;
   gen.total++;
   if (ok) { gen.right++; markStudied(); }
+  $("#gen-score").textContent = scoreText(gen.right, gen.total);
   const word = stripArticle(c.fr);
   const article = c.gender === "m" ? "le / un" : "la / une";
   $("#gen-fb").innerHTML = `
@@ -690,7 +703,7 @@ function nextNumber() {
     : num.mode === "read" ? `<div class="prompt">${escapeHtml(words)}</div>`
     : `<div class="prompt">${num.n}</div>`;
   box.innerHTML = `
-    <div class="muted">${t("common.score", { right: num.right, total: num.total })}</div>
+    <div class="muted" id="num-score">${scoreText(num.right, num.total)}</div>
     ${prompt}
     <input type="text" id="num-in" autocomplete="off" spellcheck="false" placeholder="${num.mode === "write" ? "en français…" : t("num.digits")}">
     ${drillButton("num-go")}
@@ -713,8 +726,10 @@ function nextNumber() {
       r = Number(input.value.replace(/\s/g, "")) === num.n ? "ok" : "no";
     }
     if (r === "ok") { num.right++; markStudied(); }
+    $("#num-score").textContent = scoreText(num.right, num.total);
     $("#num-fb").innerHTML = `
       <div class="feedback ${r === "ok" ? "ok" : r === "accent" ? "warn" : "no"}">${r === "ok" ? "✅" : r === "accent" ? t("num.accents") : "❌"} <b>${num.n}</b> = ${escapeHtml(words)} ${speakBtn(words, voiceLang)}</div>`;
+    showAboveAccentBar($("#num-fb"));
   };
   input.addEventListener("keydown", (e) => {
     if (e.key !== "Enter") return;
