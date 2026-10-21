@@ -56,7 +56,10 @@ You're not imagining it. Here's what the research says:
   beats cramming. The best gap between reviews grows the longer you want to remember something.
 - **In this repo:** the app schedules each card so that you see it again just before you'd
   forget it (an SM-2-style algorithm, the same family as Anki). Hard cards come back sooner,
-  easy cards later.
+  easy cards later. The conjugation drill does the same for each verb form (e.g. *nous* + *manger*
+  + imparfait): a form you miss comes back three questions later and again on later days, and a form
+  you know well shows up less and less. Typing the answer means the app grades you, so you can't
+  give yourself credit for "almost" (Dunlosky & Rawson, 2012).
 - **Language-specific evidence:** a meta-analysis of 37 second-language studies (Kim & Webb, 2022)
   found that spacing generally helps L2 learning too, although the size of the benefit varies
   with the skill, the learners and the activity.
@@ -234,6 +237,7 @@ See [`study-system.md`](study-system.md) for the concrete routine.
 - Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., & Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. *Psychological Bulletin, 132*(3), 354–380.
 - DeKeyser, R. (2007). Skill acquisition theory. In B. VanPatten & J. Williams (Eds.), *Theories in Second Language Acquisition*. Erlbaum.
 - Dewaele, J.-M. (2004). Retention or omission of the *ne* in advanced French interlanguage: The variable effect of extralinguistic factors. *Journal of Sociolinguistics, 8*(3), 433–450.
+- Dunlosky, J., & Rawson, K. A. (2012). Overconfidence produces underachievement: Inaccurate self evaluations undermine students' learning and retention. *Learning and Instruction, 22*(4), 271–280.
 - Dunlosky, J., Rawson, K. A., Marsh, E. J., Nathan, M. J., & Willingham, D. T. (2013). Improving students' learning with effective learning techniques. *Psychological Science in the Public Interest, 14*(1), 4–58.
 - Gollwitzer, P. M., & Sheeran, P. (2006). Implementation intentions and goal achievement: A meta-analysis of effects and processes. *Advances in Experimental Social Psychology, 38*, 69–119.
 - Hamada, Y. (2016). Shadowing: Who benefits and how? *Language Teaching Research, 20*(1), 35–52.

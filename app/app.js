@@ -482,10 +482,38 @@ function subjectFor(p, form) {
 // Remove a pronoun the learner may have typed in front of the verb.
 const stripPronoun = (s) => norm(s).replace(/^(j'|je |tu |il |elle |on |nous |vous |ils |elles )/, "");
 
+// Spacing: each form ("verb|tense|person") has its own SM-2 schedule in "conjSrs", like a flashcard.
+// Right = Good, accent slip = Hard, wrong = Again. A form you miss also comes back after
+// CONJ_RETRY_GAP other questions (the drill has no fixed queue, so minutes alone won't do).
+const CONJ_RATING = { ok: 2, accent: 1, no: 0 };
+const CONJ_RETRY_GAP = 3;
+const conjKey = (inf, tense, p) => `${inf}|${tense}|${p}`;
+
+// What to ask next: a form you missed a few questions ago, then a form that's due,
+// then one you've never been asked, then any form. Never the same form twice in a row.
+function pickConjKey(keys, srs, retry, now, last) {
+  const ready = retry.find((r) => r.wait <= 0 && keys.includes(r.key));
+  if (ready) return { key: ready.key, kind: "retry" };
+  const waiting = new Set(retry.map((r) => r.key));
+  const free = keys.filter((k) => !waiting.has(k) && k !== last);
+  const due = free.filter((k) => srs[k] && srs[k].due <= now);
+  if (due.length) return { key: pick(due), kind: "due" };
+  const fresh = free.filter((k) => !srs[k]);
+  return { key: pick(fresh.length ? fresh : free.length ? free : keys), kind: "" };
+}
+// Getting a form right before it's due keeps its schedule (like Anki):
+// extra practice today shouldn't push it weeks away. Mistakes always count.
+function conjReview(prev, result, now, retried) {
+  const rating = CONJ_RATING[result];
+  if (prev && prev.due > now && !retried && rating > 0) return prev;
+  return schedule(prev, rating, now);
+}
+
 const conj = {
   verbs: store.get("conjVerbs", null),
   tenses: store.get("conjTenses", null),
   q: null, checked: false, right: 0, total: 0,
+  retry: [], // [{ key, wait }]: missed forms waiting to come back this session
 };
 
 function renderConj() {
@@ -525,16 +553,23 @@ function newConjQ() {
     box.innerHTML = `<p>${t("conj.pickOne")}</p>`;
     return;
   }
-  const v = pick(pool);
-  const tense = pick(conj.tenses);
-  const p = Math.floor(Math.random() * 6);
+  const keys = pool.flatMap((v) => conj.tenses.flatMap((tense) => PERSONS.map((_, p) => conjKey(v.inf, tense, p))));
+  const srs = store.get("conjSrs", {});
+  const now = Date.now();
+  const { key, kind } = pickConjKey(keys, srs, conj.retry, now, conj.q && conj.q.key);
+  conj.retry = conj.retry.filter((r) => r.key !== key);
+  const [inf, tense, ps] = key.split("|");
+  const v = pool.find((x) => x.inf === inf);
+  const p = Number(ps);
   const res = conjugate(v, tense, p);
-  conj.q = { v, tense, p, res };
+  conj.q = { v, tense, p, res, key, retried: kind === "retry" };
   conj.checked = false;
   const tLabel = COURSE.tenses.find((x) => x.id === tense).label;
+  const due = keys.filter((k) => srs[k] && srs[k].due <= now).length;
   box.innerHTML = `
-    <div class="row"><span class="tag">${tLabel}</span><span class="muted">${v.inf}: ${v.en}</span>
-      <span class="muted">· <span id="conj-score">${scoreText(conj.right, conj.total)}</span></span></div>
+    <div class="row"><span class="tag">${tLabel}</span>${kind ? `<span class="tag" id="conj-kind">${t("conj." + kind)}</span>` : ""}
+      <span class="muted">${v.inf}: ${v.en}</span>
+      <span class="muted">· <span id="conj-score">${scoreText(conj.right, conj.total)}</span> · ${t("cards.due", { n: due })}</span></div>
     <div class="prompt">${subjectFor(p, res.display)} ___ <small class="muted">(${v.inf})</small></div>
     <input type="text" id="conj-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t("conj.placeholder")}">
     ${drillButton("conj-go")}
@@ -559,6 +594,13 @@ function checkConj() {
   const r = compare(typed, res.answers);
   conj.total++;
   if (r === "ok") conj.right++;
+  const srs = store.get("conjSrs", {});
+  const now = Date.now();
+  srs[conj.q.key] = conjReview(srs[conj.q.key], r, now, conj.q.retried);
+  store.set("conjSrs", srs);
+  conj.retry.forEach((x) => x.wait--);
+  // Short relearning steps (Again, or Hard on a new form) come back in this same session.
+  if (srs[conj.q.key].due - now < 20 * MIN) conj.retry.push({ key: conj.q.key, wait: CONJ_RETRY_GAP });
   $("#conj-score").textContent = scoreText(conj.right, conj.total);
   const full = `${subjectFor(p, res.display)}${subjectFor(p, res.display) === "j'" ? "" : " "}${res.display}`;
   $("#conj-fb").innerHTML = `
@@ -1530,4 +1572,4 @@ try { startTab = sessionStorage.getItem(PREFIX + "tab") || "today"; } catch (e) 
 showTab(RENDER[startTab] && COURSE.tabs.includes(startTab) ? startTab : "today");
 
 // Exposed for tests (see app/test.mjs)
-window.__fr = { schedule, frenchNumber, conjugate, genderHint, stripArticle, compare, tokenize, renderMd, tutorSystem, claudeAiPrompt, estimateCost, formatDelay, exportAll: () => store.exportAll() };
+window.__fr = { schedule, pickConjKey, conjReview, frenchNumber, conjugate, genderHint, stripArticle, compare, tokenize, renderMd, tutorSystem, claudeAiPrompt, estimateCost, formatDelay, exportAll: () => store.exportAll() };
