@@ -121,6 +121,45 @@ eq("strip article", misc.strip, ["eau", "chanson"]);
 eq("compare ok/accent/no", misc.cmp, ["ok", "accent", "no"]);
 eq("1-day card due 20h later", misc.g1DueHours, 20);
 
+// ── Conjugation spacing ──
+const cs = await page.evaluate(() => {
+  const { pickConjKey, conjReview, schedule } = window.__fr;
+  const DAY = 864e5;
+  const now = 10 * DAY;
+  const keys = ["a", "b", "c", "d"];
+  const srs = { a: { due: now - 1 }, b: { due: now + DAY }, c: { due: now + DAY } };
+  const known = schedule(schedule(null, 2, 0), 2, 0); // 3-day interval, due long before now
+  const early = Object.assign({}, known, { due: now + DAY });
+  return {
+    retryFirst: pickConjKey(keys, srs, [{ key: "c", wait: 0 }], now, null),
+    retryWaits: pickConjKey(keys, srs, [{ key: "a", wait: 1 }], now, null).key,
+    retryOutsidePool: pickConjKey(keys, srs, [{ key: "zzz", wait: 0 }], now, null),
+    dueNext: pickConjKey(keys, srs, [], now, null),
+    newBeforeLater: pickConjKey(keys, srs, [], now, "a"),
+    notTwiceInARow: pickConjKey(["a", "b"], {}, [], now, "a").key,
+    onlyOne: pickConjKey(["a"], {}, [], now, "a").key,
+    wrong: conjReview(null, "no", now, false).reps,
+    right: conjReview(null, "ok", now, false).interval,
+    accentNew: Math.round((conjReview(null, "accent", now, false).due - now) / 60000),
+    earlyRightKept: conjReview(early, "ok", now, false) === early,
+    earlyWrongCounts: conjReview(early, "no", now, false).lapses,
+    retriedRightCounts: conjReview(schedule(null, 0, now), "ok", now + 60000, true).interval,
+  };
+});
+eq("conj: a missed form whose wait is over comes first", cs.retryFirst, { key: "c", kind: "retry" });
+eq("conj: a missed form still waiting isn't asked, even if due", cs.retryWaits, "d");
+eq("conj: a missed form outside the chosen verbs/tenses is skipped", cs.retryOutsidePool, { key: "a", kind: "due" });
+eq("conj: due forms come next", cs.dueNext, { key: "a", kind: "due" });
+eq("conj: then never-asked forms, before ones scheduled for later", cs.newBeforeLater, { key: "d", kind: "" });
+eq("conj: not the same form twice in a row", cs.notTwiceInARow, "b");
+eq("conj: a one-form pool still gives a question", cs.onlyOne, "a");
+eq("conj: wrong = Again", cs.wrong, 0);
+eq("conj: right on a new form = 1 day", cs.right, 1);
+eq("conj: accent slip on a new form = Hard (10 min)", cs.accentNew, 10);
+eq("conj: right before it's due keeps the schedule", cs.earlyRightKept, true);
+eq("conj: wrong before it's due still counts", cs.earlyWrongCounts, 1);
+eq("conj: right on the in-session retry counts", cs.retriedRightCounts, 1);
+
 // ── UI smoke test: every tab renders, a flashcard can be reviewed ──
 for (const tab of ["cards", "conj", "gender", "numbers", "songs", "today"]) {
   await page.click(`#tabs button[data-tab=${tab}]`);
@@ -149,6 +188,29 @@ eq("Next button gives a new question", [await page.textContent("#conj-fb"), awai
 await page.fill("#conj-in", "zzz");
 await page.click("#conj-go");
 eq("Check button checks without Enter", (await page.textContent("#conj-fb")).includes("Not quite"), true);
+
+// Conjugation spacing: a missed form is saved and comes back after CONJ_RETRY_GAP (3) other questions
+{
+  const p = await browser.newPage();
+  await p.goto(url);
+  await p.click("#tabs button[data-tab=conj]");
+  const ask = () => p.$eval("#conj-card", (el) => el.querySelector(".tag").textContent + " " + el.querySelector(".prompt").textContent.trim());
+  const asked = [];
+  for (let i = 0; i < 5; i++) {
+    asked.push(await ask());
+    if (i === 4) break;
+    await p.fill("#conj-in", "zzz");
+    await p.keyboard.press("Enter");
+    await p.keyboard.press("Enter");
+  }
+  eq("conj: the 3 questions in between are other forms", new Set(asked.slice(0, 4)).size, 4);
+  eq("conj: the missed form comes back 4th question later", asked[4], asked[0]);
+  eq("conj: …tagged as missed a moment ago", await p.textContent("#conj-kind"), "↺ missed a moment ago");
+  const saved = await p.evaluate(() => Object.values(JSON.parse(localStorage.getItem("llc.fr.conjSrs"))).map((s) => s.lapses));
+  eq("conj: each missed form saved with a lapse", saved, [1, 1, 1, 1]);
+  eq("conj: forms schedule in backups", Object.keys(await p.evaluate(() => window.__fr.exportAll().conjSrs)).length, 4);
+  await p.close();
+}
 
 // Numbers: the same Check → Next button
 await page.click("#tabs button[data-tab=numbers]");

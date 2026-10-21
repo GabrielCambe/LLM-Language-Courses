@@ -76,7 +76,9 @@ window.LLC_I18N = {
     "cards.easy": "Easy",
 
     "conj.title": "Conjugation drill",
-    "conj.intro": "Type only the verb form (e.g. <i>suis</i>, <i>ai parlé</i>). Mixing verbs and tenses is harder but works better: that's <b>interleaving</b>.",
+    "conj.intro": "Type only the verb form (e.g. <i>suis</i>, <i>ai parlé</i>). Mixing verbs and tenses is harder but works better: that's <b>interleaving</b>. Forms you miss come back a few questions later, and again on later days: that's <b>spacing</b>.",
+    "conj.retry": "↺ missed a moment ago",
+    "conj.due": "↺ review",
     "conj.choose": "Choose verbs & tenses",
     "conj.summary": "({n} verbs · {tenses})",
     "conj.none": "none",
@@ -322,7 +324,9 @@ window.LLC_I18N = {
     "cards.easy": "Fácil",
 
     "conj.title": "Treino de conjugação",
-    "conj.intro": "Digite só a forma verbal (ex.: <i>suis</i>, <i>ai parlé</i>). Misturar verbos e tempos é mais difícil, mas funciona melhor: isso se chama <b>intercalação</b> (interleaving).",
+    "conj.intro": "Digite só a forma verbal (ex.: <i>suis</i>, <i>ai parlé</i>). Misturar verbos e tempos é mais difícil, mas funciona melhor: isso se chama <b>intercalação</b> (interleaving). As formas que você erra voltam algumas perguntas depois e de novo nos dias seguintes: isso é <b>espaçamento</b> (spacing).",
+    "conj.retry": "↺ errou há pouco",
+    "conj.due": "↺ revisão",
     "conj.choose": "Escolher verbos e tempos",
     "conj.summary": "({n} verbos · {tenses})",
     "conj.none": "nenhum",
