@@ -32,7 +32,7 @@ The course website has the same button, and one choice applies to both.
 
 | Tab | What it trains | Research principle |
 |---|---|---|
-| **Today** | Current unit, due cards, 25-min focus timer, session checklist, parking lot | Implementation intentions, scope guard |
+| **Today** | Current unit, due cards, 25-min focus timer, session checklist, practice calendar (GitHub-style month view of the days you studied), parking lot | Implementation intentions, scope guard |
 | **Flashcards** | Vocabulary by unit, FR→EN then EN→FR, SM-2 spaced repetition, 🔊 audio | Retrieval practice + spacing |
 | **Conjugation** | Type the verb form; mix verbs and tenses (unlocked by unit); missed forms come back 3 questions later, and each form has its own SM-2 schedule | Retrieval + interleaving + spacing |
 | **Gender** | le or la? with the ending rule (or exception) after each answer | Explicit rule + immediate feedback |

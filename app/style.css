@@ -170,6 +170,23 @@ textarea { width: 100%; min-height: 120px; resize: vertical; }
 .check { display: flex; gap: 8px; align-items: center; padding: 4px 0; }
 .check input { width: 18px; height: 18px; }
 
+/* Practice calendar (Today): squares get greener with more of the day's session done */
+.cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; max-width: 320px; margin: 12px 0 8px; }
+.cal-head { text-align: center; font-size: 0.75rem; color: var(--muted); }
+.cal-day {
+  aspect-ratio: 1; border-radius: 4px; border: 1px solid var(--line); background: var(--bg);
+  display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--muted);
+}
+.cal-day.lv-1 { background: color-mix(in srgb, var(--good) 25%, var(--panel)); color: var(--text); }
+.cal-day.lv-2 { background: color-mix(in srgb, var(--good) 50%, var(--panel)); color: var(--text); }
+.cal-day.lv-3 { background: color-mix(in srgb, var(--good) 75%, var(--panel)); color: var(--panel); }
+.cal-day.lv-4 { background: var(--good); color: var(--panel); }
+.cal-day:not(.lv-0) { border-color: transparent; }
+.cal-day.today { outline: 2px solid var(--accent); outline-offset: 1px; }
+.cal-day.future { opacity: 0.4; }
+.cal-month { min-width: 9em; text-align: center; }
+.cal-legend .cal-day { display: inline-block; width: 12px; height: 12px; margin: 0 1px; vertical-align: middle; }
+
 /* Timer */
 .timer { font-variant-numeric: tabular-nums; font-size: 2.4rem; font-weight: 700; }
 
