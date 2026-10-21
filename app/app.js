@@ -87,8 +87,7 @@ const DAY = 24 * 60 * MIN;
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
-function todayKey() {
-  const d = new Date();
+function todayKey(d = new Date()) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 function shuffle(arr) {
@@ -984,6 +983,7 @@ function renderToday() {
       ${CHECK_ITEMS.map((id) => `<label class="check"><input type="checkbox" data-c="${id}" ${check[id] ? "checked" : ""}> ${t("today." + id)}</label>`).join("")}
       <p class="muted">${t("today.onlyFirst")}</p>
     </div>
+    <div class="panel" id="t-cal"></div>
     <div class="panel">
       <h3 style="margin-top:0">${t("today.parking")}</h3>
       <p class="muted">${t("today.parkingHelp")}</p>
@@ -1012,7 +1012,9 @@ function renderToday() {
     all[todayKey()] = Object.assign({}, all[todayKey()], { [i.dataset.c]: i.checked });
     store.set("checklist", all);
     if (i.checked) markStudied();
+    drawCalendar();
   }));
+  drawCalendar();
   $("#t-park").oninput = (e) => store.set("parking", e.target.value);
   $("#t-export").onclick = () => {
     const blob = new Blob([JSON.stringify(store.exportAll(), null, 2)], { type: "application/json" });
@@ -1060,6 +1062,60 @@ function renderToday() {
   };
   $("#t-reset").onclick = () => { clearInterval(timer.handle); timer.handle = null; timer.left = timer.total; draw(); };
   draw();
+}
+// Practice calendar: one square per day of a month, like GitHub's contribution graph.
+// A day is lit once anything marked it studied; each ticked session item makes it greener (levels 1–4).
+const cal = { offset: 0 }; // how many months back from the current one
+function calendarHtml() {
+  const days = new Set(store.get("days", []));
+  const checks = store.get("checklist", {});
+  const now = new Date();
+  const first = new Date(now.getFullYear(), now.getMonth() - cal.offset, 1);
+  const count = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+  const earliest = Array.from(days).sort()[0];
+  const canPrev = !!earliest && earliest.slice(0, 7) < todayKey(first).slice(0, 7);
+  const month = new Intl.DateTimeFormat(lang, { month: "long", year: "numeric" }).format(first);
+  const title = month.charAt(0).toUpperCase() + month.slice(1);
+  const dayName = new Intl.DateTimeFormat(lang, { day: "numeric", month: "long" });
+  // Weeks start on Sunday, as in the US and Brazil (1 Feb 2026 was a Sunday)
+  const weekday = new Intl.DateTimeFormat(lang, { weekday: "narrow" });
+  const heads = Array.from({ length: 7 }, (_, i) => `<span class="cal-head" aria-hidden="true">${weekday.format(new Date(2026, 1, 1 + i))}</span>`);
+  const blanks = Array.from({ length: first.getDay() }, () => "<span></span>");
+  let practiced = 0;
+  const cells = [];
+  for (let n = 1; n <= count; n++) {
+    const d = new Date(first.getFullYear(), first.getMonth(), n);
+    const k = todayKey(d);
+    const ticks = Object.values(checks[k] || {}).filter(Boolean).length;
+    const level = days.has(k) ? Math.max(1, Math.min(4, ticks)) : 0;
+    if (level) practiced++;
+    const cls = ["cal-day", "lv-" + level, k === todayKey() ? "today" : "", d > now ? "future" : ""].filter(Boolean).join(" ");
+    const label = `${dayName.format(d)}: ${level ? t("today.calPracticed") : t("today.calNone")}`;
+    cells.push(`<span class="${cls}" data-day="${k}" role="img" aria-label="${label}" title="${label}">${n}</span>`);
+  }
+  const legend = [0, 1, 2, 3, 4].map((l) => `<span class="cal-day lv-${l}"></span>`).join("");
+  return `
+    <div class="row" style="justify-content:space-between">
+      <h3 style="margin:0">${t("today.calendar")}</h3>
+      <div class="row cal-nav">
+        <button class="small" id="cal-prev" type="button" aria-label="${t("today.calPrev")}" ${canPrev ? "" : "disabled"}>‹</button>
+        <b class="cal-month">${escapeHtml(title)}</b>
+        <button class="small" id="cal-next" type="button" aria-label="${t("today.calNext")}" ${cal.offset ? "" : "disabled"}>›</button>
+      </div>
+    </div>
+    <div class="cal">${heads.concat(blanks, cells).join("")}</div>
+    <div class="row" style="justify-content:space-between">
+      <span class="muted" id="cal-count">${t("today.calCount", { n: practiced })}</span>
+      <span class="muted cal-legend" aria-hidden="true">${t("today.calLess")} ${legend} ${t("today.calMore")}</span>
+    </div>
+    <p class="muted" style="margin-bottom:0">${t("today.calHelp")}</p>`;
+}
+function drawCalendar() {
+  const el = $("#t-cal");
+  if (!el) return;
+  el.innerHTML = calendarHtml();
+  $("#cal-prev").onclick = () => { cal.offset++; drawCalendar(); };
+  $("#cal-next").onclick = () => { cal.offset--; drawCalendar(); };
 }
 function chime() {
   try {

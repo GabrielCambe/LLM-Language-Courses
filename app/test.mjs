@@ -525,6 +525,38 @@ for (const [id, firstCard, voice, tutorLine] of [
   await p.close();
 }
 
+// ── Practice calendar: this month's practiced days, darker with more of the session checklist ──
+{
+  const p = await browser.newPage();
+  const pErrors = [];
+  p.on("pageerror", (e) => pErrors.push(e.message));
+  await p.goto(url);
+  const keys = await p.evaluate(() => {
+    const k = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const now = new Date();
+    const today = k(now), first = k(new Date(now.getFullYear(), now.getMonth(), 1));
+    const lastMonth = k(new Date(now.getFullYear(), now.getMonth() - 1, 15));
+    localStorage.setItem("llc.fr.days", JSON.stringify([lastMonth, first, today]));
+    localStorage.setItem("llc.fr.checklist", JSON.stringify({ [today]: { flash: true, rule: true, media: true, output: false } }));
+    return { today, first, lastMonth, count: new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() };
+  });
+  await p.reload();
+  const level = (k) => p.$eval(`.cal-day[data-day="${k}"]`, (el) => (el.className.match(/lv-(\d)/) || [])[1]);
+  eq("calendar shows every day of this month", await p.$$eval(".cal .cal-day", (d) => d.length), keys.count);
+  eq("practiced days lit, darker with more checklist ticks", [await level(keys.first), await level(keys.today)],
+    keys.first === keys.today ? ["3", "3"] : ["1", "3"]);
+  eq("today is outlined", await p.$eval(".cal-day.today", (el) => el.dataset.day), keys.today);
+  eq("monthly count", await p.textContent("#cal-count"), `Days practiced this month: ${keys.first === keys.today ? 1 : 2}`);
+  eq("can't go past this month", await p.$eval("#cal-next", (b) => b.disabled), true);
+  await p.click("#cal-prev");
+  eq("previous month shows its practice", [await level(keys.lastMonth), await p.$eval("#cal-prev", (b) => b.disabled)], ["1", true]);
+  await p.click("#cal-next");
+  await p.click("#tab-today [data-c=output]");
+  eq("ticking the checklist updates today's square", await level(keys.today), "4");
+  eq("calendar: no page errors", pErrors, []);
+  await p.close();
+}
+
 // ── Responsive: no horizontal scrolling on any tab, phone to desktop, in both languages ──
 for (const [width, lang] of [[320, "en"], [390, "en"], [768, "en"], [1280, "en"], [320, "pt-BR"], [390, "pt-BR"], [1280, "pt-BR"]]) {
   const p = await browser.newPage({ viewport: { width, height: 800 } });
