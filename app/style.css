@@ -163,6 +163,7 @@ textarea { width: 100%; min-height: 120px; resize: vertical; }
 .feedback.ok { background: var(--good-soft); color: var(--good); }
 .feedback.no { background: var(--bad-soft); color: var(--bad); }
 .feedback.warn { background: var(--warn-soft); color: var(--warn); }
+.conj-line { margin-top: 6px; }
 
 .tag { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); }
 

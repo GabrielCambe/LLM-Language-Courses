@@ -438,13 +438,23 @@ function bindDrillButton(id, advance) {
 }
 
 // ───────────────────────── conjugation ─────────────────────────
-const PERSONS = ["je", "tu", "il/elle/on", "nous", "vous", "ils/elles"];
+// The pronouns of each person. The drill asks one pronoun at a time; the feedback shows
+// every pronoun of the person on its own line, so the voice reads each one with its verb.
+const PERSONS = [["je"], ["tu"], ["il", "elle", "on"], ["nous"], ["vous"], ["ils", "elles"]];
 const AVOIR = ["ai", "as", "a", "avons", "avez", "ont"];
 const ETRE = ["suis", "es", "est", "sommes", "êtes", "sont"];
 const ALLER = ["vais", "vas", "va", "allons", "allez", "vont"];
 
-// Returns { answers: [accepted...], display: "canonical form" }
-function conjugate(v, tense, p) {
+// Past participle endings after être, by subject: [accepted endings, how to show them].
+// il/elle/ils/elles fix gender and number; the others can be either ("on" can mean "we").
+const PC_AGREE = {
+  je: [["", "e"], "(e)"], tu: [["", "e"], "(e)"], il: [[""], ""], elle: [["e"], "e"], on: [["", "e", "s", "es"], "(e)(s)"],
+  nous: [["s", "es"], "(e)s"], vous: [["", "e", "s", "es"], "(e)(s)"], ils: [["s"], "s"], elles: [["es"], "es"],
+};
+
+// Returns { answers: [accepted...], display: "canonical form" } for person p (0–5) said with
+// pronoun `pron` (defaults to the person's first pronoun; only passé composé with être cares).
+function conjugate(v, tense, p, pron = PERSONS[p][0]) {
   if (tense === "present") return { answers: [v.present[p]], display: v.present[p] };
   if (tense === "futurProche") {
     const f = `${ALLER[p]} ${v.inf}`;
@@ -452,11 +462,8 @@ function conjugate(v, tense, p) {
   }
   if (tense === "passeCompose") {
     if (v.aux === "avoir") { const f = `${AVOIR[p]} ${v.pp}`; return { answers: [f], display: f }; }
-    const pp = v.pp;
-    // Agreement with the subject: which endings are possible for each person.
-    const variants = [[pp, pp + "e"], [pp, pp + "e"], [pp, pp + "e", pp + "s", pp + "es"], [pp + "s", pp + "es"], [pp, pp + "e", pp + "s", pp + "es"], [pp + "s", pp + "es"]][p];
-    const disp = ["(e)", "(e)", "(e)", "(e)s", "(e)(s)", "(e)s"][p];
-    return { answers: variants.map((x) => `${ETRE[p]} ${x}`), display: `${ETRE[p]} ${pp}${disp}` };
+    const [endings, disp] = PC_AGREE[pron];
+    return { answers: endings.map((x) => `${ETRE[p]} ${v.pp}${x}`), display: `${ETRE[p]} ${v.pp}${disp}` };
   }
   if (tense === "imparfait") {
     const endings = ["ais", "ais", "ait", "ions", "iez", "aient"];
@@ -475,9 +482,14 @@ function conjugate(v, tense, p) {
   }
   throw new Error("Unknown tense " + tense);
 }
-function subjectFor(p, form) {
-  return p === 0 && /^[aeiouyéèêh]/i.test(form) ? "j'" : PERSONS[p];
+function subjectFor(pron, form) {
+  return pron === "je" && /^[aeiouyéèêh]/i.test(form) ? "j'" : pron;
 }
+// "j'ai parlé", "il est allé": pronoun + form, as it's written and said.
+const withSubject = (pron, form) => {
+  const s = subjectFor(pron, form);
+  return s === "j'" ? s + form : `${s} ${form}`;
+};
 // Remove a pronoun the learner may have typed in front of the verb.
 const stripPronoun = (s) => norm(s).replace(/^(j'|je |tu |il |elle |on |nous |vous |ils |elles )/, "");
 
@@ -560,8 +572,10 @@ function newConjQ() {
   const [inf, tense, ps] = key.split("|");
   const v = pool.find((x) => x.inf === inf);
   const p = Number(ps);
-  const res = conjugate(v, tense, p);
-  conj.q = { v, tense, p, res, key, retried: kind === "retry" };
+  // One spacing schedule per person: il/elle/on take turns asking for the same form.
+  const pron = pick(PERSONS[p]);
+  const res = conjugate(v, tense, p, pron);
+  conj.q = { v, tense, p, pron, res, key, retried: kind === "retry" };
   conj.checked = false;
   const tLabel = COURSE.tenses.find((x) => x.id === tense).label;
   const due = keys.filter((k) => srs[k] && srs[k].due <= now).length;
@@ -569,7 +583,7 @@ function newConjQ() {
     <div class="row"><span class="tag">${tLabel}</span>${kind ? `<span class="tag" id="conj-kind">${t("conj." + kind)}</span>` : ""}
       <span class="muted">${v.inf}: ${v.en}</span>
       <span class="muted">· <span id="conj-score">${scoreText(conj.right, conj.total)}</span> · ${t("cards.due", { n: due })}</span></div>
-    <div class="prompt">${subjectFor(p, res.display)} ___ <small class="muted">(${v.inf})</small></div>
+    <div class="prompt">${subjectFor(pron, res.display)} ___ <small class="muted">(${v.inf})</small></div>
     <input type="text" id="conj-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t("conj.placeholder")}">
     ${drillButton("conj-go")}
     <div id="conj-fb"></div>`;
@@ -585,7 +599,7 @@ function newConjQ() {
 }
 
 function checkConj() {
-  const { res, p, v } = conj.q;
+  const { res, p, pron, v, tense } = conj.q;
   const typed = stripPronoun($("#conj-in").value);
   if (!typed) return;
   conj.checked = true;
@@ -601,12 +615,18 @@ function checkConj() {
   // Short relearning steps (Again, or Hard on a new form) come back in this same session.
   if (srs[conj.q.key].due - now < 20 * MIN) conj.retry.push({ key: conj.q.key, wait: CONJ_RETRY_GAP });
   $("#conj-score").textContent = scoreText(conj.right, conj.total);
-  const full = `${subjectFor(p, res.display)}${subjectFor(p, res.display) === "j'" ? "" : " "}${res.display}`;
+  // The asked pronoun first, then the others that share its form, each on its own line with its own 🔊.
+  const lines = [pron, ...PERSONS[p].filter((x) => x !== pron)].map((x) => {
+    const full = withSubject(x, conjugate(v, tense, p, x).display);
+    const say = full.replace(/\(e\)|\(s\)/g, "");
+    return `<div class="conj-line">${x === pron ? `<b>${escapeHtml(full)}</b>` : escapeHtml(full)} ${speakBtn(say)}</div>`;
+  });
   $("#conj-fb").innerHTML = `
     <div class="feedback ${r === "ok" ? "ok" : r === "accent" ? "warn" : "no"}">
-      ${r === "ok" ? t("conj.correct") : r === "accent" ? t("conj.accent") : t("conj.wrong")}: <b>${escapeHtml(full)}</b> ${speakBtn(full.replace(/\(e\)|\(s\)/g, ""))}
+      <div>${r === "ok" ? t("conj.correct") : r === "accent" ? t("conj.accent") : t("conj.wrong")}:</div>
+      ${lines.join("")}
     </div>
-    ${conj.q.tense === "passeCompose" && v.aux === "être" ? `<p class="muted">${t("conj.etre", { verb: v.inf })}</p>` : ""}`;
+    ${tense === "passeCompose" && v.aux === "être" ? `<p class="muted">${t("conj.etre", { verb: v.inf })}</p>` : ""}`;
   showAboveAccentBar($("#conj-fb"));
   if (r === "ok") markStudied();
 }
@@ -959,6 +979,7 @@ function renderToday() {
   const check = store.get("checklist", {})[todayKey()] || {};
   const u = UNITS[settings.unit];
   root.innerHTML = `
+    <div class="panel" id="t-cal"></div>
     <div class="panel">
       <div class="row" style="justify-content:space-between">
         <div>
@@ -983,7 +1004,6 @@ function renderToday() {
       ${CHECK_ITEMS.map((id) => `<label class="check"><input type="checkbox" data-c="${id}" ${check[id] ? "checked" : ""}> ${t("today." + id)}</label>`).join("")}
       <p class="muted">${t("today.onlyFirst")}</p>
     </div>
-    <div class="panel" id="t-cal"></div>
     <div class="panel">
       <h3 style="margin-top:0">${t("today.parking")}</h3>
       <p class="muted">${t("today.parkingHelp")}</p>
