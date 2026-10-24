@@ -441,6 +441,19 @@ function bindDrillButton(id, advance) {
 // The pronouns of each person. The drill asks one pronoun at a time; the feedback shows
 // every pronoun of the person on its own line, so the voice reads each one with its verb.
 const PERSONS = [["je"], ["tu"], ["il", "elle", "on"], ["nous"], ["vous"], ["ils", "elles"]];
+// What each pronoun means, shown under the question and next to each answer line.
+const PRONOUN_MEANING = {
+  je: { en: "I", "pt-BR": "eu" },
+  tu: { en: "you (informal)", "pt-BR": "tu / você (informal)" },
+  il: { en: "he / it", "pt-BR": "ele" },
+  elle: { en: "she / it", "pt-BR": "ela" },
+  on: { en: "we / one", "pt-BR": "a gente" },
+  nous: { en: "we", "pt-BR": "nós" },
+  vous: { en: "you (plural / formal)", "pt-BR": "vocês / o senhor, a senhora" },
+  ils: { en: "they (m. / mixed)", "pt-BR": "eles" },
+  elles: { en: "they (f.)", "pt-BR": "elas" },
+};
+const pronounMeaning = (pron) => local(PRONOUN_MEANING[pron]);
 const AVOIR = ["ai", "as", "a", "avons", "avez", "ont"];
 const ETRE = ["suis", "es", "est", "sommes", "êtes", "sont"];
 const ALLER = ["vais", "vas", "va", "allons", "allez", "vont"];
@@ -584,6 +597,7 @@ function newConjQ() {
       <span class="muted">${v.inf}: ${v.en}</span>
       <span class="muted">· <span id="conj-score">${scoreText(conj.right, conj.total)}</span> · ${t("cards.due", { n: due })}</span></div>
     <div class="prompt">${subjectFor(pron, res.display)} ___ <small class="muted">(${v.inf})</small></div>
+    <div class="muted" id="conj-pron">${pron} = ${escapeHtml(pronounMeaning(pron))}</div>
     <input type="text" id="conj-in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${t("conj.placeholder")}">
     ${drillButton("conj-go")}
     <div id="conj-fb"></div>`;
@@ -619,7 +633,7 @@ function checkConj() {
   const lines = [pron, ...PERSONS[p].filter((x) => x !== pron)].map((x) => {
     const full = withSubject(x, conjugate(v, tense, p, x).display);
     const say = full.replace(/\(e\)|\(s\)/g, "");
-    return `<div class="conj-line">${x === pron ? `<b>${escapeHtml(full)}</b>` : escapeHtml(full)} ${speakBtn(say)}</div>`;
+    return `<div class="conj-line">${x === pron ? `<b>${escapeHtml(full)}</b>` : escapeHtml(full)} <span class="muted pron-meaning">(${escapeHtml(pronounMeaning(x))})</span> ${speakBtn(say)}</div>`;
   });
   $("#conj-fb").innerHTML = `
     <div class="feedback ${r === "ok" ? "ok" : r === "accent" ? "warn" : "no"}">

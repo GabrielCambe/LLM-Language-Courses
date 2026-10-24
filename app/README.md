@@ -34,7 +34,7 @@ The course website has the same button, and one choice applies to both.
 |---|---|---|
 | **Today** | Practice calendar at the top (GitHub-style month view of the days you studied), current unit, due cards, 25-min focus timer, session checklist, parking lot | Implementation intentions, scope guard |
 | **Flashcards** | Vocabulary by unit, FR→EN then EN→FR, SM-2 spaced repetition, 🔊 audio | Retrieval practice + spacing |
-| **Conjugation** | Type the verb form; mix verbs and tenses (unlocked by unit); missed forms come back 3 questions later, and each form has its own SM-2 schedule; one pronoun per question (il, elle or on), and the answer lists every pronoun that shares the form on its own line with its own 🔊 | Retrieval + interleaving + spacing |
+| **Conjugation** | Type the verb form; mix verbs and tenses (unlocked by unit); missed forms come back 3 questions later, and each form has its own SM-2 schedule; one pronoun per question (il, elle or on), shown with what it means in your interface language (on = "we / one", "a gente"), and the answer lists every pronoun that shares the form on its own line with its meaning and its own 🔊 | Retrieval + interleaving + spacing |
 | **Gender** | le or la? with the ending rule (or exception) after each answer | Explicit rule + immediate feedback |
 | **Numbers** | Listen → digits, read → digits, digits → words; 🇫🇷/🇧🇪/🇨🇭 variants | Listening automaticity |
 | **Song Workshop** | Paste lyrics → click words to make cards, cloze (fill-the-gap) while listening | Noticing + retrieval with real media |

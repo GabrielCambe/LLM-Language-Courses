@@ -210,11 +210,13 @@ eq("Check button checks without Enter", (await page.textContent("#conj-fb")).inc
   await p.click("#tabs button[data-tab=conj]");
   const asked = (await p.textContent("#conj-card .prompt")).trim().split(" ")[0];
   eq("one pronoun per question", ["il", "elle", "on"].includes(asked), true);
+  const meanings = { il: "he / it", elle: "she / it", on: "we / one" };
+  eq("question shows what the pronoun means", await p.textContent("#conj-pron"), `${asked} = ${meanings[asked]}`);
   await p.fill("#conj-in", "zzz");
   await p.keyboard.press("Enter");
-  const lines = await p.$$eval("#conj-fb .conj-line", (els) => els.map((el) => [el.textContent.trim().replace(/\s*🔊$/, ""), el.querySelector(".speak").dataset.say]));
-  const want = { il: ["il est allé", "il est allé"], elle: ["elle est allée", "elle est allée"], on: ["on est allé(e)(s)", "on est allé"] };
-  eq("answer: asked pronoun first, then each other pronoun on its own line", lines, [asked, ...["il", "elle", "on"].filter((x) => x !== asked)].map((x) => want[x]));
+  const lines = await p.$$eval("#conj-fb .conj-line", (els) => els.map((el) => [el.firstChild.textContent.trim(), el.querySelector(".pron-meaning").textContent, el.querySelector(".speak").dataset.say]));
+  const want = { il: ["il est allé", "(he / it)", "il est allé"], elle: ["elle est allée", "(she / it)", "elle est allée"], on: ["on est allé(e)(s)", "(we / one)", "on est allé"] };
+  eq("answer: asked pronoun first, then each other pronoun on its own line with its meaning", lines, [asked, ...["il", "elle", "on"].filter((x) => x !== asked)].map((x) => want[x]));
   await p.close();
 }
 
