@@ -70,8 +70,11 @@ const conj = await page.evaluate(() => {
     commencerImpVous: c(V("commencer"), "imparfait", 4).display,
     etreImp: c(V("être"), "imparfait", 5).display,
     faireImp: c(V("faire"), "imparfait", 0).display,
-    allerPC: c(V("aller"), "passeCompose", 5).answers,
+    allerPCils: c(V("aller"), "passeCompose", 5, "ils").answers,
+    allerPCelles: c(V("aller"), "passeCompose", 5, "elles").display,
+    allerPCon: c(V("aller"), "passeCompose", 2, "on").answers,
     allerPCje: c(V("aller"), "passeCompose", 0).display,
+    etrePresElle: c(V("être"), "present", 2, "elle").display,
     parlerPC: c(V("parler"), "passeCompose", 0).display,
     venirFut: c(V("venir"), "futurSimple", 3).display,
     prendreFut: c(V("prendre"), "futurSimple", 0).display,
@@ -83,7 +86,10 @@ eq("je mangeais", conj.mangerImpJe, "mangeais");
 eq("vous commenciez", conj.commencerImpVous, "commenciez");
 eq("ils étaient", conj.etreImp, "étaient");
 eq("je faisais", conj.faireImp, "faisais");
-eq("ils sont allés/allées", conj.allerPC, ["sont allés", "sont allées"]);
+eq("ils sont allés", conj.allerPCils, ["sont allés"]);
+eq("elles sont allées", conj.allerPCelles, "sont allées");
+eq("on est allé/allée/allés/allées", conj.allerPCon, ["est allé", "est allée", "est allés", "est allées"]);
+eq("elle est", conj.etrePresElle, "est");
 eq("je suis allé(e)", conj.allerPCje, "suis allé(e)");
 eq("j'ai parlé", conj.parlerPC, "ai parlé");
 eq("nous viendrons", conj.venirFut, "viendrons");
@@ -188,6 +194,29 @@ eq("Next button gives a new question", [await page.textContent("#conj-fb"), awai
 await page.fill("#conj-in", "zzz");
 await page.click("#conj-go");
 eq("Check button checks without Enter", (await page.textContent("#conj-fb")).includes("Not quite"), true);
+
+// Pronouns that share a form: asked one at a time, the answer lists each on its own line with its own 🔊
+{
+  const p = await browser.newPage();
+  await p.goto(url);
+  await p.evaluate(() => {
+    localStorage.setItem("llc.fr.conjVerbs", JSON.stringify(["aller"]));
+    localStorage.setItem("llc.fr.conjTenses", JSON.stringify(["passeCompose"]));
+    // Every person but il/elle/on (2) is scheduled for later, so the drill asks person 2.
+    const later = { reps: 1, interval: 5, ease: 2.5, lapses: 0, due: Date.now() + 864e5 };
+    localStorage.setItem("llc.fr.conjSrs", JSON.stringify(Object.fromEntries([0, 1, 3, 4, 5].map((n) => ["aller|passeCompose|" + n, later]))));
+  });
+  await p.reload();
+  await p.click("#tabs button[data-tab=conj]");
+  const asked = (await p.textContent("#conj-card .prompt")).trim().split(" ")[0];
+  eq("one pronoun per question", ["il", "elle", "on"].includes(asked), true);
+  await p.fill("#conj-in", "zzz");
+  await p.keyboard.press("Enter");
+  const lines = await p.$$eval("#conj-fb .conj-line", (els) => els.map((el) => [el.textContent.trim().replace(/\s*🔊$/, ""), el.querySelector(".speak").dataset.say]));
+  const want = { il: ["il est allé", "il est allé"], elle: ["elle est allée", "elle est allée"], on: ["on est allé(e)(s)", "on est allé"] };
+  eq("answer: asked pronoun first, then each other pronoun on its own line", lines, [asked, ...["il", "elle", "on"].filter((x) => x !== asked)].map((x) => want[x]));
+  await p.close();
+}
 
 // Conjugation spacing: a missed form is saved and comes back after CONJ_RETRY_GAP (3) other questions
 {
@@ -542,6 +571,7 @@ for (const [id, firstCard, voice, tutorLine] of [
   });
   await p.reload();
   const level = (k) => p.$eval(`.cal-day[data-day="${k}"]`, (el) => (el.className.match(/lv-(\d)/) || [])[1]);
+  eq("calendar is the first panel on Today", await p.$eval("#tab-today > .panel", (el) => el.id), "t-cal");
   eq("calendar shows every day of this month", await p.$$eval(".cal .cal-day", (d) => d.length), keys.count);
   eq("practiced days lit, darker with more checklist ticks", [await level(keys.first), await level(keys.today)],
     keys.first === keys.today ? ["3", "3"] : ["1", "3"]);
