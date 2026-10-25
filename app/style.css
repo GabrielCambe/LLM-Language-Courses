@@ -227,6 +227,7 @@ textarea { width: 100%; min-height: 120px; resize: vertical; }
 code { overflow-wrap: anywhere; }
 #tabs .short { display: none; }
 .unit-pick select { max-width: 100%; }
+.unit-pick small { display: block; margin-top: 4px; }
 details > summary { cursor: pointer; }
 
 /* Tutor chat */

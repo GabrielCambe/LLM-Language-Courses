@@ -529,7 +529,13 @@ for (const [id, firstCard, voice, tutorLine, articles] of [
   await p.goto(url);
   eq(`${id}: course selected, starter tabs only`, [await p.inputValue("#course-select"),
     await p.$$eval("#tabs button", (b) => b.filter((x) => !x.hidden).map((x) => x.dataset.tab))], [id, ["today", "cards", "tutor"]]);
-  eq(`${id}: unit link goes to the course roadmap`, await p.$eval("#tab-today a", (a) => a.getAttribute("href")), `../${{ es: "spanish", la: "latin", pl: "polish", ja: "japanese" }[id]}/README.md`);
+  const folder = { es: "spanish", la: "latin", pl: "polish", ja: "japanese" }[id];
+  eq(`${id}: unit link opens the lesson page, or says there isn't one and opens the roadmap`,
+    await p.$eval("#tab-today a", (a) => [a.getAttribute("href"), a.textContent]),
+    id === "es" ? [`../${folder}/units/unit-00-sounds.md`, "Open the unit →"] : [`../${folder}/README.md`, "No lesson page yet: open the roadmap →"]);
+  eq(`${id}: unit picker marks the units that have a lesson page`,
+    await p.$eval("#t-unit", (s) => [[...s.options].filter((o) => o.textContent.endsWith("✅")).map((o) => o.value), !!s.parentElement.querySelector("small")]),
+    id === "es" ? [["0", "1", "2", "3"], true] : [[], false]);
   await p.click("#tabs button[data-tab=cards]");
   eq(`${id}: first card`, (await p.textContent("#fc-card .prompt")).trim().startsWith(firstCard), true);
   eq(`${id}: nouns carry a gender (and the "include the article" hint) only in courses with articles`, await p.evaluate(() => {

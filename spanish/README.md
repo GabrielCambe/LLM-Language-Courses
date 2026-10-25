@@ -11,9 +11,9 @@ whose gender flips, the false friends and the handful of rules Portuguese doesn'
 
 Each unit = **one rule family + ~15 high-frequency words + one output task**.
 
-> 🌱 **Status: starter.** The study app has decks for units 0–3 and the Tutor knows the course.
-> Lesson pages aren't written yet: generate each one with
-> [`../docs/unit-template.md`](../docs/unit-template.md) when you reach it, like the French units.
+> 🌱 **Status: starter.** ✅ **Lesson pages: units 0–3** (marked ✅ below). The study app has decks
+> for the same units and the Tutor knows the course. Generate the next lesson pages with
+> [`../docs/unit-template.md`](../docs/unit-template.md) when you reach them, like the French units.
 
 > 🧭 **Scope guard:** you only need the unit you're on and the next one. French is the main course:
 > if French minutes start dropping, Spanish pauses first.
@@ -50,10 +50,10 @@ Learning two close languages at the same time works, but they leak into each oth
 
 | # | Unit | Focus |
 |---|---|---|
-| 0 | Sounds and spelling | The jota (*j*, *ge/gi*), *rr* vs *r*, *b = v*, *s* always s, *ll/y*, *ñ*; final *o/e* never become *u/i*, *ti/di* never *tchi/dji* |
-| 1 | Introductions and *ser* | *soy, eres, es…*, greetings, *tú* vs *usted* (and *vos*), ¿ and ¡ |
-| 2 | Gender and articles | *el/la/los/las*, *el agua*, and the nouns whose gender flips (*la leche, el viaje, el color*) |
-| 3 | Having and describing | *tener*, *hay* (never *tiene*), **muy vs mucho**, adjective agreement |
+| 0 ✅ | [Sounds and spelling](units/unit-00-sounds.md) | The jota (*j*, *ge/gi*), *rr* vs *r*, *b = v*, *s* always s, *ll/y*, *ñ*; final *o/e* never become *u/i*, *ti/di* never *tchi/dji* |
+| 1 ✅ | [Introductions and *ser*](units/unit-01-ser.md) | *soy, eres, es…*, greetings, *tú* vs *usted* (and *vos*), ¿ and ¡ |
+| 2 ✅ | [Gender and articles](units/unit-02-gender-articles.md) | *el/la/los/las*, *el agua*, and the nouns whose gender flips (*la leche, el viaje, el color*) |
+| 3 ✅ | [Having and describing](units/unit-03-tener-hay-muy.md) | *tener*, *hay* (never *tiene*), **muy vs mucho**, adjective agreement |
 | 4 | Present tense: -ar, -er, -ir | Regular verbs; *ustedes* for "vocês"; recognising *vosotros* |
 | 5 | Stem-changing verbs | *querer → quiero*, *poder → puedo*, *pedir → pido*: new for Portuguese speakers |
 | 6 | Ser and estar | Mostly like Portuguese, plus the differences (*estar casado*, *ser* for events) |

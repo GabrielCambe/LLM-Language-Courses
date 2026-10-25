@@ -16,12 +16,17 @@ This repo tries to fill that gap. It has:
 Duolingo, films, music and conversation stay in the plan. They now feed into a structure
 instead of being the whole plan.
 
-Courses:
-- **French** 🇫🇷🇧🇪: the first and most complete one ([roadmap](french/README.md))
-- **Spanish** 🇪🇸: starter, built for Portuguese speakers and run alongside French ([roadmap](spanish/README.md))
-- **Latin** 🏛️: starter, for reading ([roadmap](latin/README.md))
-- **Polish** 🇵🇱: starter ([roadmap](polish/README.md))
-- **Japanese** 🇯🇵: starter, kana first ([roadmap](japanese/README.md))
+Courses: a ✅ means the course has written **lesson pages** (unit by unit: rules, vocab, media,
+tasks). A course without them has only a roadmap: you generate each lesson page with
+[`docs/unit-template.md`](docs/unit-template.md) when you reach it.
+
+| Course | Lesson pages | In the study app |
+|---|---|---|
+| 🇫🇷🇧🇪 **French**: the first and most complete one ([roadmap](french/README.md)) | ✅ Units 0–4 (of 27) + grammar reference + media guides | Every tab: flashcards, conjugation, gender, numbers, songs, tutor |
+| 🇪🇸 **Spanish**: built for Portuguese speakers, run alongside French ([roadmap](spanish/README.md)) | ✅ Units 0–3 (of 21) | Flashcards (units 0–3) + tutor |
+| 🏛️ **Latin**: for reading ([roadmap](latin/README.md)) | ❌ None yet: roadmap only | Flashcards (units 0–3) + tutor |
+| 🇵🇱 **Polish** ([roadmap](polish/README.md)) | ❌ None yet: roadmap only | Flashcards (units 0–3) + tutor |
+| 🇯🇵 **Japanese**: kana first ([roadmap](japanese/README.md)) | ❌ None yet: roadmap only | Flashcards (units 0–3) + tutor |
 
 <p class="llc-app-cta"><a href="https://gabrielcambe.github.io/LLM-Language-Courses/app/">📱 Open the study app →</a></p>
 
@@ -50,8 +55,11 @@ french/
   units/                  Unit-by-unit lessons (rules + vocab + media + tasks)
   grammar/                Grammar reference, one rule family per file (incl. sentence structure)
   media/                  Music (Angèle first!), films, series, podcasts, reading ladder, sorted by level
-spanish/, latin/, polish/, japanese/
-  README.md               Starter roadmaps (lesson pages get generated as you go)
+spanish/
+  README.md               Roadmap A0 → A2, false friends, running it alongside French
+  units/                  Lesson pages for units 0–3
+latin/, polish/, japanese/
+  README.md               Roadmaps only (lesson pages get generated as you go)
 app/
   index.html              Offline study app: SRS flashcards, conjugation, gender, numbers, song workshop
 ```
