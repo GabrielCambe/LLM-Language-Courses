@@ -877,10 +877,30 @@ function renderSongs() {
   if (songs.mode === "read") renderSongRead(s); else renderSongCloze(s);
 }
 
+// Lyrics search: LRCLIB (lrclib.net) is a free community lyrics database that allows
+// calls from any website. Only the title and artist are sent; nothing is stored there.
+const LRCLIB_URL = "https://lrclib.net/api/search";
+const LRCLIB_CLIENT = "LLM Language Courses (https://github.com/GabrielCambe/LLM-Language-Courses)";
+// Synced lyrics carry a timestamp per line ("[00:42.10] text"); drop it to get plain text.
+const plainFromSynced = (lrc) => lrc.split("\n").map((l) => l.replace(/^\s*(\[[^\]]*\]\s*)+/, "")).join("\n").trim();
+
+async function findLyrics(title, artist) {
+  const params = new URLSearchParams(artist ? { track_name: title, artist_name: artist } : { q: title });
+  const res = await fetch(`${LRCLIB_URL}?${params}`, { headers: { "Lrclib-Client": LRCLIB_CLIENT }, signal: AbortSignal.timeout(15000) });
+  if (!res.ok) throw new Error(`LRCLIB ${res.status}`);
+  return (await res.json())
+    .filter((r) => !r.instrumental && (r.plainLyrics || r.syncedLyrics))
+    .slice(0, 8)
+    .map((r) => ({ title: r.trackName, artist: r.artistName, album: r.albumName === "null" ? "" : r.albumName, duration: r.duration,
+      lyrics: (r.plainLyrics || plainFromSynced(r.syncedLyrics)).trim() }));
+}
+
 function renderSongForm(main) {
   main.innerHTML = `
     <h3>${t("songs.add")}</h3>
-    <div class="row"><input type="text" id="sf-title" placeholder="${t("songs.titlePh")}"><input type="text" id="sf-artist" placeholder="${t("songs.artistPh")}"></div>
+    <div class="row"><input type="text" id="sf-title" placeholder="${t("songs.titlePh")}"><input type="text" id="sf-artist" placeholder="${t("songs.artistPh")}">
+      <button id="sf-find">${t("songs.find")}</button></div>
+    <div id="sf-results" class="muted"></div>
     <p class="muted">${t("songs.tip")}</p>
     <textarea id="sf-lyrics" placeholder="${t("songs.lyricsPh")}"></textarea>
     <button class="primary" id="sf-save">${t("common.save")}</button>`;
@@ -890,6 +910,25 @@ function renderSongForm(main) {
     if (!title || !lyrics) { alert(t("songs.needed")); return; }
     const song = { id: String(Date.now()), title, artist: $("#sf-artist").value.trim(), lyrics };
     songs.list.push(song); saveSongs(); songs.sel = song.id; songs.mode = "read"; renderSongs();
+  };
+  $("#sf-find").onclick = async () => {
+    const title = $("#sf-title").value.trim();
+    const out = $("#sf-results");
+    if (!title) { out.textContent = t("songs.needTitle"); return; }
+    out.textContent = t("songs.searching");
+    let found;
+    try { found = await findLyrics(title, $("#sf-artist").value.trim()); } catch (e) { out.textContent = t("songs.searchError"); return; }
+    if (!found.length) { out.textContent = t("songs.noResults"); return; }
+    const mins = (d) => (d ? ` · ${Math.floor(d / 60)}:${String(Math.round(d % 60)).padStart(2, "0")}` : "");
+    out.innerHTML = `<p>${t("songs.pick")}</p><div class="picks">${found.map((r, i) =>
+      `<button class="small" data-i="${i}">${escapeHtml(r.title)} · ${escapeHtml(r.artist)}${r.album ? ` · <i>${escapeHtml(r.album)}</i>` : ""}${mins(r.duration)}</button>`).join("")}</div>`;
+    $$("#sf-results [data-i]").forEach((b) => (b.onclick = () => {
+      const r = found[b.dataset.i];
+      $("#sf-title").value = r.title;
+      $("#sf-artist").value = r.artist;
+      $("#sf-lyrics").value = r.lyrics;
+      out.innerHTML = `<p>${t("songs.source")}</p>`;
+    }));
   };
 }
 
