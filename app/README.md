@@ -38,7 +38,7 @@ The course website has the same button, and one choice applies to both.
 | **Gender** | le or la? with the ending rule (or exception) after each answer | Explicit rule + immediate feedback |
 | **Numbers** | Listen → digits, read → digits, digits → words; 🇫🇷/🇧🇪/🇨🇭 variants | Listening automaticity |
 | **Song Workshop** | Paste lyrics → click words to make cards, cloze (fill-the-gap) while listening | Noticing + retrieval with real media |
-| **💬 Tutor** | Chat with Claude in 5 modes (Tutor, Corrector, Conversation, Song explainer, Reading), aware of your current unit | Output + corrective feedback, retrieval |
+| **💬 Tutor** | Chat with Claude in 6 modes (Tutor, Corrector, Conversation, Song explainer, Pronunciation, Reading), aware of your current unit | Output + corrective feedback, retrieval |
 
 ### The Tutor and your Claude account
 - **Claude Pro / Max subscription:** subscriptions can't be used by other apps. The Tutor tab

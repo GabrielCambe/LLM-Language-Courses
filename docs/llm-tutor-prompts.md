@@ -1,7 +1,7 @@
 # LLM tutor prompts
 
 > 💬 **These are built into the study app's Tutor tab** (Tutor, Corrector, Conversation, Song
-> explainer and Reading modes), already filled in with your current unit. With an API key, the
+> explainer, Pronunciation and Reading modes), already filled in with your current unit. With an API key, the
 > chat runs inside the app; with a Claude Pro subscription, the tab copies the prompt for Claude.ai.
 > The versions below are for any other chat app.
 
@@ -85,6 +85,27 @@ Do NOT continue the lyrics beyond what I paste, and do not invent lyrics.
 Lines:
 {paste 2–6 lines}
 ```
+
+### 4b. 👄 The Pronunciation Coach (songs or any sentence)
+
+```text
+I'm learning French. Break down the pronunciation of the lines below. For each line:
+- an easy respelling for an {English / Portuguese} speaker (syllables split with dashes),
+  then the IPA,
+- what trips learners up, word by word: silent final letters, liaison (required, optional
+  or forbidden), elision, nasal vowels, u vs ou, the e muet,
+- if it's a song: where normal speech and singing probably differ (the e muet is often
+  sung as a full syllable to fit the melody).
+End with ONE sound to practise and a shadowing tip. Do NOT continue the lyrics beyond what
+I paste, and do not invent lyrics.
+
+Lines:
+{paste 1–4 lines}
+```
+
+> 💡 **Text can't carry sound.** An LLM working from text knows the *rules* well but can't hear
+> the recording, so treat its "how it's sung" notes as guesses and check them by listening.
+> The rules it uses are the ones in [Unit 0](../french/units/unit-00-sounds.md).
 
 ## 5. 🎬 The Scene Explainer (films/series)
 
