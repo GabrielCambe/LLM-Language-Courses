@@ -18,6 +18,7 @@ instead of being the whole plan.
 
 Courses:
 - **French** 🇫🇷🇧🇪: the first and most complete one ([roadmap](french/README.md))
+- **Spanish** 🇪🇸: starter, built for Portuguese speakers and run alongside French ([roadmap](spanish/README.md))
 - **Latin** 🏛️: starter, for reading ([roadmap](latin/README.md))
 - **Polish** 🇵🇱: starter ([roadmap](polish/README.md))
 - **Japanese** 🇯🇵: starter, kana first ([roadmap](japanese/README.md))
@@ -49,7 +50,7 @@ french/
   units/                  Unit-by-unit lessons (rules + vocab + media + tasks)
   grammar/                Grammar reference, one rule family per file (incl. sentence structure)
   media/                  Music (Angèle first!), films, series, podcasts, reading ladder, sorted by level
-latin/, polish/, japanese/
+spanish/, latin/, polish/, japanese/
   README.md               Starter roadmaps (lesson pages get generated as you go)
 app/
   index.html              Offline study app: SRS flashcards, conjugation, gender, numbers, song workshop

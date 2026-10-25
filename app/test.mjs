@@ -299,7 +299,7 @@ await stale.route(/app\.js/, (r) => r.fulfill({ contentType: "text/javascript", 
 await stale.goto(url);
 eq("button still visible with a stale app.js", await stale.$eval("#theme-toggle", (b) => [b.textContent, b.offsetWidth > 40]), ["🌓 Auto", true]);
 eq("course and language pickers still usable with a stale app.js",
-  [await stale.$eval("#course-select", (s) => s.options.length), await stale.$eval("#lang-select", (s) => [...s.options].map((o) => o.value))], [4, ["en", "pt-BR"]]);
+  [await stale.$eval("#course-select", (s) => s.options.length), await stale.$eval("#lang-select", (s) => [...s.options].map((o) => o.value))], [5, ["en", "pt-BR"]]);
 await stale.close();
 
 // ── Tutor (Claude) against a mocked API: request shape, append-only history, errors ──
@@ -476,7 +476,7 @@ for (const tab of ["conj", "numbers"]) {
   });
   await p.goto(url);
   eq("course picker lists the courses", await p.$$eval("#course-select option", (o) => o.map((x) => [x.value || "", x.disabled])),
-    [["fr", false], ["la", false], ["pl", false], ["ja", false], ["xx", false], ["➕ More soon", true]]);
+    [["fr", false], ["es", false], ["la", false], ["pl", false], ["ja", false], ["xx", false], ["➕ More soon", true]]);
   eq("French is the default course", await p.inputValue("#course-select"), "fr");
   await p.evaluate(() => localStorage.setItem("llc.fr.days", JSON.stringify(["2026-01-01"])));
 
@@ -515,11 +515,12 @@ for (const tab of ["conj", "numbers"]) {
   await p.close();
 }
 
-// ── Latin, Polish and Japanese starter courses ──
-for (const [id, firstCard, voice, tutorLine] of [
-  ["la", "salvē", "it-IT", "You are a Latin tutor"],
-  ["pl", "cześć", "pl-PL", "You are a Polish tutor"],
-  ["ja", "こんにちは", "ja-JP", "You are a Japanese tutor"],
+// ── Spanish, Latin, Polish and Japanese starter courses ──
+for (const [id, firstCard, voice, tutorLine, articles] of [
+  ["es", "la jirafa", "es-MX", "You are a Spanish tutor", true],
+  ["la", "salvē", "it-IT", "You are a Latin tutor", false],
+  ["pl", "cześć", "pl-PL", "You are a Polish tutor", false],
+  ["ja", "こんにちは", "ja-JP", "You are a Japanese tutor", false],
 ]) {
   const p = await browser.newPage();
   const pErrors = [];
@@ -528,19 +529,34 @@ for (const [id, firstCard, voice, tutorLine] of [
   await p.goto(url);
   eq(`${id}: course selected, starter tabs only`, [await p.inputValue("#course-select"),
     await p.$$eval("#tabs button", (b) => b.filter((x) => !x.hidden).map((x) => x.dataset.tab))], [id, ["today", "cards", "tutor"]]);
-  eq(`${id}: unit link goes to the course roadmap`, await p.$eval("#tab-today a", (a) => a.getAttribute("href")), `../${{ la: "latin", pl: "polish", ja: "japanese" }[id]}/README.md`);
+  eq(`${id}: unit link goes to the course roadmap`, await p.$eval("#tab-today a", (a) => a.getAttribute("href")), `../${{ es: "spanish", la: "latin", pl: "polish", ja: "japanese" }[id]}/README.md`);
   await p.click("#tabs button[data-tab=cards]");
   eq(`${id}: first card`, (await p.textContent("#fc-card .prompt")).trim().startsWith(firstCard), true);
-  eq(`${id}: no "include the article" hint (no articles)`, await p.evaluate(() => {
+  eq(`${id}: nouns carry a gender (and the "include the article" hint) only in courses with articles`, await p.evaluate(() => {
     const deck = window.LLC_COURSES.find((c) => c.id === localStorage.getItem("llc.course")).vocab;
-    return Object.values(deck).flat().filter((e) => e[2] !== null).length;
-  }), 0);
+    return Object.values(deck).flat().some((e) => e[2] !== null);
+  }), articles);
   eq(`${id}: speaks with the course voice`, await p.$eval("#fc-card .speak", (b) => b.dataset.lang), voice);
   const sys = await p.evaluate(() => [window.__fr.tutorSystem("conversation"), window.__fr.claudeAiPrompt("conversation")]);
-  eq(`${id}: tutor is about the course language, not French`, [sys[0].includes(tutorLine), /French|Belgi|Angèle/.test(sys.join(" "))], [true, false]);
+  eq(`${id}: tutor is about the course language, not French`, [sys[0].includes(tutorLine), /You are a French|Belgi|Angèle/.test(sys.join(" "))], [true, false]);
   await p.click("#tabs button[data-tab=tutor]");
   eq(`${id}: tutor tab renders`, !!(await p.$("#tm-setup")), true);
   eq(`${id}: no page errors`, pErrors, []);
+  await p.close();
+}
+
+// ── Spanish: ¿ and ¡ are optional when typing, nouns come with their article ──
+{
+  const p = await browser.newPage();
+  await p.addInitScript(() => localStorage.setItem("llc.course", "es"));
+  await p.goto(url);
+  eq("es: ¿ ¡ are ignored, accents still checked", await p.evaluate(() => {
+    const { compare } = window.__fr;
+    return [compare("como te llamas", ["¿cómo te llamas?"]), compare("¿Cómo te llamas?", ["¿cómo te llamas?"]), compare("¡hola!", ["hola"]), compare("el nino", ["el niño"])];
+  }), ["accent", "ok", "ok", "accent"]);
+  eq("es: every noun with a gender starts with its article", await p.evaluate(() =>
+    Object.values(window.ES_VOCAB).flat().filter((e) => e[2] && !/^(el|la|los|las) /.test(e[0])).map((e) => e[0])), []);
+  eq("es: accent bar has ñ and the opening ¿", await p.$$eval("#accent-bar button", (b) => b.map((x) => x.textContent).filter((x) => "ñ¿".includes(x))), ["ñ", "¿"]);
   await p.close();
 }
 

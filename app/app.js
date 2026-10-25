@@ -102,7 +102,7 @@ const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const stripAccents = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "");
 // Normalise an answer for comparison: case, curly quotes, spacing, punctuation.
 function norm(s) {
-  return s.toLowerCase().replace(/[’`]/g, "'").replace(/[!?.,;:…]/g, "").replace(/\s+/g, " ").trim();
+  return s.toLowerCase().replace(/[’`]/g, "'").replace(/[!?¡¿.,;:…]/g, "").replace(/\s+/g, " ").trim();
 }
 // Compare typed vs expected: "ok", "accent" (right except accents) or "no".
 function compare(typed, expectedList) {
