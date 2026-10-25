@@ -24,6 +24,7 @@ window.LLC_COURSES = [
       course: "The course favours Belgian examples (the learner loves Angèle and Stromae), but teach standard French and mark regional usage.",
       mark: "Mark anything colloquial vs formal, and France vs Belgium/Switzerland/Québec.",
       song: "slang, Belgian/regional expressions",
+      pronounce: "silent final letters, liaison (required, optional or forbidden), elision and enchaînement, nasal vowels, u vs ou, and the e muet (dropped in speech, often sung as a full syllable)",
       reading: "Verbs in the passé simple or other tenses above their level, with the passé composé equivalent.",
     },
     scenarios: {
@@ -83,6 +84,7 @@ window.LLC_COURSES = [
       course: "The course teaches classical Latin with macrons and restored classical pronunciation, in the spirit of Ørberg's Lingua Latina per se illustrata (reading lots of easy Latin).",
       mark: "Mark classical vs later (medieval/Church) usage, and point out words in the learner's language that come from the Latin.",
       song: "poetic word order, archaic or Church Latin forms",
+      pronounce: "vowel length (macrons), where the stress falls (the penultimate rule), c and g always hard, v as w, and how Church (Italian-style) pronunciation differs; in verse, elision and metre",
       reading: "Forms above their level (cases, tenses, participles, ablative absolutes), each with a one-line explanation.",
     },
     scenarios: {
@@ -127,6 +129,7 @@ window.LLC_COURSES = [
       course: "The course teaches standard contemporary Polish.",
       mark: "Mark anything colloquial vs formal (ty vs Pan/Pani), and point out cases and aspect pairs when they appear.",
       song: "slang and colloquial forms",
+      pronounce: "stress on the second-to-last syllable, sz/cz/rz/ż/ch, the soft ś/ć/ź/ń (and si/ci/zi/ni), the nasal ą and ę, and final devoicing and voicing assimilation",
       reading: "Cases and verb forms above their level (especially aspect pairs), each with a one-line explanation.",
     },
     scenarios: {
@@ -175,6 +178,7 @@ window.LLC_COURSES = [
       course: "The course teaches standard (Tokyo) Japanese, polite です/ます style first and casual speech from unit 13. It is kana-first: write words the learner hasn't met in kanji with the reading in hiragana in brackets, e.g. 学校（がっこう）, and use romaji only in units 0-1.",
       mark: "Mark polite (です/ます) vs casual (plain) forms, and male/female-coded or regional (e.g. Kansai) speech when it appears.",
       song: "casual and poetic forms, contractions, kanji with unusual readings, English loanwords",
+      pronounce: "the reading of each kanji in hiragana, long vowels, the small っ (double consonant), devoiced vowels (です → \"des\"), how ん changes before other sounds, and pitch accent only where it changes meaning; in songs, how morae are stretched across notes",
       reading: "Kanji above their level with the reading in hiragana, and verb forms above their level (plain, て-form, past, potential), each with a one-line explanation.",
     },
     scenarios: {

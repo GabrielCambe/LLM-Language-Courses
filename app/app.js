@@ -1234,6 +1234,12 @@ Start the scene yourself with one line.`,
 - grammar at their level,
 - ${COURSE.tutor.song}, and places where the singer bends pronunciation or grammar for the rhythm,
 then list 3 chunks worth memorising. Work ONLY with the lines they paste: never continue, complete or invent lyrics.`,
+  pronounce: `MODE: Pronunciation coach. The learner pastes a few lines of ${L} (song lyrics, a sentence from a lesson, anything) and may name the song. For each line:
+1. An easy respelling using the spelling of their language, syllables split with dashes (stressed syllable in CAPS where stress matters), then the IPA in /slashes/.
+2. Bullets for what trips learners up in this line: ${COURSE.tutor.pronounce}. Name the exact word each time.
+3. If it's a song: where normal speech and singing probably differ (you can't hear the recording, so say "probably").
+End with ONE sound from these lines to practise, and a shadowing tip: play the line, pause, say it aloud, repeat.
+Pronunciation from text is approximate: remind them once to check against the recording. Work ONLY with the lines they paste: never continue, complete or invent lyrics.`,
   reading: `MODE: Reading companion. The learner pastes one paragraph from a book or article and says what they're reading.
 1. A natural English translation.
 2. ${COURSE.tutor.reading}
@@ -1247,6 +1253,7 @@ const TUTOR_MODES = {
   corrector: {},
   conversation: {},
   song: {},
+  pronounce: {},
   reading: {},
 };
 

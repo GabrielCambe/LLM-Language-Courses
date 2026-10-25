@@ -380,6 +380,9 @@ await stale.close();
   eq("tutor: Claude.ai prompt includes unit + mode", await t.evaluate(() => {
     const p = window.__fr.claudeAiPrompt("corrector"); return p.includes("MODE: Corrector") && p.includes("Current unit: 0");
   }), true);
+  eq("tutor: pronunciation prompt has the course's sounds", await t.evaluate(() => {
+    const p = window.__fr.claudeAiPrompt("pronounce"); return p.includes("MODE: Pronunciation coach") && p.includes("liaison") && !p.includes("undefined");
+  }), true);
   eq("tutor: no page errors", tErrors, []);
   await t.close();
 }
@@ -468,7 +471,7 @@ for (const tab of ["conj", "numbers"]) {
         folder: "testish", storagePrefix: "llc.xx.", voiceLang: "es-ES", voiceSample: "Hola", accents: "á ñ",
         tabs: ["today", "cards", "songs"], vocab: { 0: [["el gato", "cat", "m", ""]] }, verbs: [], tenses: [],
         units: [{ en: "Test unit", "pt-BR": "Unidade teste" }], a1Until: 1,
-        tutor: { course: "", mark: "", song: "", reading: "" }, scenarios: { en: ["a test"] } });`;
+        tutor: { course: "", mark: "", song: "", pronounce: "", reading: "" }, scenarios: { en: ["a test"] } });`;
     await route.fulfill({ contentType: "text/javascript", body });
   });
   await p.goto(url);
