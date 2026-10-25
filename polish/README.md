@@ -6,8 +6,8 @@ speaker: 7 cases and verb aspect are new ideas, so the roadmap gives them room.
 
 Each unit = **one rule family + ~15 high-frequency words + one output task**.
 
-> 🌱 **Status: starter.** The study app has decks for units 0–3 and the Tutor knows the course.
-> Lesson pages aren't written yet: generate each one with
+> 🌱 **Status: starter.** ❌ **No lesson pages yet: this roadmap is all there is.** The study app has
+> decks for units 0–3 and the Tutor knows the course. Generate each lesson page with
 > [`../docs/unit-template.md`](../docs/unit-template.md) when you reach it, like the French units.
 
 > 🧭 **Scope guard:** you only need the unit you're on and the next one.

@@ -102,7 +102,7 @@ const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const stripAccents = (s) => s.normalize("NFD").replace(/[̀-ͯ]/g, "");
 // Normalise an answer for comparison: case, curly quotes, spacing, punctuation.
 function norm(s) {
-  return s.toLowerCase().replace(/[’`]/g, "'").replace(/[!?.,;:…]/g, "").replace(/\s+/g, " ").trim();
+  return s.toLowerCase().replace(/[’`]/g, "'").replace(/[!?¡¿.,;:…]/g, "").replace(/\s+/g, " ").trim();
 }
 // Compare typed vs expected: "ok", "accent" (right except accents) or "no".
 function compare(typed, expectedList) {
@@ -999,9 +999,10 @@ function renderToday() {
         <div>
           <div class="muted">${t("today.currentUnit")}</div>
           <h2 style="margin:0">${t("today.unitTitle", { n: settings.unit, title: escapeHtml(local(u)) })}</h2>
-          <a href="${unitLink(settings.unit)}" target="_blank">${t("today.openUnit")}</a>
+          <a href="${unitLink(settings.unit)}" target="_blank">${t(u.page ? "today.openUnit" : "today.noPage")}</a>
         </div>
-        <label class="unit-pick">${t("today.changeUnit")} <select id="t-unit">${UNITS.map((x, n) => `<option value="${n}" ${n === settings.unit ? "selected" : ""}>${n}: ${escapeHtml(local(x))}</option>`).join("")}</select></label>
+        <label class="unit-pick">${t("today.changeUnit")} <select id="t-unit">${UNITS.map((x, n) => `<option value="${n}" ${n === settings.unit ? "selected" : ""}>${n}: ${escapeHtml(local(x))}${x.page ? " ✅" : ""}</option>`).join("")}</select>
+          ${UNITS.some((x) => x.page) ? `<small class="muted">${t("today.pagesHelp")}</small>` : ""}</label>
       </div>
     </div>
     <div class="grid">
