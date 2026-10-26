@@ -39,7 +39,7 @@ The course website has the same button, and one choice applies to both.
 | **Conjugation** | Type the verb form; mix verbs and tenses (unlocked by unit); missed forms come back 3 questions later, and each form has its own SM-2 schedule; one pronoun per question (il, elle or on), shown with what it means in your interface language (on = "we / one", "a gente"), and the answer lists every pronoun that shares the form on its own line with its meaning and its own 🔊 | Retrieval + interleaving + spacing |
 | **Gender** | le or la? with the ending rule (or exception) after each answer | Explicit rule + immediate feedback |
 | **Numbers** | Listen → digits, read → digits, digits → words; 🇫🇷/🇧🇪/🇨🇭 variants | Listening automaticity |
-| **Song Workshop** | 🔍 Find lyrics by title and artist (or paste them) → click words to make cards, cloze (fill-the-gap) while listening | Noticing + retrieval with real media |
+| **Song Workshop** | 🔍 Find lyrics by title and artist (or paste them) → click a word, ✨ Translate fills in the meaning, add it as a card; cloze (fill-the-gap) while listening | Noticing + retrieval with real media |
 | **💬 Tutor** | Chat with Claude in 6 modes (Tutor, Corrector, Conversation, Song explainer, Pronunciation, Reading), aware of your current unit | Output + corrective feedback, retrieval |
 
 ### The Tutor and your Claude account
@@ -69,6 +69,10 @@ The course website has the same button, and one choice applies to both.
 - **Find lyrics** searches [LRCLIB](https://lrclib.net), a free community lyrics database (no key, no account).
   Only the title and artist you typed are sent, and only when you press the button. Community lyrics can have
   typos or belong to another version of the song, so check them against the recording.
+- **✨ Translate** (on a clicked word): with a Claude key saved in the Tutor tab, the word and its line go to Claude
+  (your Tutor model, low effort), which returns the dictionary form, a meaning in your language and the gender.
+  Without a key, only the word goes to [MyMemory](https://mymemory.translated.net), a free machine translator
+  (no key; about 5,000 characters a day per internet connection). Either way, check the meaning before adding the card.
 
 ## Developing
 - Vocabulary: `data/vocab.js` (French, by unit), `data/spanish.js`, `data/latin.js`, `data/polish.js`, `data/japanese.js`. French verbs: `data/verbs.js`.

@@ -932,27 +932,110 @@ function renderSongForm(main) {
   };
 }
 
+// Meaning for a word clicked in a song. With a Claude key (saved in the Tutor tab), Claude
+// reads the whole line for context and also gives the dictionary form and the gender.
+// Without one, MyMemory, a free translation service (no key, any website may call it),
+// translates the word on its own.
+const MYMEMORY_URL = "https://api.mymemory.translated.net/get";
+const CARD_SCHEMA = {
+  type: "object",
+  properties: {
+    word: { type: "string" },
+    meaning: { type: "string" },
+    gender: { type: "string", enum: ["m", "f", "none"] },
+  },
+  required: ["word", "meaning", "gender"],
+  additionalProperties: false,
+};
+
+async function translateWord(word, line) {
+  if (keyStore.get()) {
+    try { return await translateWithClaude(word, line); } catch (e) { /* fall back to MyMemory */ }
+  }
+  return translateWithMyMemory(word);
+}
+
+async function translateWithClaude(word, line) {
+  const Anthropic = await loadSdk();
+  const client = new Anthropic({ apiKey: keyStore.get(), dangerouslyAllowBrowser: true });
+  const params = {
+    model: tutor.model,
+    max_tokens: 4000,
+    system: `You make flashcards for an adult learning ${L} who speaks ${tutor.lang}. You get a word the learner clicked in a song and the line it comes from. Return:
+- word: the form to learn: the infinitive for a conjugated verb, the masculine singular for an adjective, a noun with its definite article.
+- meaning: a short meaning in ${tutor.lang} (2 to 6 words), the sense used in this line. If the word is part of a fixed expression in the line, add the expression after a semicolon.
+- gender: "m" or "f" for a noun, otherwise "none".`,
+    messages: [{ role: "user", content: `Word: ${word}\nLine: ${line}` }],
+    output_config: { effort: "low", format: { type: "json_schema", schema: CARD_SCHEMA } },
+  };
+  let msg;
+  if (TUTOR_MODELS[tutor.model]?.fallbacks) {
+    msg = await client.beta.messages.create({ ...params, betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" });
+  } else {
+    msg = await client.messages.create(params);
+  }
+  if (msg.stop_reason !== "end_turn") throw new Error(`Claude stopped: ${msg.stop_reason}`);
+  const card = JSON.parse(blocksText(msg.content));
+  return { word: card.word.trim(), meaning: card.meaning.trim(), gender: card.gender === "none" ? "" : card.gender, source: "claude" };
+}
+
+async function translateWithMyMemory(word) {
+  const params = new URLSearchParams({ q: word, langpair: `${COURSE.voiceLang.slice(0, 2)}|${lang}` });
+  const res = await fetch(`${MYMEMORY_URL}?${params}`, { signal: AbortSignal.timeout(15000) });
+  const data = await res.json();
+  // 429: the free daily allowance for this internet connection is used up.
+  if (res.status === 429 || Number(data.responseStatus) === 429 || data.quotaFinished) throw new Error("quota");
+  if (!res.ok || Number(data.responseStatus) !== 200) throw new Error("MyMemory failed");
+  // The text can carry HTML entities (&#39;); textContent decodes them safely.
+  let meaning = new DOMParser().parseFromString(data.responseData.translatedText || "", "text/html").documentElement.textContent.trim();
+  if (!meaning) throw new Error("MyMemory: empty");
+  // It capitalises single words ("Laziness"); keep the case of what was clicked.
+  if (word[0] === word[0].toLowerCase()) meaning = meaning[0].toLowerCase() + meaning.slice(1);
+  return { meaning, source: "mymemory" };
+}
+
 function renderSongRead(s) {
   const body = $("#song-body");
+  const lines = s.lyrics.split("\n");
+  let context = "";
   body.innerHTML = `
     <p class="muted">${t("songs.readHelp")}</p>
     <div class="panel" id="song-addcard" style="display:none">
       <div class="row">
         <input type="text" id="sa-fr" placeholder="${t("songs.wordPh")}">
         <input type="text" id="sa-en" placeholder="${t("songs.meaningPh")}">
+        <button class="small" id="sa-tr">${t("songs.translate")}</button>
         <select id="sa-g"><option value="">${t("songs.noGender")}</option><option value="m">m.</option><option value="f">f.</option></select>
         <button class="primary small" id="sa-add">${t("songs.addCard")}</button><span id="sa-msg" class="muted"></span>
       </div>
+      <div id="sa-trmsg" class="muted"></div>
     </div>
-    <div class="lyrics">${s.lyrics.split("\n").map((line) => `
-      <div class="line">${line.trim() ? speakBtn(line) : ""}<span>${tokenize(line).map((t) => (isWord(t) ? `<span class="w">${escapeHtml(t)}</span>` : escapeHtml(t))).join("")}</span></div>`).join("")}
+    <div class="lyrics">${lines.map((line, i) => `
+      <div class="line" data-l="${i}">${line.trim() ? speakBtn(line) : ""}<span>${tokenize(line).map((t) => (isWord(t) ? `<span class="w">${escapeHtml(t)}</span>` : escapeHtml(t))).join("")}</span></div>`).join("")}
     </div>`;
   $$("#song-body .w").forEach((w) => (w.onclick = () => {
     $("#song-addcard").style.display = "block";
     $("#sa-fr").value = w.textContent;
+    $("#sa-en").value = "";
+    $("#sa-g").value = "";
     $("#sa-msg").textContent = "";
+    $("#sa-trmsg").textContent = "";
+    context = lines[w.closest(".line").dataset.l];
     $("#sa-en").focus();
   }));
+  $("#sa-tr").onclick = async () => {
+    const word = $("#sa-fr").value.trim();
+    if (!word) return;
+    const msg = $("#sa-trmsg");
+    msg.textContent = t("songs.translating");
+    let r;
+    try { r = await translateWord(word, context || word); } catch (e) { msg.textContent = t(e.message === "quota" ? "songs.translateQuota" : "songs.translateError"); return; }
+    if ($("#sa-fr").value.trim() !== word) return; // another word was clicked meanwhile
+    if (r.word) $("#sa-fr").value = r.word;
+    if (r.gender !== undefined) $("#sa-g").value = r.gender;
+    $("#sa-en").value = r.meaning;
+    msg.textContent = t(r.source === "claude" ? "songs.viaClaude" : "songs.viaMyMemory");
+  };
   $("#sa-add").onclick = () => {
     const fr = $("#sa-fr").value.trim();
     const en = $("#sa-en").value.trim();

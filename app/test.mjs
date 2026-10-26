@@ -291,6 +291,28 @@ await page.fill("#sf-title", "<b>Test</b>");
 await page.fill("#sf-lyrics", "Je ne sais pas pourquoi\nOn danse <script>x</script> toujours");
 await page.click("#sf-save");
 eq("lyrics escaped", await page.$eval("#song-body", (el) => el.querySelector("script") === null), true);
+
+// Song workshop: ✨ Translate without a Claude key uses MyMemory (mocked)
+const mmAsked = [];
+let mmQuota = false;
+await page.route("https://api.mymemory.translated.net/**", (route) => {
+  mmAsked.push(new URL(route.request().url()));
+  route.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(mmQuota
+    ? { responseData: { translatedText: "MYMEMORY WARNING" }, responseStatus: 429 }
+    : { responseData: { translatedText: "Why it&#39;s" }, responseStatus: 200 }) });
+});
+await page.click("#song-body .w >> text=pourquoi");
+await page.click("#sa-tr");
+await page.waitForFunction(() => document.querySelector("#sa-en").value !== "");
+eq("translate: asks MyMemory course → interface language", [mmAsked[0].searchParams.get("q"), mmAsked[0].searchParams.get("langpair")], ["pourquoi", "fr|en"]);
+eq("translate: entities decoded, case follows the word", await page.inputValue("#sa-en"), "why it's");
+eq("translate: says where the meaning came from", (await page.textContent("#sa-trmsg")).includes("MyMemory"), true);
+mmQuota = true;
+await page.click("#song-body .w >> text=toujours");
+eq("translate: clicking a new word clears the old meaning", await page.inputValue("#sa-en"), "");
+await page.click("#sa-tr");
+await page.waitForFunction(() => document.querySelector("#sa-trmsg").textContent.includes("limit"));
+eq("translate: daily quota has its own message", await page.inputValue("#sa-en"), "");
 await page.click("[data-mode=cloze]");
 await page.selectOption("#cz-density", "func");
 eq("cloze page renders", await page.$eval("#song-body .lyrics", (el) => el.textContent.includes("pourquoi") || el.querySelectorAll("input.gap").length > 0), true);
@@ -329,6 +351,44 @@ eq("button still visible with a stale app.js", await stale.$eval("#theme-toggle"
 eq("course and language pickers still usable with a stale app.js",
   [await stale.$eval("#course-select", (s) => s.options.length), await stale.$eval("#lang-select", (s) => [...s.options].map((o) => o.value))], [5, ["en", "pt-BR"]]);
 await stale.close();
+
+// ── Song workshop ✨ Translate with a Claude key (mocked): line as context, JSON card back ──
+{
+  const c = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  const cErrors = [];
+  c.on("pageerror", (e) => cErrors.push(e.message));
+  const asked = [];
+  const cors = { "access-control-allow-origin": "*", "access-control-allow-headers": "*", "access-control-allow-methods": "POST, OPTIONS" };
+  await c.route("https://api.anthropic.com/**", (route) => {
+    const req = route.request();
+    if (req.method() === "OPTIONS") return route.fulfill({ status: 204, headers: cors });
+    asked.push({ headers: req.headers(), body: req.postDataJSON() });
+    route.fulfill({ status: 200, headers: { ...cors, "content-type": "application/json" }, body: JSON.stringify({
+      id: "msg_t", type: "message", role: "assistant", model: "claude-opus-5-5", stop_reason: "end_turn", stop_sequence: null,
+      content: [{ type: "text", text: JSON.stringify({ word: "la flemme", meaning: "laziness; avoir la flemme = can't be bothered", gender: "f" }) }],
+      usage: { input_tokens: 200, output_tokens: 40 } }) });
+  });
+  await c.route("https://api.mymemory.translated.net/**", (route) => route.abort());
+  await c.addInitScript(() => localStorage.setItem("llc.secret.anthropicKey", "sk-ant-test-123"));
+  await c.goto(url);
+  await c.click("#tabs button[data-tab=songs]");
+  await c.fill("#sf-title", "Flemme");
+  await c.fill("#sf-lyrics", "Encore la flemme de bouger");
+  await c.click("#sf-save");
+  await c.click("#song-body .w >> text=flemme");
+  await c.click("#sa-tr");
+  await c.waitForFunction(() => document.querySelector("#sa-en").value !== "");
+  const b = asked[0].body;
+  eq("translate (Claude): sends the word with its line, JSON schema, low effort",
+    [b.model, b.messages[0].content, b.output_config.format.type, b.output_config.effort, b.fallbacks],
+    ["claude-opus-5-5", "Word: flemme\nLine: Encore la flemme de bouger", "json_schema", "low", "default"]);
+  eq("translate (Claude): fills word, meaning and gender",
+    [await c.inputValue("#sa-fr"), await c.inputValue("#sa-en"), await c.inputValue("#sa-g")],
+    ["la flemme", "laziness; avoir la flemme = can't be bothered", "f"]);
+  eq("translate (Claude): says Claude suggested it", (await c.textContent("#sa-trmsg")).includes("Claude"), true);
+  eq("translate (Claude): no page errors", cErrors, []);
+  await c.close();
+}
 
 // ── Tutor (Claude) against a mocked API: request shape, append-only history, errors ──
 {
