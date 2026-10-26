@@ -73,5 +73,5 @@ Use it to improve the unit template before starting the next language.
 ## A note on lyrics and copyright
 
 Song lyrics are copyrighted, so **this repo never stores lyrics**. The units point to songs and
-tell you what to listen for. The app's *Song Workshop* lets you paste lyrics you're reading
-(e.g. from YouTube Music). They stay in your browser's local storage and never reach the repo.
+tell you what to listen for. The app's *Song Workshop* lets you search for lyrics
+([LRCLIB](https://lrclib.net)) or paste them (e.g. from YouTube Music). They stay in your browser's local storage and never reach the repo.

@@ -257,8 +257,36 @@ await page.fill("#num-in", "1");
 await page.keyboard.press("Enter");
 eq("numbers: Enter still works", await page.textContent("#num-go"), "Next (Enter)");
 
-// Song workshop: add a song, cloze renders, HTML is escaped
+// Song workshop: Find lyrics searches LRCLIB (mocked) and fills the form
+const lrclibAsked = [];
+await page.route("https://lrclib.net/**", (route) => {
+  const req = route.request();
+  lrclibAsked.push({ url: new URL(req.url()), client: req.headers()["lrclib-client"] || "" });
+  const empty = new URL(req.url()).searchParams.get("q") === "nothing";
+  route.fulfill({ contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(empty ? [] : [
+    { trackName: "Instru", artistName: "X", instrumental: true, plainLyrics: null, syncedLyrics: null },
+    { trackName: "Flemme <b>", artistName: "Angèle", albumName: "Brol", duration: 185, instrumental: false, plainLyrics: null, syncedLyrics: "[00:01.00] La flemme de bouger\n[00:04.50]Encore" },
+  ]) });
+});
 await page.click("#tabs button[data-tab=songs]");
+await page.click("#sf-find");
+eq("find lyrics: asks for a title first", await page.textContent("#sf-results"), "Type the song title first (the artist helps too).");
+await page.fill("#sf-title", "flemme");
+await page.fill("#sf-artist", "angele");
+await page.click("#sf-find");
+await page.waitForSelector("#sf-results [data-i]");
+eq("find lyrics: sends title, artist and the client header", [lrclibAsked[0].url.searchParams.get("track_name"), lrclibAsked[0].url.searchParams.get("artist_name"), lrclibAsked[0].client.startsWith("LLM Language Courses")], ["flemme", "angele", true]);
+eq("find lyrics: skips instrumentals, escapes results", await page.$$eval("#sf-results [data-i]", (b) => b.map((x) => x.textContent)), ["Flemme <b> · Angèle · Brol · 3:05"]);
+await page.click("#sf-results [data-i]");
+eq("find lyrics: fills the form, timestamps removed", [await page.inputValue("#sf-title"), await page.inputValue("#sf-artist"), await page.inputValue("#sf-lyrics")], ["Flemme <b>", "Angèle", "La flemme de bouger\nEncore"]);
+await page.fill("#sf-title", "nothing");
+await page.fill("#sf-artist", "");
+await page.click("#sf-find");
+await page.waitForFunction(() => document.querySelector("#sf-results").textContent.startsWith("No lyrics"));
+eq("find lyrics: title only uses a free search", lrclibAsked[1].url.searchParams.get("q"), "nothing");
+await page.fill("#sf-lyrics", "");
+
+// Song workshop: add a song, cloze renders, HTML is escaped
 await page.fill("#sf-title", "<b>Test</b>");
 await page.fill("#sf-lyrics", "Je ne sais pas pourquoi\nOn danse <script>x</script> toujours");
 await page.click("#sf-save");

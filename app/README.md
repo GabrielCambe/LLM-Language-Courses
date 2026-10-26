@@ -39,7 +39,7 @@ The course website has the same button, and one choice applies to both.
 | **Conjugation** | Type the verb form; mix verbs and tenses (unlocked by unit); missed forms come back 3 questions later, and each form has its own SM-2 schedule; one pronoun per question (il, elle or on), shown with what it means in your interface language (on = "we / one", "a gente"), and the answer lists every pronoun that shares the form on its own line with its meaning and its own 🔊 | Retrieval + interleaving + spacing |
 | **Gender** | le or la? with the ending rule (or exception) after each answer | Explicit rule + immediate feedback |
 | **Numbers** | Listen → digits, read → digits, digits → words; 🇫🇷/🇧🇪/🇨🇭 variants | Listening automaticity |
-| **Song Workshop** | Paste lyrics → click words to make cards, cloze (fill-the-gap) while listening | Noticing + retrieval with real media |
+| **Song Workshop** | 🔍 Find lyrics by title and artist (or paste them) → click words to make cards, cloze (fill-the-gap) while listening | Noticing + retrieval with real media |
 | **💬 Tutor** | Chat with Claude in 6 modes (Tutor, Corrector, Conversation, Song explainer, Pronunciation, Reading), aware of your current unit | Output + corrective feedback, retrieval |
 
 ### The Tutor and your Claude account
@@ -66,6 +66,9 @@ The course website has the same button, and one choice applies to both.
 - **Import cards:** use the *Flashcard Maker* prompt in `docs/llm-tutor-prompts.md`, then paste the JSON
   into Flashcards → Deck settings.
 - **Lyrics** stay in your browser's local storage only. Don't commit them.
+- **Find lyrics** searches [LRCLIB](https://lrclib.net), a free community lyrics database (no key, no account).
+  Only the title and artist you typed are sent, and only when you press the button. Community lyrics can have
+  typos or belong to another version of the song, so check them against the recording.
 
 ## Developing
 - Vocabulary: `data/vocab.js` (French, by unit), `data/spanish.js`, `data/latin.js`, `data/polish.js`, `data/japanese.js`. French verbs: `data/verbs.js`.
