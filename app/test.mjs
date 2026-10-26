@@ -457,6 +457,13 @@ for (const tab of ["conj", "numbers"]) {
      (await p.textContent("#tab-today")).includes("Unidade atual"), await p.textContent("#theme-toggle")],
     ["Hoje", ["pt-BR", "Estudo de francês"], true, "🌓 Auto"]);
   eq("tutor answers in the interface language", await p.evaluate(() => window.__fr.tutorSystem("tutor").includes("speaks Brazilian Portuguese")), true);
+  eq("tutor explains, translates and gives feedback in that language, in every mode", await p.evaluate(() => {
+    const modes = ["tutor", "corrector", "conversation", "song", "pronounce", "reading"];
+    return modes.filter((m) => {
+      const s = window.__fr.tutorSystem(m);
+      return !s.includes("feedback in Brazilian Portuguese") || /\bEnglish\b/.test(s);
+    });
+  }), []);
   eq("tutor prompt to Claude stays in English", await p.evaluate(() => window.__fr.tutorSystem("tutor").includes('Current unit: 0, "The sound system"')), true);
 
   // No tab shows a raw key like "cards.deck" (a missing translation).

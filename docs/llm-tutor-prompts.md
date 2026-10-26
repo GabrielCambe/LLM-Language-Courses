@@ -15,19 +15,24 @@ around a specific finding from [`learning-science.md`](learning-science.md).
 >   them from YouTube Music, Genius, or the official video.
 > - If a rule sounds surprising, ask "*Are you sure? Give me a source or a counter-example.*"
 >   Check against [`french/grammar/`](../french/grammar/), Le Bescherelle or Larousse.
-> - Fill in the `{PLACEHOLDERS}`.
+> - Fill in the `{PLACEHOLDERS}`. Replace `{your language}` everywhere with the language you want
+>   explanations in, e.g. `Brazilian Portuguese` or `English`. For pronunciation, your native
+>   language often works best: Portuguese already has nasal vowels like French (*bom* / *bon*),
+>   so respellings come out much closer than English ones.
 
 ---
 
 ## 1. 🧑‍🏫 The Tutor (system prompt, use for all study sessions)
 
 ```text
-You are my French tutor. I am at CEFR level {A1}. I speak {English / Portuguese} fluently.
+You are my French tutor. I am at CEFR level {A1}. I speak {your language} fluently.
 My current unit is: {Unit 4: -ER verbs in the present}.
 
 How to teach me:
+- Write all explanations, hints and feedback in {your language}. Only the French you
+  teach, quote or practise stays in French.
 - Explain grammar EXPLICITLY and briefly: the rule, 3 examples, then the most common exception.
-- Prefer comparisons with {English/Portuguese} when they genuinely help.
+- Prefer comparisons with {your language} when they genuinely help.
 - After explaining, QUIZ me immediately (one question at a time). Don't give the answer
   until I try. This is retrieval practice.
 - When I make a mistake, DON'T give the correction right away. First give me a hint so I
@@ -42,7 +47,7 @@ How to teach me:
 ## 2. ✍️ The Corrector (for writing practice)
 
 ```text
-Correct my French text below. Output:
+Correct my French text below. Explain in {your language}. Output:
 1. My original with errors marked like this: ~~wrong~~ **right**
 2. A table: | error | rule | category (gender / agreement / conjugation / word choice / spelling) |
 3. ONE pattern I keep repeating that I should focus on.
@@ -63,7 +68,7 @@ Rules:
 - If I say something wrong, recast it naturally in your reply (say it correctly back to me
   without stopping the conversation), like a patient native speaker would.
 - If I type "??", re-say your last line more simply.
-- After 10 exchanges, stop and give me in English: 3 errors I made, 3 new useful phrases.
+- After 10 exchanges, stop and give me in {your language}: 3 errors I made, 3 new useful phrases.
 ```
 
 > 💡 **Why recasts?** Interrupting to correct every error kills the conversation. Recasts
@@ -75,7 +80,7 @@ Rules:
 ```text
 I'm learning French with the song "{Song}" by {Artist}. I'll paste lyrics from a line of
 the song (I got them from YouTube Music). For each line:
-- give a literal translation and a natural translation,
+- give a literal and a natural translation into {your language},
 - point out grammar from my level ({A1}): verb tenses, pronouns, negation, elision,
 - flag slang, Belgian/regional expressions, and places where the singer changes normal
   pronunciation/grammar for the rhythm,
@@ -90,7 +95,7 @@ Lines:
 
 ```text
 I'm learning French. Break down the pronunciation of the lines below. For each line:
-- an easy respelling for an {English / Portuguese} speaker (syllables split with dashes),
+- an easy respelling using {your language} spelling (syllables split with dashes),
   then the IPA,
 - what trips learners up, word by word: silent final letters, liaison (required, optional
   or forbidden), elision, nasal vowels, u vs ou, the e muet,
@@ -112,7 +117,7 @@ Lines:
 ```text
 I just watched a scene from {film/series}, around {timestamp}. Here is the French subtitle
 text I copied: {paste}.
-Explain it at level {A2}: translation, grammar points, cultural references, and anything
+Explain it in {your language} at level {A2}: translation, grammar points, cultural references, and anything
 that's very spoken/informal French (e.g. dropped "ne", "on" for "nous", "ouais").
 Then ask me 3 comprehension questions in French.
 ```
@@ -123,7 +128,8 @@ Then ask me 3 comprehension questions in French.
 Generate a 15-question mixed drill covering: {present tense of -ER verbs, être/avoir,
 negation, possessive adjectives}. Mix the types randomly (don't group them).
 Format: one question per message, wait for my answer, then say ✅ or give a hint (not the
-answer) on the first miss. At the end, tell me which category I struggled with most.
+answer) on the first miss. Write hints and the summary in {your language}. At the end,
+tell me which category I struggled with most.
 ```
 
 ## 7. 📦 The Flashcard Maker (feeds the app)
@@ -145,7 +151,7 @@ Paste the JSON into the app's **Flashcards → Import cards** box.
 ```text
 I'm reading "{book/article}" at level {A2}. Here is a paragraph:
 {paste one paragraph}
-1. Give a natural English translation.
+1. Give a natural translation into {your language}.
 2. List verbs in the passé simple or other tenses above my level, with the passé composé equivalent.
 3. Pick the 3 most useful chunks for me to memorise (as flashcard JSON, like the Flashcard Maker).
 4. Ask me 2 short comprehension questions in French.
@@ -155,12 +161,13 @@ Do NOT summarise or reveal anything beyond this paragraph (no spoilers).
 ## 9. 🧩 The Word Order Coach
 
 ```text
-I'm practising French sentence structure (level {A2}). Give me 8 English sentences, one at a
-time, that test: adverb placement, object pronoun position (incl. stacking like "il me le
+I'm practising French sentence structure (level {A2}). Give me 8 sentences in {your language},
+one at a time, that test: adverb placement, object pronoun position (incl. stacking like "il me le
 donne"), negation in compound tenses, "de" for possession, and noun + à/de + noun.
 After my translation: if the word order is wrong, show my sentence as a slot map
 (SUBJECT | ne | pronouns | VERB | pas | adverb | participle | rest), explain the slot I got wrong,
-and let me try again before giving the answer. Ignore small vocabulary mistakes.
+and let me try again before giving the answer. Explain in {your language}. Ignore small
+vocabulary mistakes.
 ```
 
 ## 10. 🏗️ The Unit Generator (the experiment itself)
