@@ -225,7 +225,9 @@ eq("Check button checks without Enter", (await page.textContent("#conj-fb")).inc
   const p = await browser.newPage();
   await p.goto(url);
   await p.click("#tabs button[data-tab=conj]");
-  const ask = () => p.$eval("#conj-card", (el) => el.querySelector(".tag").textContent + " " + el.querySelector(".prompt").textContent.trim());
+  // il/elle/on (and ils/elles) share one form and take turns at random, so compare the form, not the pronoun.
+  const ask = () => p.$eval("#conj-card", (el) => (el.querySelector(".tag").textContent + " " + el.querySelector(".prompt").textContent.trim())
+    .replace(/\b(elle|on)\b/, "il").replace(/\belles\b/, "ils"));
   const asked = [];
   for (let i = 0; i < 5; i++) {
     asked.push(await ask());
