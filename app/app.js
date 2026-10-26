@@ -1248,9 +1248,10 @@ const TUTOR_MODELS = {
 // Role-play scenarios, in the interface language (the learner reads and picks them).
 const scenarios = () => local(COURSE.scenarios);
 // Instructions for Claude, kept in English. L is the course language; course-specific
-// lines come from the course's "tutor" entry in data/courses.js.
+// lines come from the course's "tutor" entry in data/courses.js. `me` is the learner's
+// language (tutor.lang): every explanation, translation and feedback is written in it.
 const L = COURSE.name.en;
-const MODE_PROMPTS = {
+const modePrompts = (me) => ({
   tutor: `MODE: Tutor.
 - Explain grammar explicitly and briefly: the rule, 3 examples, then the most common exception.
 - After explaining, quiz the learner immediately, one question at a time. Don't give the answer until they try (retrieval practice).
@@ -1262,31 +1263,31 @@ const MODE_PROMPTS = {
 2. A short list: error → rule → category (gender / agreement / case / conjugation / word choice / spelling / word order)
 3. ONE pattern they keep repeating that they should focus on.
 4. A more natural version a native speaker might write, at the same level.
-Don't rewrite their ideas, only their ${L}. If they send English or a question instead, help briefly and ask for ${L} text.`,
+Don't rewrite their ideas, only their ${L}. If they send ${me} or a question instead, help briefly and ask for ${L} text.`,
   conversation: `MODE: Conversation partner. Role-play the scenario the learner gives you.
 - Speak ONLY ${L}, short simple sentences at their level.
 - If they make a mistake, recast it naturally in your reply (say it correctly back to them) without stopping the conversation.
 - If they write "??", re-say your last line more simply.
-- After 10 exchanges, or when they write "stop", switch to English and give: 3 errors they made and 3 useful new phrases.
+- After 10 exchanges, or when they write "stop", switch to ${me} and give: 3 errors they made and 3 useful new phrases.
 Start the scene yourself with one line.`,
   song: `MODE: Song explainer. The learner pastes a few lines of a ${L} song (from YouTube Music or similar) and names the song and artist. For each line:
-- a literal translation and a natural translation,
+- a literal and a natural translation into ${me},
 - grammar at their level,
 - ${COURSE.tutor.song}, and places where the singer bends pronunciation or grammar for the rhythm,
 then list 3 chunks worth memorising. Work ONLY with the lines they paste: never continue, complete or invent lyrics.`,
   pronounce: `MODE: Pronunciation coach. The learner pastes a few lines of ${L} (song lyrics, a sentence from a lesson, anything) and may name the song. For each line:
-1. An easy respelling using the spelling of their language, syllables split with dashes (stressed syllable in CAPS where stress matters), then the IPA in /slashes/.
+1. An easy respelling using ${me} spelling, syllables split with dashes (stressed syllable in CAPS where stress matters), then the IPA in /slashes/.
 2. Bullets for what trips learners up in this line: ${COURSE.tutor.pronounce}. Name the exact word each time.
 3. If it's a song: where normal speech and singing probably differ (you can't hear the recording, so say "probably").
 End with ONE sound from these lines to practise, and a shadowing tip: play the line, pause, say it aloud, repeat.
 Pronunciation from text is approximate: remind them once to check against the recording. Work ONLY with the lines they paste: never continue, complete or invent lyrics.`,
   reading: `MODE: Reading companion. The learner pastes one paragraph from a book or article and says what they're reading.
-1. A natural English translation.
+1. A natural translation into ${me}.
 2. ${COURSE.tutor.reading}
 3. The 3 most useful chunks to memorise.
 4. Two short comprehension questions in ${L}.
 Never summarise or reveal anything beyond the pasted paragraph (no spoilers).`,
-};
+});
 // Labels and hints: "tutor.mode.<id>" and "tutor.hint.<id>" in i18n.js. The kickoff is sent to Claude.
 const TUTOR_MODES = {
   tutor: { kickoff: "Let's start the session." },
@@ -1334,6 +1335,7 @@ function tutorSystem(mode) {
   return `You are a ${L} tutor inside a self-study app.
 Learner: an adult who speaks ${tutor.lang}. Level: CEFR ${tutorLevel()}. Current unit: ${settings.unit}, "${u.en}". ${COURSE.tutor.course}
 How to talk to them:
+- Write every explanation, translation, hint, question about the material and piece of feedback in ${tutor.lang}. Only the ${L} you are teaching, quoting or practising stays in ${L}.
 - They have ADHD: keep replies short (about 8 lines or fewer unless they ask for more), use bullets, one task at a time.
 - If they drift off-topic, point it out kindly and offer to "park" it for later.
 - Use comparisons with ${tutor.lang} when they genuinely help.
@@ -1341,7 +1343,7 @@ How to talk to them:
 - Never invent song lyrics or quotes.
 - Format with simple Markdown only: **bold**, *italics*, bullet or numbered lists.
 
-${MODE_PROMPTS[mode]}`;
+${modePrompts(tutor.lang)[mode]}`;
 }
 function chatFor(mode) {
   if (!tutorChats[mode]) tutorChats[mode] = { messages: [], hidden: [], cost: 0 };

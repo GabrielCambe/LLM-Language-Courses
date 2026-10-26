@@ -17,7 +17,9 @@ long-press a letter on the phone keyboard (e → é è ê).
 
 **Language:** the 🌐 menu in the top bar switches the interface between **English** and **Português (BR)**.
 The first visit follows your device language. The tutor's "your language" follows it too, unless you typed your own.
-Only the app's interface is translated: card meanings and the course pages are still in English.
+In every Tutor mode, explanations, translations, hints and feedback come in that language (pronunciation respellings
+use its spelling); only the course language you're practising stays as is.
+Only the app's interface and the Tutor are translated: card meanings and the course pages are still in English.
 
 **Course:** the menu with the flag (top left) picks the course: French, Spanish, Latin, Polish or Japanese.
 Each course keeps its own progress, so switching never touches another course's cards.
