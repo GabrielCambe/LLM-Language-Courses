@@ -19,7 +19,7 @@
 - **Articles:** *un/une/des/du/de la* → **de** after negation (see `01-nouns-articles.md`).
 
 ### 🗣️ Spoken French drops the *ne*
-In casual speech (and in songs), *ne* almost always disappears: *Je sais pas* ("shay pa"),
+In casual speech (and in songs), *ne* almost always disappears: *Je sais pas* ("xê pa"),
 *C'est pas grave, J'ai rien compris*. **Understand it, but write with *ne*** until B1.
 
 ## Three ways to ask a yes/no question

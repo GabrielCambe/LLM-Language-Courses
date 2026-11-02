@@ -6,22 +6,22 @@
 // The Japanese string is the card ID: don't rename an entry, or its review history is lost.
 window.JA_VOCAB = {
   0: [
-    ["こんにちは", "hello / good afternoon", null, "kon-ni-chi-wa · the last は is read 'wa': it was once the topic particle"],
-    ["ありがとう", "thank you (casual)", null, "a-ri-ga-tō · polite: ありがとうございます"],
+    ["こんにちは", "hello / good afternoon", null, "kon-ni-chi-wa · romaji chi = the Brazilian 'ti' of 'tia', not the PT 'ch' of 'chá' · nn: a real n, not a nasal 'kõ' · the last は is read 'wa': it was once the topic particle"],
+    ["ありがとう", "thank you (casual)", null, "a-ri-ga-tō · r = the tap of 'caro', never the 'h' of 'rato' · final ō stays 'ô', never 'u' · polite: ありがとうございます"],
     ["はい", "yes", null, "ha-i"],
     ["いいえ", "no", null, "i-i-e · ii is a long vowel: hold it for two beats"],
     ["ねこ", "cat", null, "ne-ko · kanji: 猫"],
     ["いぬ", "dog", null, "i-nu · kanji: 犬"],
-    ["すし", "sushi", null, "su-shi · u after s is often almost silent: 'sushi' ≈ 'sshi'"],
+    ["すし", "sushi", null, "su-shi · romaji sh = the PT 'ch' of 'chá': 'su-xi' · u after s is often almost silent: 'sxi'"],
     ["さかな", "fish", null, "sa-ka-na · kanji: 魚"],
     ["みず", "water", null, "mi-zu · ゛ (dakuten) turns す into ず · kanji: 水"],
     ["きって", "postage stamp", null, "ki-t-te · small っ = a one-beat pause before the t"],
     ["がっこう", "school", null, "ga-k-kō · small っ pause + long ō (こう) · kanji: 学校"],
     ["おかあさん", "mother (someone's, or 'Mom')", null, "o-ka-a-sa-n · ん is a full beat of its own"],
-    ["でんしゃ", "train", null, "de-n-sha · small ゃ joins し into one beat: しゃ = sha · kanji: 電車"],
+    ["でんしゃ", "train", null, "de-n-sha · small ゃ joins し into one beat: しゃ = 'xa' · de stays 'de', never 'dji' · kanji: 電車"],
   ],
   1: [
-    ["はじめまして", "nice to meet you (first meeting)", null, "ha-ji-me-ma-shi-te"],
+    ["はじめまして", "nice to meet you (first meeting)", null, "ha-ji-me-ma-shi-te · romaji j = the Brazilian 'di' of 'dia' · h = a soft version of the Brazilian 'r' of 'rato' · final te stays 'te', never 'tchi'"],
     ["よろしくおねがいします", "please treat me well (said after introducing yourself)", null, "yo-ro-shi-ku o-ne-ga-i-shi-ma-su · no exact English equivalent"],
     ["わたし", "I, me", null, "wa-ta-shi · kanji: 私 · Japanese drops 'I' whenever it's obvious"],
     ["わたしは…です", "I am…", null, "wa-ta-shi wa … de-su · は (wa) marks the topic: 'as for me, …'"],

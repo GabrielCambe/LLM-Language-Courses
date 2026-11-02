@@ -55,4 +55,4 @@ Definite articles never change: *J'aime le café → Je n'aime pas **le** café.
 | -ail → -aux (some) | *le travail → les travaux* |
 | irregular | *l'œil → les yeux* (eye/eyes) |
 
-💡 *les yeux* is pronounced "lay-**z**yuh" (liaison), so you'll hear "*tes yeux*" as "tay-zyuh".
+💡 *les yeux* is pronounced "lê-**z**iö" (liaison), so you'll hear "*tes yeux*" as "tê-ziö".

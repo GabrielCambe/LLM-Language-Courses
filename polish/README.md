@@ -16,7 +16,7 @@ Each unit = **one rule family + ~15 high-frequency words + one output task**.
 
 | # | Unit | Focus |
 |---|---|---|
-| 0 | Sounds and spelling | *sz cz rz/ż*, soft *ś ć ź ń*, nasal *ą ę*, *ł* = w, final consonants lose voice |
+| 0 | Sounds and spelling | *sz* = PT *ch*, *cz* = *tch*, *rz/ż* = PT *j*; soft *ś ć ź ń* (*ć, dź* ≈ the Brazilian *ti, di* of *tia, dia*); nasal *ą ę* (≈ *om, em*); *ł* = the *u* of a Brazilian *Brasil*; final consonants lose voice |
 | 1 | Introductions and *być* | *jestem, jesteś, jest…*, greetings, *ty* vs *Pan/Pani* |
 | 2 | Nouns and gender | Masculine / feminine / neuter from the ending, and the exceptions |
 | 3 | Having and describing | *mieć*, adjective endings *-y/-a/-e* (and *-i/-ie* after k, g) |
@@ -34,6 +34,11 @@ Each unit = **one rule family + ~15 high-frequency words + one output task**.
 | 15 | A2 milestone | A 10-minute conversation with the Tutor about your life, past and plans |
 
 ## Notes
+- 🇧🇷 **A Brazilian head start:** Polish sounds that scare English speakers are already in your mouth.
+  *sz* is the *ch* of *chá*, *ż/rz* the *j* of *já*, *ń* the *nh* of *ninho*, *ł* the *u* of a Brazilian
+  final l (*Brasil*), *ch* the throat *rr* of *carro*, and the soft *ć / dź* are very close to the Brazilian
+  *ti / di* in *tia / dia*. Watch two habits: Polish *e* is always an open *é* and never turns into *i*
+  at the end of a word, and *te / de* stay "te / de" (never "tchi / dji").
 - **Resources:** the coursebook *Polski, krok po kroku* (A1–A2) and the *Real Polish* podcast for
   easy listening.
 - Cases look scary in a table. Learn them as **questions** instead (*kto? co?* → nominative,
