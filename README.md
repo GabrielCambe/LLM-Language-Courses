@@ -24,6 +24,7 @@ tasks). A course without them has only a roadmap: you generate each lesson page 
 |---|---|---|
 | 🇫🇷🇧🇪 **French**: the first and most complete one ([roadmap](french/README.md)) | ✅ Units 0–4 (of 27) + grammar reference + media guides | Every tab: flashcards, conjugation, gender, numbers, songs, tutor |
 | 🇪🇸 **Spanish**: built for Portuguese speakers, run alongside French ([roadmap](spanish/README.md)) | ✅ Units 0–3 (of 21) | Flashcards (units 0–3) + tutor |
+| 🇮🇹 **Italian**: for a B1 proficiency exam, built for Portuguese speakers ([roadmap](italian/README.md)) | ✅ Units 0–3 (of 29) + exam guide | Flashcards (units 0–3) + tutor |
 | 🏛️ **Latin**: for reading ([roadmap](latin/README.md)) | ❌ None yet: roadmap only | Flashcards (units 0–3) + tutor |
 | 🇵🇱 **Polish** ([roadmap](polish/README.md)) | ❌ None yet: roadmap only | Flashcards (units 0–3) + tutor |
 | 🇯🇵 **Japanese**: kana first ([roadmap](japanese/README.md)) | ❌ None yet: roadmap only | Flashcards (units 0–3) + tutor |
@@ -57,6 +58,9 @@ french/
   media/                  Music (Angèle first!), films, series, podcasts, reading ladder, sorted by level
 spanish/
   README.md               Roadmap A0 → A2, false friends, running it alongside French
+  units/                  Lesson pages for units 0–3
+italian/
+  README.md               Roadmap A0 → B1, the exam (CILS, CELI, PLIDA, CERT.IT), false friends
   units/                  Lesson pages for units 0–3
 latin/, polish/, japanese/
   README.md               Roadmaps only (lesson pages get generated as you go)
