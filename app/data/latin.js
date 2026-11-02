@@ -4,16 +4,16 @@
 // rename an entry, or its review history is lost.
 window.LA_VOCAB = {
   0: [
-    ["salvē", "hello (to one person)", null, "v sounds like English w: 'sal-weh'"],
-    ["valē", "goodbye (to one person)", null, "v = w; ē is long: hold it"],
-    ["cīvis", "citizen", null, "cīvis, -is (m./f.) · c is always hard (k): 'kee-wis'"],
-    ["caelum", "sky, heaven", null, "caelum, -ī (n.) · ae sounds like 'eye'"],
-    ["poena", "punishment, penalty", null, "poena, -ae (f.) · oe sounds like 'oy'"],
-    ["aqua", "water", null, "aqua, -ae (f.) · qu = kw"],
+    ["salvē", "hello (to one person)", null, "v = the 'u' of 'água' (a w sound): 'SAL-uê'"],
+    ["valē", "goodbye (to one person)", null, "v = the 'u' of 'água': 'UÁ-lê' · ē is long: hold it"],
+    ["cīvis", "citizen", null, "cīvis, -is (m./f.) · c is always k, even before i: 'KII-uis' (never 'si' or Italian 'tchi')"],
+    ["caelum", "sky, heaven", null, "caelum, -ī (n.) · ae = the 'ai' of 'pai': 'KAI-lum'"],
+    ["poena", "punishment, penalty", null, "poena, -ae (f.) · oe = the 'ói' of 'herói': 'PÓI-na'"],
+    ["aqua", "water", null, "aqua, -ae (f.) · qu is always 'kw', as in 'quando' (never as in 'queijo')"],
     ["māter", "mother", null, "māter, mātris (f.) · the macron marks a long vowel"],
-    ["pater", "father", null, "pater, patris (m.) · short a: compare māter"],
-    ["ager", "field", null, "ager, agrī (m.) · g is always hard, as in 'go'"],
-    ["iūs", "law, right", null, "iūs, iūris (n.) · consonant i sounds like y: 'yoos'"],
+    ["pater", "father", null, "pater, patris (m.) · short a: compare māter · t stays t: 'PA-ter', never 'tchi'"],
+    ["ager", "field", null, "ager, agrī (m.) · g is always hard, as in 'gato', even before e/i: 'A-guer'"],
+    ["iūs", "law, right", null, "iūs, iūris (n.) · consonant i = the 'i' of 'iogurte': 'IUUS'"],
     ["nihil", "nothing", null, "h is light, often almost silent"],
   ],
   1: [

@@ -43,6 +43,11 @@ Each unit = **one rule family + ~15 high-frequency words + one output task**.
 | 18 | A2 milestone | A 10-minute conversation with the Tutor about your life, past and plans, half of it in casual speech |
 
 ## Notes
+- 🇧🇷 **Romaji for a Brazilian:** romaji is spelled for English readers, so read *ch* as "tch", *sh* as the
+  *ch* of *chá*, and *j* as the Brazilian *di* of *dia*. Good news: ち (*chi*) and じ (*ji*) **are** the
+  Brazilian *ti* and *di* of *tia* and *dia*. Habits to drop: *r* is the tap of *caro* (never the *h* of
+  *rato*), vowels are never nasal (*konnichiwa* has a real n, not "kõ"), and final *e / o* stay full
+  (*shite* is "xi-te", not "xi-tchi").
 - ⌨️ **Typing Japanese:** for EN → JA flashcards, add a Japanese keyboard (on a phone: the kana or
   romaji keyboard; on a computer: the system's Japanese input). You type *neko* and it turns into
   ねこ. Typing is optional: you can also say the answer in your head and press *Show*.

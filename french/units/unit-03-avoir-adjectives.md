@@ -14,11 +14,11 @@
 | j'**ai** | (elision: *je → j'*) |
 | tu **as** | |
 | il / elle / on **a** | (*a* without accent = has; *à* = to) |
-| nous **avons** | "noo-**z**a-vohn" |
-| vous **avez** | "voo-**z**a-vay" |
-| ils / elles **ont** | "eel-**z**ohn" ⚠️ |
+| nous **avons** | "nu-**z**a-VÕ" |
+| vous **avez** | "vu-**z**a-VÊ" |
+| ils / elles **ont** | "il-**z**Õ" ⚠️ |
 
-**The crucial pair:** *ils **s**ont* ("eel **s**ohn", they are) vs *ils **ont*** ("eel **z**ohn", they have).
+**The crucial pair:** *ils **s**ont* ("il **s**õ", they are) vs *ils **ont*** ("il **z**õ", they have).
 The only difference is **s vs z**.
 
 ### Expressions with avoir (where English uses "to be")
@@ -43,7 +43,7 @@ Adjectives agree in **gender and number** with the noun:
 | plural | petit**s** | petit**es** |
 
 🔊 **Pronunciation bonus:** adding *-e* makes the silent final consonant **audible**:
-*petit* "puh-tee" → *petite* "puh-teet"; *grand* "grahn" → *grande* "grahnd". That's how you *hear* the feminine.
+*petit* "p(e)-TI" → *petite* "p(e)-TIT"; *grand* "grã" → *grande* "grãd". That's how you *hear* the feminine.
 
 Adjectives already ending in **-e** don't change in the feminine: *facile, jeune, belge, rouge*.
 

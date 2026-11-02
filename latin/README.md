@@ -18,7 +18,7 @@ pronunciation are used throughout.
 
 | # | Unit | Focus |
 |---|---|---|
-| 0 | Pronunciation (classical) | c = k, v = w, ae = "eye", long vs short vowels (macrons), stress |
+| 0 | Pronunciation (classical) | c = k (*casa*), v = the *u* of *água*, ae = *ai* (*pai*), oe = *ói*, s never z, *ti* never "tchi"; long vs short vowels (macrons), stress |
 | 1 | Being: *sum, es, est* | *sum* in the present, questions with *ubi, quis, quid*, word order is free |
 | 2 | First declension (*puella*) | Nominative and genitive, singular and plural, masculine exceptions (*nauta*) |
 | 3 | Present tense: 1st and 2nd conjugation | *amō, amāre* · *videō, vidēre*, personal endings -ō -s -t -mus -tis -nt |
@@ -35,7 +35,11 @@ pronunciation are used throughout.
 
 ## Notes
 - 🔊 **Audio:** there are no Latin voices for text-to-speech, so the app uses an **Italian** voice.
-  It sounds like Church Latin, not classical: in classical Latin *c* is always "k" and *v* is "w".
+  It sounds like Church Latin, not classical: in classical Latin *c* is always "k" (*Cicero* = "KI-ke-ro",
+  not "TCHI-tche-ro") and *v* is the *u* of *água*.
+- 🇧🇷 **Brazilian habits to drop:** *s* between vowels stays s (*rosa* = "RÓ-sa", not "RÓ-za"), *ti / di* stay
+  "ti / di" (never "tchi / dji"), and final *-e / -o* stay full (*mare*, *dominō*). Classical final *-m*
+  probably just nasalised the vowel before it, as in Portuguese *bem*: *rosam* ≈ "RÓ-sã".
 - **Portuguese helps a lot:** Portuguese grew out of spoken Latin, so many words are recognisable
   (*aqua* → água, *terra* → terra, *fīlia* → filha). Use that, but watch for false friends.
 - **Resources:** Ørberg, *Lingua Latina per se illustrata* (pars I: *Familia Rōmāna*) as the main reader;

@@ -24,7 +24,7 @@ window.LLC_COURSES = [
       course: "The course favours Belgian examples (the learner loves Angèle and Stromae), but teach standard French and mark regional usage.",
       mark: "Mark anything colloquial vs formal, and France vs Belgium/Switzerland/Québec.",
       song: "slang, Belgian/regional expressions",
-      pronounce: "silent final letters, liaison (required, optional or forbidden), elision and enchaînement, nasal vowels, u vs ou, and the e muet (dropped in speech, often sung as a full syllable)",
+      pronounce: "silent final letters, liaison (required, optional or forbidden), elision and enchaînement, nasal vowels, u vs ou, and the e muet (dropped in speech, often sung as a full syllable), and the habits a Brazilian brings: ti/di becoming tchi/dji (petit, dire), nasal vowels ending in a glide (bon is not 'bõu'), é said open (it is the closed PT ê), and final o reduced to u",
       reading: "Verbs in the passé simple or other tenses above their level, with the passé composé equivalent.",
     },
     scenarios: {
@@ -198,7 +198,7 @@ window.LLC_COURSES = [
       course: "The course teaches classical Latin with macrons and restored classical pronunciation, in the spirit of Ørberg's Lingua Latina per se illustrata (reading lots of easy Latin).",
       mark: "Mark classical vs later (medieval/Church) usage, and point out words in the learner's language that come from the Latin.",
       song: "poetic word order, archaic or Church Latin forms",
-      pronounce: "vowel length (macrons), where the stress falls (the penultimate rule), c and g always hard, v as w, and how Church (Italian-style) pronunciation differs; in verse, elision and metre",
+      pronounce: "vowel length (macrons), where the stress falls (the penultimate rule), c and g always hard, v as w, and how Church (Italian-style) pronunciation differs; in verse, elision and metre; and the habits a Brazilian brings: s between vowels becoming z (rosa), ti/di becoming tchi/dji, final e and o reduced to i and u",
       reading: "Forms above their level (cases, tenses, participles, ablative absolutes), each with a one-line explanation.",
     },
     scenarios: {
@@ -243,7 +243,7 @@ window.LLC_COURSES = [
       course: "The course teaches standard contemporary Polish.",
       mark: "Mark anything colloquial vs formal (ty vs Pan/Pani), and point out cases and aspect pairs when they appear.",
       song: "slang and colloquial forms",
-      pronounce: "stress on the second-to-last syllable, sz/cz/rz/ż/ch, the soft ś/ć/ź/ń (and si/ci/zi/ni), the nasal ą and ę, and final devoicing and voicing assimilation",
+      pronounce: "stress on the second-to-last syllable, sz/cz/rz/ż/ch, the soft ś/ć/ź/ń (and si/ci/zi/ni), the nasal ą and ę, and final devoicing and voicing assimilation. For a Brazilian: sz = PT ch, ż/rz = PT j, ń = nh, ł = the u of a Brazilian final l, ch = the throat rr of carro, ć/dź are close to the Brazilian ti/di of tia/dia; e is always open and never reduced to i",
       reading: "Cases and verb forms above their level (especially aspect pairs), each with a one-line explanation.",
     },
     scenarios: {
@@ -292,7 +292,7 @@ window.LLC_COURSES = [
       course: "The course teaches standard (Tokyo) Japanese, polite です/ます style first and casual speech from unit 13. It is kana-first: write words the learner hasn't met in kanji with the reading in hiragana in brackets, e.g. 学校（がっこう）, and use romaji only in units 0-1.",
       mark: "Mark polite (です/ます) vs casual (plain) forms, and male/female-coded or regional (e.g. Kansai) speech when it appears.",
       song: "casual and poetic forms, contractions, kanji with unusual readings, English loanwords",
-      pronounce: "the reading of each kanji in hiragana, long vowels, the small っ (double consonant), devoiced vowels (です → \"des\"), how ん changes before other sounds, and pitch accent only where it changes meaning; in songs, how morae are stretched across notes",
+      pronounce: "the reading of each kanji in hiragana, long vowels, the small っ (double consonant), devoiced vowels (です → \"des\"), how ん changes before other sounds, and pitch accent only where it changes meaning; in songs, how morae are stretched across notes. For a Brazilian: romaji ch/sh/j are tch / PT ch / dj (ち and じ are the Brazilian ti and di of tia and dia), r is the tap of caro (never the h of rato), and vowels are never nasalised or reduced (final e stays e)",
       reading: "Kanji above their level with the reading in hiragana, and verb forms above their level (plain, て-form, past, potential), each with a one-line explanation.",
     },
     scenarios: {
