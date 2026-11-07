@@ -624,8 +624,8 @@ for (const [id, firstCard, voice, tutorLine, articles] of [
     await q.close();
     return level;
   };
-  eq("it: tutor level is A1, A2, then B1", [await levelAt(5), await levelAt(20), await levelAt(25)], ["A1", "A2", "B1"]);
-  eq("it: the tutor knows about the exam", await p.evaluate(() => window.__fr.tutorSystem("tutor").includes("B1 proficiency exam")), true);
+  eq("it: tutor level is A1, A2, B1, then B2", [await levelAt(5), await levelAt(20), await levelAt(25), await levelAt(28)], ["A1", "A2", "B1", "B2"]);
+  eq("it: the tutor knows about the exam", await p.evaluate(() => window.__fr.tutorSystem("tutor").includes("CILS B1 Cittadinanza")), true);
   await p.close();
 }
 

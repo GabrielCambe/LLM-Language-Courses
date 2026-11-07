@@ -1327,10 +1327,11 @@ function keyRemembered() {
   try { return !!localStorage.getItem(KEY_NAME); } catch (e) { return false; }
 }
 function tutorLevel() {
-  // a2Until is optional: only courses that go past A2 (Italian, to B1) set it.
+  // a2Until and b1Until are optional: only courses that go past A2 (Italian, to B2) set them.
   if (settings.unit === 0) return "A0 (complete beginner)";
   if (settings.unit <= COURSE.a1Until) return "A1";
-  return COURSE.a2Until != null && settings.unit > COURSE.a2Until ? "B1" : "A2";
+  if (COURSE.a2Until == null || settings.unit <= COURSE.a2Until) return "A2";
+  return COURSE.b1Until == null || settings.unit <= COURSE.b1Until ? "B1" : "B2";
 }
 // The system prompt depends only on mode, unit and language, so it stays byte-stable
 // for a whole chat (good for prompt caching).

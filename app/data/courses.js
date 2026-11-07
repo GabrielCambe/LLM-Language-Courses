@@ -132,18 +132,19 @@ window.LLC_COURSES = [
     verbs: [],
     tenses: [],
     a1Until: 13,
-    a2Until: 23, // the course goes on to B1: units after this one are B1
+    a2Until: 23, // optional, for courses that go past A2: units after this one are B1…
+    b1Until: 26, // …and after this one, B2
     tutor: {
-      course: "The course teaches standard Italian and prepares the learner for a B1 proficiency exam (CILS, CELI, PLIDA or CERT.IT: listening, reading, writing, speaking, and grammar in CILS). The learner is a Brazilian Portuguese speaker who also studies Spanish: point out where Italian differs from Portuguese (articles il/lo/gli, plurals without -s, c'è vs 'tem', essere vs avere in the passato prossimo, ci and ne, the subjunctive after penso che, false friends), and gently flag any Portuguese or Spanish word that slips in. When it helps, frame tasks the way the exam does.",
+      course: "The course teaches standard Italian and prepares the learner for the CILS B1 Cittadinanza exam (Università per Stranieri di Siena), then for B2. The exam has 4 sections, all of which must be passed: listening (multiple choice + true/false, audio played twice), reading with a grammar cloze, writing (one 80-120-word email about daily life in Italy, e.g. to a landlord or a school) and speaking (a 1-minute self-presentation from a list of questions, then a 2-3-minute dialogue giving and commenting on opinions). Its grammar syllabus stops at the condizionale presente: up to unit 26, don't require the congiuntivo or the passato remoto (teach opinions with secondo me + indicative or penso di + infinitive); from unit 27 (the B2 track) teach them. The learner is a Brazilian Portuguese speaker who also studies Spanish: point out where Italian differs from Portuguese (articles il/lo/gli, plurals without -s, c'è vs 'tem', essere vs avere in the passato prossimo, ci and ne, the subjunctive after penso che, false friends), and gently flag any Portuguese or Spanish word that slips in. When it helps, frame tasks the way the exam does.",
       mark: "Mark anything colloquial vs formal (tu vs Lei), regional (North vs South, dialect words), and false friends with Portuguese.",
       song: "slang, regional and dialect forms (Roman, Neapolitan, Milanese), and false friends with Portuguese",
       pronounce: "double consonants (held longer: anno vs ano, cappello vs capello), c/g before e/i (tch/dj) vs ch/gh (k/g), gn, gli and sc, z as ts or dz, open vs closed e and o, stress on the third-from-last syllable, and the habits a Brazilian brings: final e and o never turning into i and u, ti/di never becoming tchi/dji, no nasal vowels (bene, tanto), r always with the tongue (never the Brazilian h of 'rato'), l never becoming u (molto, Brasile)",
       reading: "Verb tenses above their level (passato remoto, congiuntivo, condizionale), ci and ne, and false friends with Portuguese, each with a one-line explanation.",
     },
     scenarios: {
-      en: ["an examiner at the start of the speaking test (I use Lei)", "a barista in a bar in Rome", "a new colleague at an AI startup in Milan",
+      en: ["a CILS examiner: after my 1-minute self-presentation, ask my opinion on a daily-life topic (I use Lei)", "the landlord I email because I want to move out (I use Lei)", "a barista in a bar in Rome", "a new colleague at an AI startup in Milan",
         "a receptionist at the comune (town hall) where I hand in documents", "a waiter in a trattoria in Naples", "someone asking me for directions"],
-      "pt-BR": ["um examinador no começo da prova oral (uso Lei)", "um barista num bar em Roma", "um novo colega numa startup de IA em Milão",
+      "pt-BR": ["um examinador da CILS: depois da minha apresentação de 1 minuto, pergunta minha opinião sobre um tema do dia a dia (uso Lei)", "o proprietário a quem escrevo porque quero me mudar (uso Lei)", "um barista num bar em Roma", "um novo colega numa startup de IA em Milão",
         "um atendente no comune (prefeitura) onde entrego documentos", "um garçom numa trattoria em Nápoles", "alguém me pedindo informações na rua"],
     },
     units: [
@@ -171,11 +172,14 @@ window.LLC_COURSES = [
       { en: "Imperative", "pt-BR": "Imperativo" },
       { en: "Comparisons and relative pronouns", "pt-BR": "Comparações e pronomes relativos" },
       { en: "A2 milestone + mock exam", "pt-BR": "Marco A2 + simulado" },
-      { en: "Congiuntivo presente: penso che sia", "pt-BR": "Congiuntivo presente: penso che sia" },
-      { en: "Formal writing and connectors", "pt-BR": "Escrita formal e conectivos" },
-      { en: "Congiuntivo imperfetto and if-sentences", "pt-BR": "Congiuntivo imperfetto e frases com se" },
-      { en: "Reading for the exam: passato remoto, si, passive", "pt-BR": "Leitura para a prova: passato remoto, si, passiva" },
-      { en: "B1 milestone: full mock exam", "pt-BR": "Marco B1: simulado completo" },
+      { en: "Emails for daily life (the exam's writing task)", "pt-BR": "E-mails do dia a dia (a tarefa escrita da prova)" },
+      { en: "Giving your opinion (the exam's dialogue)", "pt-BR": "Dar sua opinião (o diálogo da prova)" },
+      { en: "B1 milestone: full CILS B1 Cittadinanza mock exam", "pt-BR": "Marco B1: simulado completo da CILS B1 Cittadinanza" },
+      { en: "B2 track: congiuntivo presente", "pt-BR": "Trilha B2: congiuntivo presente" },
+      { en: "B2 track: congiuntivo imperfetto and if-sentences", "pt-BR": "Trilha B2: congiuntivo imperfetto e frases com se" },
+      { en: "B2 track: reading real texts (passato remoto, si, passive)", "pt-BR": "Trilha B2: ler textos reais (passato remoto, si, passiva)" },
+      { en: "B2 track: arguing in writing", "pt-BR": "Trilha B2: argumentar por escrito" },
+      { en: "B2 milestone: full mock exam", "pt-BR": "Marco B2: simulado completo" },
     ],
   },
   {

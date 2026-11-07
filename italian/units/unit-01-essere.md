@@ -1,7 +1,7 @@
 # Unit 1: Ciao! Introductions and *essere* · CEFR A1 · ~5–7 days
 
-> Every Italian speaking exam starts the same way: *"Si presenti"* (introduce yourself). This
-> unit is that first minute of the exam.
+> The speaking test of the CILS B1 Cittadinanza opens with a **1-minute self-presentation**,
+> answering a list of questions about you. This unit is the start of that minute.
 
 ## 🎯 Can-do goals
 - I can greet people at any time of day and say goodbye, formally and informally.
