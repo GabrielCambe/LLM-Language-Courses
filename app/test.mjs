@@ -513,7 +513,7 @@ for (const tab of ["conj", "numbers"]) {
   });
   await p.goto(url);
   eq("course picker lists the courses", await p.$$eval("#course-select option", (o) => o.map((x) => [x.value || "", x.disabled])),
-    [["fr", false], ["es", false], ["la", false], ["pl", false], ["ja", false], ["xx", false], ["➕ More soon", true]]);
+    [["fr", false], ["es", false], ["it", false], ["la", false], ["pl", false], ["ja", false], ["xx", false], ["➕ More soon", true]]);
   eq("French is the default course", await p.inputValue("#course-select"), "fr");
   await p.evaluate(() => localStorage.setItem("llc.fr.days", JSON.stringify(["2026-01-01"])));
 
@@ -552,9 +552,10 @@ for (const tab of ["conj", "numbers"]) {
   await p.close();
 }
 
-// ── Spanish, Latin, Polish and Japanese starter courses ──
+// ── Spanish, Italian, Latin, Polish and Japanese starter courses ──
 for (const [id, firstCard, voice, tutorLine, articles] of [
   ["es", "la jirafa", "es-MX", "You are a Spanish tutor", true],
+  ["it", "ciao", "it-IT", "You are an Italian tutor", true],
   ["la", "salvē", "it-IT", "You are a Latin tutor", false],
   ["pl", "cześć", "pl-PL", "You are a Polish tutor", false],
   ["ja", "こんにちは", "ja-JP", "You are a Japanese tutor", false],
@@ -566,13 +567,13 @@ for (const [id, firstCard, voice, tutorLine, articles] of [
   await p.goto(url);
   eq(`${id}: course selected, starter tabs only`, [await p.inputValue("#course-select"),
     await p.$$eval("#tabs button", (b) => b.filter((x) => !x.hidden).map((x) => x.dataset.tab))], [id, ["today", "cards", "tutor"]]);
-  const folder = { es: "spanish", la: "latin", pl: "polish", ja: "japanese" }[id];
+  const folder = { es: "spanish", it: "italian", la: "latin", pl: "polish", ja: "japanese" }[id];
   eq(`${id}: unit link opens the lesson page, or says there isn't one and opens the roadmap`,
     await p.$eval("#tab-today a", (a) => [a.getAttribute("href"), a.textContent]),
-    id === "es" ? [`../${folder}/units/unit-00-sounds.md`, "Open the unit →"] : [`../${folder}/README.md`, "No lesson page yet: open the roadmap →"]);
+    ["es", "it"].includes(id) ? [`../${folder}/units/unit-00-sounds.md`, "Open the unit →"] : [`../${folder}/README.md`, "No lesson page yet: open the roadmap →"]);
   eq(`${id}: unit picker marks the units that have a lesson page`,
     await p.$eval("#t-unit", (s) => [[...s.options].filter((o) => o.textContent.endsWith("✅")).map((o) => o.value), !!s.parentElement.querySelector("small")]),
-    id === "es" ? [["0", "1", "2", "3"], true] : [[], false]);
+    { es: [["0", "1", "2", "3"], true], it: [["0", "1", "2", "3", "4"], true] }[id] || [[], false]);
   await p.click("#tabs button[data-tab=cards]");
   eq(`${id}: first card`, (await p.textContent("#fc-card .prompt")).trim().startsWith(firstCard), true);
   eq(`${id}: nouns carry a gender (and the "include the article" hint) only in courses with articles`, await p.evaluate(() => {
@@ -600,6 +601,31 @@ for (const [id, firstCard, voice, tutorLine, articles] of [
   eq("es: every noun with a gender starts with its article", await p.evaluate(() =>
     Object.values(window.ES_VOCAB).flat().filter((e) => e[2] && !/^(el|la|los|las) /.test(e[0])).map((e) => e[0])), []);
   eq("es: accent bar has ñ and the opening ¿", await p.$$eval("#accent-bar button", (b) => b.map((x) => x.textContent).filter((x) => "ñ¿".includes(x))), ["ñ", "¿"]);
+  await p.close();
+}
+
+// ── Italian: nouns come with their article; the tutor's level goes on to B1 ──
+{
+  const p = await browser.newPage();
+  await p.addInitScript(() => localStorage.setItem("llc.course", "it"));
+  await p.goto(url);
+  eq("it: every noun with a gender starts with its article", await p.evaluate(() =>
+    Object.values(window.IT_VOCAB).flat().filter((e) => e[2] && !/^((il|lo|la|i|gli|le) |l')/.test(e[0])).map((e) => e[0])), []);
+  eq("it: accented answers are checked", await p.evaluate(() => {
+    const { compare } = window.__fr;
+    return [compare("la città", ["la città"]), compare("la citta", ["la città"])];
+  }), ["ok", "accent"]);
+  // A fresh page per unit: the app saves its own settings on reload, which would race a write here.
+  const levelAt = async (unit) => {
+    const q = await browser.newPage();
+    await q.addInitScript((u) => { localStorage.setItem("llc.course", "it"); localStorage.setItem("llc.it.settings", JSON.stringify({ unit: u })); }, unit);
+    await q.goto(url);
+    const level = await q.evaluate(() => window.__fr.tutorSystem("tutor").match(/Level: CEFR (\w+)/)[1]);
+    await q.close();
+    return level;
+  };
+  eq("it: tutor level is A1, A2, B1, then B2", [await levelAt(5), await levelAt(20), await levelAt(25), await levelAt(28)], ["A1", "A2", "B1", "B2"]);
+  eq("it: the tutor knows about the exam", await p.evaluate(() => window.__fr.tutorSystem("tutor").includes("CILS B1 Cittadinanza")), true);
   await p.close();
 }
 

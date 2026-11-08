@@ -4,11 +4,19 @@
 > sound** (the reverse is harder). Learn ~15 rules now and every song lyric you read becomes
 > something you can pronounce. It also makes listening much easier, because you'll know what
 > to *expect* to hear.
+>
+> 🇧🇷 **Head start:** a Brazilian already has the French *j*, *ch*, *gn*, the throat *r* and nasal
+> vowels. The new sounds are *u* and *eu*, and the fixes are the Brazilian habits in ⚠️ below.
+
+> 🔤 **How to read the respellings:** they use **Portuguese spelling**, with the stressed syllable in
+> CAPS. A tilde marks a nasal vowel, as in Portuguese (*vã, bõ*). **ö** = say *ê* with your lips
+> rounded as for *ô* (the French *eu*). *(e)* = a short e that is often swallowed. And *ti, di* stay
+> "ti, di", never "tchi, dji".
 
 ## 🎯 Can-do goals
 - I can read a French word I've never seen and pronounce it roughly right.
 - I can hear the difference between *tu* and *tout*, and between *vin*, *vent* and *vont*.
-- I can explain why *les amis* sounds like "lay-za-mee".
+- I can explain why *les amis* sounds like "lê-za-MI".
 
 ## 📐 The rules
 
@@ -17,24 +25,27 @@
 | Write | Say | Example |
 |---|---|---|
 | final **-e** | silent | *la table* → "la tabl" |
-| final **-s, -t, -d, -x, -z, -p** | silent | *petit* "puh-tee", *deux* "duh", *trop* "troh" |
-| verb ending **-ent** (ils/elles) | silent! | *ils parlent* = "eel parl" |
+| final **-s, -t, -d, -x, -z, -p** | silent | *petit* "p(e)-TI", *deux* "dö", *trop* "trô" |
+| verb ending **-ent** (ils/elles) | silent! | *ils parlent* = "il parl" |
 | final **c, r, f, l** | often pronounced ("**CaReFuL**") | *avec, bonjour, neuf, avril* |
 
-⚠️ Exception to CaReFuL: **-er** at the end of verbs is "é": *parler* = "par-lé".
+⚠️ Exception to CaReFuL: **-er** at the end of verbs is a closed "ê": *parler* = "par-LÊ".
 
 ### 2. Vowels
 
-| Spelling | Sound | Example | Tip |
+| Spelling | Sound | Example | Portuguese reference |
 |---|---|---|---|
-| **u** | [y] | *tu, rue* | Say "ee" with rounded lips, like whistling |
-| **ou** | [u] | *tout, roue* | Like English "oo" in *food* |
-| **é** | [e] | *café, été* | Short "ay" with no glide |
-| **è, ê, ai** | [ɛ] | *père, fête, mais* | "e" in *bed* |
-| **eau, au, o** | [o] | *beau, au, vélo* | |
-| **oi** | [wa] | *moi, toi, voiture* | |
-| **eu, œu** | [ø]/[œ] | *deux, sœur* | Say "eh" with rounded lips |
-| **e** (unstressed) | [ə] or silent | *le, petit, samedi* | Often swallowed in speech: *samedi* → "sam-dee" |
+| **u** | [y] | *tu, rue* | Not in Portuguese: say *i*, then round your lips as for *u* without moving your tongue |
+| **ou** | [u] | *tout, roue* | The *u* of *tudo* |
+| **é** | [e] | *café, été* | The **closed *ê*** of *você* (not the open é of PT *café*!) |
+| **è, ê, ai** | [ɛ] | *père, fête, mais* | The **open *é*** of *pé* |
+| **eau, au, o** | [o] | *beau, au, vélo* | The closed *ô* of *avô*, kept full at the end (never "u") |
+| **oi** | [wa] | *moi, toi, voiture* | "uá" |
+| **eu, œu** | [ø]/[œ] | *deux, sœur* | Say *ê* (*deux*) or *é* (*sœur*) with your lips rounded as for *ô* |
+| **e** (unstressed) | [ə] or silent | *le, petit, samedi* | A short, relaxed *ö*; often swallowed: *samedi* → "sam-DI" |
+
+⚠️ **The accent marks are swapped compared with Portuguese:** French *é* is the closed PT *ê*, and
+French *è* is the open PT *é*.
 
 **Minimal pair you must master:** ***tu*** (you) vs ***tout*** (all), ***dessus*** (on top) vs ***dessous*** (under).
 
@@ -42,20 +53,31 @@
 When a vowel is followed by **n** or **m** *and then a consonant or the end of the word*, the vowel
 goes nasal and the *n/m* is **not** pronounced.
 
-| Spelling | Example | Rough description |
+| Spelling | Example | Portuguese reference |
 |---|---|---|
-| **an, en, am, em** | *vent, enfant, temps* | open "ah" through the nose |
-| **on, om** | *bon, nom, vont* | rounded "oh" through the nose |
-| **in, ain, ein, un, im** | *vin, pain, un* | "eh" through the nose |
+| **an, en, am, em** | *vent, enfant, temps* | like *ã* in *irmã*, with the mouth more open: "vã" |
+| **on, om** | *bon, nom, vont* | like *om* in *bom*, with rounder lips: "bõ" |
+| **in, ain, ein, un, im** | *vin, pain, un* | an open nasal *é*, like *em* in *bem* without the final "i": "vẽ" |
 
-If the *n/m* is followed by a vowel, **no nasal**: *bon* (nasal) vs *bonne* ("bun", n pronounced).
+🇧🇷 **You already make nasal vowels.** The one fix: Portuguese nasals end in a glide (*bem* = "bẽi",
+*bom* = "bõu", *pão* = "pãu"). French nasals are **one steady vowel**, with no "i" or "u" at the end.
+
+If the *n/m* is followed by a vowel, **no nasal**: *bon* (nasal) vs *bonne* ("bón": an oral open o, and the n is pronounced).
 
 **Minimal triplet:** *vin* (wine) · *vent* (wind) · *vont* (they go).
 
 ### 4. The French R
 It's made at the back of the throat (uvular [ʁ]), like a soft gargle, not with the tongue tip.
-Practise with *rue, Paris, très, merci*. 💡 If you speak Brazilian Portuguese, the *r* in *rato*
-(in many accents) is already very close.
+Practise with *rue, Paris, très, merci*. 💡 The Brazilian *r* of *rato* and *carro* (in most accents)
+is already very close: use it **everywhere**, also between vowels (*Paris*), where Portuguese would
+use the tap of *caro*.
+
+### 4b. Consonants you already have
+- ***j***, and ***g*** before e/i = the *j* of *já*: *je, jour, rouge, manger*.
+- ***ch*** = the *ch* of *chá*: *chat, chanson*. ***gn*** = *nh*: *montagne, Espagne*.
+- ***s*** between vowels = z, as in *casa*: *maison* = "mê-ZÕ". *ss* = s: *poisson* "pua-SÕ" (fish) vs
+  *poison* "pua-ZÕ" (poison).
+- ***t, d*** before *i* stay plain t and d: *petit* = "p(e)-TI", never "pe-TCHI".
 
 ### 5. Elision: vowels don't like to touch
 Short words ending in a vowel **drop it** before a word starting with a vowel or mute *h*, and
@@ -65,35 +87,41 @@ take an apostrophe:
 ### 6. Liaison: silent consonants wake up
 A normally silent final consonant is pronounced **when the next word starts with a vowel**, and
 attaches to that word:
-- *les amis* → "lay-**z**a-mee" (s → z sound)
-- *vous avez* → "voo-**z**a-vay"
-- *un ami* → "uh-**n**a-mee"
-- *petit ami* → "puh-tee-**t**a-mee"
+- *les amis* → "lê-**z**a-MI" (s → z sound)
+- *vous avez* → "vu-**z**a-VÊ"
+- *un ami* → "ẽ-**n**a-MI"
+- *petit ami* → "p(e)-ti-**t**a-MI"
+
+💡 Portuguese does this too: Brazilians say *os amigos* as "u-**z**a-MI-gus". Liaison is the same move.
 
 **Required** after articles, pronouns and short adjectives (*les, des, un, nous, vous, ils, mon, petit*).
 **Forbidden** after *et* ("and"): *et | il* has no liaison.
 
-Liaison is how you tell **ils sont** ("eel sohn", *they are*) from **ils ont** ("eel **z**ohn",
+Liaison is how you tell **ils sont** ("il sõ", *they are*) from **ils ont** ("il **z**õ",
 *they have*). That's Unit 3.
 
 ### 7. Accents
 
 | Mark | Name | Effect |
 |---|---|---|
-| **é** | accent aigu | always [e] "ay" |
-| **è** | accent grave | [ɛ] "eh"; on *à, où* it only distinguishes words (*a* = has, *à* = to) |
+| **é** | accent aigu | always [e]: the closed PT *ê* |
+| **è** | accent grave | [ɛ]: the open PT *é*; on *à, où* it only distinguishes words (*a* = has, *à* = to) |
 | **ê, â, î, ô, û** | circonflexe | slightly changes vowel; often marks a **lost s** (see 💡) |
 | **ç** | cédille | makes *c* sound like *s* before a/o/u: *ça, garçon* |
 | **ë, ï** | tréma | pronounce the vowels separately: *Noël, naïf* |
 
 ### 8. Rhythm
 French has **no word stress**. Syllables are even, and the **last syllable of each phrase**
-is a bit longer. Don't stress the first syllable like in English: *ba-NA-na* → *ba-na-NE*.
+is a bit longer. Portuguese leans on one syllable inside each word (*ba-NA-na*); French keeps
+them even and leans on the end: *banane* → "ba-NAN".
 
 ## ⚠️ Common traps
-- Pronouncing the final *-ent* of verbs: *ils mangent* is "eel manzh", never "manzh-ent".
+- Pronouncing the final *-ent* of verbs: *ils mangent* is "il mãj", never "mãj-ent".
 - Pronouncing the *s* of plurals: *les livres* sounds the same as *le livre* except for the article.
-- English *u*: *tu* is not "too"; *too* is closer to *tout*.
+- Portuguese *u*: French *tu* is not PT "tu". PT "tu" is French *tout*.
+- 🇧🇷 ❌ "pe-TCHI", "DJI-re" → ✅ *petit, dire*: t and d before i stay t and d.
+- 🇧🇷 ❌ "bõu", "bẽi" → ✅ *bon, bain*: no glide at the end of a nasal vowel.
+- 🇧🇷 ❌ "ka-FÉ" (open) → ✅ *café* = "ka-FÊ": *é* is closed. And a final *o* stays *ô*: *vélo* is "ve-LÔ", never "VÉ-lu".
 
 ## 🧱 Vocabulary (sound-focused, in the app as Unit 0)
 *le vin, le vent, le pain, la rue, la roue, bon, bonne, un, tout, tu, deux, beau.*
@@ -107,10 +135,10 @@ is a bit longer. Don't stress the first syllable like in English: *ba-NA-na* →
 <details>
 <summary markdown="span">Self-test: how do you pronounce these? (click for answers)</summary>
 
-1. *ils chantent* → "eel shahnt" (‑ent silent)
-2. *bonne* vs *bon* → "bun" (n pronounced) vs nasal "boh(n)"
-3. *les enfants* → "lay-**z**ahn-fahn"
-4. *et alors* → "ay a-lor" (no liaison after *et*)
+1. *ils chantent* → "il xãt" (‑ent silent)
+2. *bonne* vs *bon* → "bón" (n pronounced) vs nasal "bõ"
+3. *les enfants* → "lê-**z**ã-FÃ"
+4. *et alors* → "ê a-LÓR" (no liaison after *et*)
 5. *forêt* → circumflex = lost s → English *forest*!
 </details>
 

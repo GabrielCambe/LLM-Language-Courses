@@ -99,6 +99,8 @@ I'm learning French. Break down the pronunciation of the lines below. For each l
   then the IPA,
 - what trips learners up, word by word: silent final letters, liaison (required, optional
   or forbidden), elision, nasal vowels, u vs ou, the e muet,
+- for each tricky sound, the nearest sound in a common {your language} word ("like the ...
+  in ..."), or say there's none and how to make it,
 - if it's a song: where normal speech and singing probably differ (the e muet is often
   sung as a full syllable to fit the melody).
 End with ONE sound to practise and a shadowing tip. Do NOT continue the lyrics beyond what

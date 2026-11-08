@@ -15,14 +15,14 @@
 | je | -e | parl**e** | "parl" |
 | tu | -es | parl**es** | "parl" |
 | il/elle/on | -e | parl**e** | "parl" |
-| nous | -ons | parl**ons** | "par-lohn" |
-| vous | -ez | parl**ez** | "par-lay" |
+| nous | -ons | parl**ons** | "par-LÕ" |
+| vous | -ez | parl**ez** | "par-LÊ" |
 | ils/elles | -ent | parl**ent** | "parl" ⚠️ silent |
 
 🎉 **Four of the six forms sound identical.** In speech you only need to learn 3 sounds: *parl*, *parlons*, *parlez*.
 
 With a vowel or mute h at the start: **j'**aime, **j'**habite, **j'**écoute, with liaison
-*nous_aimons, ils_habitent* ("eel-za-beet").
+*nous_aimons, ils_habitent* ("il-za-BIT").
 
 ### Present = 3 English tenses
 *Je travaille* = I work / I am working / I do work. There's no separate "-ing" form.
@@ -46,7 +46,7 @@ And remember Unit 2: *J'aime **la** musique.* (general category = definite artic
 See sections 1 and 4 of the [sentence map](../grammar/09-sentence-structure.md).
 
 ## ⚠️ Common traps
-- Pronouncing *-ent*: ❌ "ils parl-ENT" → ✅ "eel parl".
+- Pronouncing *-ent*: ❌ "ils parl-ENT" → ✅ "il parl".
 - ❌ *Je suis travaille* / *Je suis travailler* (copying "I am working") → ✅ *Je travaille.*
 - ❌ *Je souvent travaille.* → ✅ *Je travaille souvent.*
 
@@ -63,7 +63,7 @@ souvent, toujours, parfois, maintenant, aujourd'hui, beaucoup.*
 <summary markdown="span">Self-test (answers)</summary>
 
 1. *Nous ___ (manger) au restaurant.* → **mangeons**
-2. *Ils ___ (habiter) à Bruxelles.* → **habitent** (say: "eel-za-beet")
+2. *Ils ___ (habiter) à Bruxelles.* → **habitent** (say: "il-za-BIT")
 3. *J'___ (écouter) Angèle.* → **écoute**
 4. *Tu ___ (préférer) le café ?* → **préfères**
 5. "I often work at night." → *Je travaille souvent la nuit.*

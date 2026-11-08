@@ -28,10 +28,10 @@
 |---|---|---|
 | je **suis** | I am | |
 | tu **es** | you are | |
-| il / elle / on **est** | he/she/one is | *es* and *est* sound the same: "eh" |
+| il / elle / on **est** | he/she/one is | *es* and *est* sound the same: "é" |
 | nous **sommes** | we are | |
-| vous **êtes** | you are | *vous_êtes* → "voo-zet" |
-| ils / elles **sont** | they are | "sohn" (s sound, **not** z) |
+| vous **êtes** | you are | *vous_êtes* → "vu-ZÉT" |
+| ils / elles **sont** | they are | "sõ" (s sound, **not** z) |
 
 ### *C'est* vs *il/elle est*
 - **C'est** + determiner/noun/name: *C'est Angèle. C'est un ami. C'est une chanson belge.*

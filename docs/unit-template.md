@@ -25,6 +25,11 @@ Follow the template below EXACTLY. Constraints:
   for, not the lyrics themselves. Only recommend songs/films you are confident exist;
   mark anything you are unsure about with (verify).
 - Mark colloquial vs. formal, and France vs. Belgium/Switzerland/Québec differences.
+- Pronunciation: explain every sound with a reference word in the learner's language, not
+  English (for a Brazilian: "ce = the tch of *tchau*", "gn = the nh of *banho*"). Write
+  respellings in the learner's spelling, stressed syllable in CAPS. For a Brazilian, also flag
+  the accent habits that change the sound: ti/di → tchi/dji, final e/o → i/u, nasalised
+  vowels, the h-sounding r, l → u.
 - Include one 💡 Curiosity box (etymology, culture, or a surprising fact).
 
 TEMPLATE:

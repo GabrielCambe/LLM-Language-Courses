@@ -1251,6 +1251,7 @@ const scenarios = () => local(COURSE.scenarios);
 // lines come from the course's "tutor" entry in data/courses.js. `me` is the learner's
 // language (tutor.lang): every explanation, translation and feedback is written in it.
 const L = COURSE.name.en;
+const aL = `${/^[AEIOU]/.test(L) ? "an" : "a"} ${L}`; // "an Italian", "a Spanish"
 const modePrompts = (me) => ({
   tutor: `MODE: Tutor.
 - Explain grammar explicitly and briefly: the rule, 3 examples, then the most common exception.
@@ -1270,14 +1271,14 @@ Don't rewrite their ideas, only their ${L}. If they send ${me} or a question ins
 - If they write "??", re-say your last line more simply.
 - After 10 exchanges, or when they write "stop", switch to ${me} and give: 3 errors they made and 3 useful new phrases.
 Start the scene yourself with one line.`,
-  song: `MODE: Song explainer. The learner pastes a few lines of a ${L} song (from YouTube Music or similar) and names the song and artist. For each line:
+  song: `MODE: Song explainer. The learner pastes a few lines of ${aL} song (from YouTube Music or similar) and names the song and artist. For each line:
 - a literal and a natural translation into ${me},
 - grammar at their level,
 - ${COURSE.tutor.song}, and places where the singer bends pronunciation or grammar for the rhythm,
 then list 3 chunks worth memorising. Work ONLY with the lines they paste: never continue, complete or invent lyrics.`,
   pronounce: `MODE: Pronunciation coach. The learner pastes a few lines of ${L} (song lyrics, a sentence from a lesson, anything) and may name the song. For each line:
 1. An easy respelling using ${me} spelling, syllables split with dashes (stressed syllable in CAPS where stress matters), then the IPA in /slashes/.
-2. Bullets for what trips learners up in this line: ${COURSE.tutor.pronounce}. Name the exact word each time.
+2. Bullets for what trips learners up in this line: ${COURSE.tutor.pronounce}. Name the exact word each time, and compare each tricky sound with the nearest sound in a common ${me} word (e.g. "like the ... in ..."). When ${me} has nothing close, say so and describe how to make the sound.
 3. If it's a song: where normal speech and singing probably differ (you can't hear the recording, so say "probably").
 End with ONE sound from these lines to practise, and a shadowing tip: play the line, pause, say it aloud, repeat.
 Pronunciation from text is approximate: remind them once to check against the recording. Work ONLY with the lines they paste: never continue, complete or invent lyrics.`,
@@ -1326,13 +1327,17 @@ function keyRemembered() {
   try { return !!localStorage.getItem(KEY_NAME); } catch (e) { return false; }
 }
 function tutorLevel() {
-  return settings.unit === 0 ? "A0 (complete beginner)" : settings.unit <= COURSE.a1Until ? "A1" : "A2";
+  // a2Until and b1Until are optional: only courses that go past A2 (Italian, to B2) set them.
+  if (settings.unit === 0) return "A0 (complete beginner)";
+  if (settings.unit <= COURSE.a1Until) return "A1";
+  if (COURSE.a2Until == null || settings.unit <= COURSE.a2Until) return "A2";
+  return COURSE.b1Until == null || settings.unit <= COURSE.b1Until ? "B1" : "B2";
 }
 // The system prompt depends only on mode, unit and language, so it stays byte-stable
 // for a whole chat (good for prompt caching).
 function tutorSystem(mode) {
   const u = UNITS[settings.unit];
-  return `You are a ${L} tutor inside a self-study app.
+  return `You are ${aL} tutor inside a self-study app.
 Learner: an adult who speaks ${tutor.lang}. Level: CEFR ${tutorLevel()}. Current unit: ${settings.unit}, "${u.en}". ${COURSE.tutor.course}
 How to talk to them:
 - Write every explanation, translation, hint, question about the material and piece of feedback in ${tutor.lang}. Only the ${L} you are teaching, quoting or practising stays in ${L}.
