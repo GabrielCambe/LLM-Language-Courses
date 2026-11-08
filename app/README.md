@@ -23,8 +23,8 @@ Only the app's interface and the Tutor are translated: card meanings and the cou
 
 **Course:** the menu with the flag (top left) picks the course: French, Spanish, Italian, Latin, Polish or Japanese.
 Each course keeps its own progress, so switching never touches another course's cards.
-Spanish, Italian, Latin, Polish and Japanese are starters: Today, Flashcards (units 0–3) and the Tutor.
-In Today's unit picker, ✅ marks the units that have a lesson page (French 0–4, Spanish 0–3, Italian 0–3); for the
+Spanish, Italian, Latin, Polish and Japanese are starters: Today, Flashcards (units 0–3; Italian 0–4) and the Tutor.
+In Today's unit picker, ✅ marks the units that have a lesson page (French 0–4, Spanish 0–3, Italian 0–4); for the
 others, the unit link says so and opens the roadmap. Conjugation, Gender,
 Numbers and the Song Workshop are French-only for now. Latin audio uses an Italian voice (there are no Latin voices).
 For Japanese, type answers with your device's Japanese keyboard; the accent keys add the long mark ー and small kana (っ ゃ ゅ ょ).

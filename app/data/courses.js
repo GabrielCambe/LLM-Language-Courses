@@ -152,7 +152,7 @@ window.LLC_COURSES = [
       { en: "Ciao! Introductions and essere", "pt-BR": "Ciao! Apresentações e essere", page: "units/unit-01-essere.md" },
       { en: "Gender, articles and plurals", "pt-BR": "Gênero, artigos e plurais", page: "units/unit-02-gender-articles.md" },
       { en: "Having and describing: avere, c'è, molto", "pt-BR": "Ter e descrever: avere, c'è, molto", page: "units/unit-03-avere-ce-molto.md" },
-      { en: "Present tense: -are, -ere, -ire", "pt-BR": "Presente: -are, -ere, -ire" },
+      { en: "Present tense: -are, -ere, -ire", "pt-BR": "Presente: -are, -ere, -ire", page: "units/unit-04-present-tense.md" },
       { en: "Irregular verbs: fare, andare, venire…", "pt-BR": "Verbos irregulares: fare, andare, venire…" },
       { en: "Want, can, must, know", "pt-BR": "Querer, poder, dever, saber" },
       { en: "Prepositions: di, a, da, in… (del, al, nel)", "pt-BR": "Preposições: di, a, da, in… (del, al, nel)" },

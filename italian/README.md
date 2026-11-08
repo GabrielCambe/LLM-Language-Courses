@@ -11,7 +11,7 @@ plurals, *essere* vs *avere* in the past, *ci* and *ne* and, for B2, the subjunc
 Each unit = **one rule family + ~15–20 high-frequency words + one output task**.
 ⚡ marks units that are almost identical to Portuguese: read the rule, do the drills, move on.
 
-> 🌱 **Status: starter.** ✅ **Lesson pages: units 0–3** (marked ✅ below). The study app has decks
+> 🌱 **Status: starter.** ✅ **Lesson pages: units 0–4** (marked ✅ below). The study app has decks
 > for the same units and the Tutor knows the course and the exam. Generate the next lesson pages
 > with [`../docs/unit-template.md`](../docs/unit-template.md) when you reach them.
 
@@ -42,7 +42,7 @@ Each unit = **one rule family + ~15–20 high-frequency words + one output task*
 | 1 ✅ | [Introductions and *essere*](units/unit-01-essere.md) | *sono, sei, è…*; *tu* vs *Lei*; *voi* ≠ *vocês* (*siete*); greetings by time of day; the exam's self-introduction |
 | 2 ✅ | [Gender, articles and plurals](units/unit-02-gender-articles.md) | *il / lo / la / l' / i / gli / le*, *un / uno / una / un'*; plurals change the vowel (no -s); the nouns that flip (*il fiore, il viaggio*) |
 | 3 ✅ | [Having and describing](units/unit-03-avere-ce-molto.md) | *avere* (*ho* = "o"), ***c'è / ci sono*** (never *ha*), *molto* = *muito*, adjective agreement |
-| 4 | Present tense: -are, -ere, -ire | *parlo, prendo, dormo*; *-isc-* verbs (*capisco, finisco*); stress in the *loro* form (*PAR-la-no*) |
+| 4 ✅ | [Present tense: -are, -ere, -ire](units/unit-04-present-tense.md) | *parlo, prendo, dormo*; *-isc-* verbs (*capisco, finisco*); stress in the *loro* form (*PAR-la-no*) |
 | 5 | Irregular verbs | *fare, andare, venire, uscire, stare, dare, bere, dire* |
 | 6 | Want, can, must, know | *volere, potere, dovere* + infinitive; ⚡ *sapere* vs *conoscere* (= *saber* vs *conhecer*) |
 | 7 | Prepositions | *di, a, da, in, con, su, per, tra*; *del, al, dal, nel, sul* (like PT *do, ao, no*, but more); *da Marco* = at Marco's |

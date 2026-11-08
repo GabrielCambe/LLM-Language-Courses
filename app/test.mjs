@@ -573,7 +573,7 @@ for (const [id, firstCard, voice, tutorLine, articles] of [
     ["es", "it"].includes(id) ? [`../${folder}/units/unit-00-sounds.md`, "Open the unit →"] : [`../${folder}/README.md`, "No lesson page yet: open the roadmap →"]);
   eq(`${id}: unit picker marks the units that have a lesson page`,
     await p.$eval("#t-unit", (s) => [[...s.options].filter((o) => o.textContent.endsWith("✅")).map((o) => o.value), !!s.parentElement.querySelector("small")]),
-    ["es", "it"].includes(id) ? [["0", "1", "2", "3"], true] : [[], false]);
+    { es: [["0", "1", "2", "3"], true], it: [["0", "1", "2", "3", "4"], true] }[id] || [[], false]);
   await p.click("#tabs button[data-tab=cards]");
   eq(`${id}: first card`, (await p.textContent("#fc-card .prompt")).trim().startsWith(firstCard), true);
   eq(`${id}: nouns carry a gender (and the "include the article" hint) only in courses with articles`, await p.evaluate(() => {
