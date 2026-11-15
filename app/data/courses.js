@@ -16,6 +16,7 @@ window.LLC_COURSES = [
     // Drills written for this course. Conjugation, gender and numbers are French-specific code.
     tabs: ["today", "cards", "conj", "gender", "numbers", "songs", "tutor"],
     vocab: window.FR_VOCAB,
+    vocabPt: window.LLC_PT_VOCAB.fr, // Portuguese meanings and notes, by card ID (data/*.pt.js)
     verbs: window.FR_VERBS,
     tenses: window.FR_TENSES,
     a1Until: 13, // last A1 unit (unit 0 is A0); used for the tutor's level
@@ -77,6 +78,7 @@ window.LLC_COURSES = [
     accents: "á é í ó ú ñ ü ¿ ¡",
     tabs: ["today", "cards", "tutor"],
     vocab: window.ES_VOCAB,
+    vocabPt: window.LLC_PT_VOCAB.es, // Portuguese meanings and notes, by card ID (data/*.pt.js)
     verbs: [],
     tenses: [],
     a1Until: 11,
@@ -129,6 +131,7 @@ window.LLC_COURSES = [
     accents: "à è é ì ò ù",
     tabs: ["today", "cards", "tutor"],
     vocab: window.IT_VOCAB,
+    vocabPt: window.LLC_PT_VOCAB.it, // Portuguese meanings and notes, by card ID (data/*.pt.js)
     verbs: [],
     tenses: [],
     a1Until: 13,
@@ -195,6 +198,7 @@ window.LLC_COURSES = [
     accents: "ā ē ī ō ū ȳ",
     tabs: ["today", "cards", "tutor"],
     vocab: window.LA_VOCAB,
+    vocabPt: window.LLC_PT_VOCAB.la, // Portuguese meanings and notes, by card ID (data/*.pt.js)
     verbs: [],
     tenses: [],
     a1Until: 7,
@@ -240,6 +244,7 @@ window.LLC_COURSES = [
     accents: "ą ć ę ł ń ó ś ź ż",
     tabs: ["today", "cards", "tutor"],
     vocab: window.PL_VOCAB,
+    vocabPt: window.LLC_PT_VOCAB.pl, // Portuguese meanings and notes, by card ID (data/*.pt.js)
     verbs: [],
     tenses: [],
     a1Until: 8,
@@ -289,6 +294,7 @@ window.LLC_COURSES = [
     accents: "ー っ ゃ ゅ ょ ッ ャ ュ ョ",
     tabs: ["today", "cards", "tutor"],
     vocab: window.JA_VOCAB,
+    vocabPt: window.LLC_PT_VOCAB.ja, // Portuguese meanings and notes, by card ID (data/*.pt.js)
     verbs: [],
     tenses: [],
     a1Until: 11,

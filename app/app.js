@@ -151,9 +151,11 @@ document.addEventListener("click", (e) => {
 // ───────────────────────── units ─────────────────────────
 // Index = unit number; each unit is { en, "pt-BR", page? } (see data/courses.js).
 const UNITS = COURSE.units;
-// Links to the course's Markdown pages. GitHub Pages renders .md as .html
+// Links to the course's Markdown pages. Each page "name.md" has a Portuguese twin "name.pt.md",
+// so link to the one in the interface language. GitHub Pages renders .md as .html
 // (and README.md as the folder index), so adjust links when hosted there.
 function docLink(path) {
+  if (lang === "pt-BR") path = path.replace(/\.md$/, ".pt.md");
   if (!location.hostname.endsWith("github.io")) return path;
   return path.replace(/README\.md$/, "").replace(/\.md$/, ".html");
 }
@@ -194,14 +196,28 @@ function formatDelay(ms) {
   return (days / 365).toLocaleString(lang, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + " " + t("delay.y");
 }
 
+// Each entry carries its meaning and note in the interface language (meaning, note), plus the
+// English meaning (en). Portuguese comes from the course's vocabPt (data/*.pt.js), keyed by card ID.
+// Custom cards are [word, english, gender, note, portuguese?]; either meaning may be empty.
 function allEntries() {
   const list = [];
+  const pt = lang === "pt-BR" ? COURSE.vocabPt || {} : {};
   Object.keys(COURSE.vocab).forEach((u) => {
-    COURSE.vocab[u].forEach(([fr, en, gender, note]) => list.push({ fr, en, gender, note, unit: Number(u) }));
+    COURSE.vocab[u].forEach(([fr, en, gender, note]) => {
+      const [ptMeaning, ptNote] = pt[fr] || [];
+      list.push({ fr, en, meaning: ptMeaning || en, gender, note: ptMeaning ? ptNote || "" : note, unit: Number(u) });
+    });
   });
-  store.get("custom", []).forEach(([fr, en, gender, note]) => list.push({ fr, en, gender: gender || null, note: note || "", unit: "custom" }));
+  store.get("custom", []).forEach(([fr, en, gender, note, ptMeaning]) => {
+    const meaning = (lang === "pt-BR" ? ptMeaning || en : en || ptMeaning) || "";
+    list.push({ fr, en: en || "", meaning, gender: gender || null, note: note || "", unit: "custom" });
+  });
   return list;
 }
+// The language code of the meanings side of a card ("EN" or "PT"), for the direction labels.
+const meaningCode = () => (lang === "pt-BR" ? "PT" : "EN");
+// A verb's meaning in the interface language.
+const verbMeaning = (v) => (lang === "pt-BR" && v.pt) || v.en;
 function activeCards() {
   const cards = [];
   allEntries().forEach((e) => {
@@ -270,14 +286,13 @@ function renderCards() {
     <details class="panel">
       <summary><b>${t("cards.settings")}</b></summary>
       <div class="row" style="margin-top:12px">
-        <label><input type="checkbox" id="fc-fr2en" ${settings.fr2en ? "checked" : ""}> ${code} → EN (${t("cards.recognise")})</label>
-        <label><input type="checkbox" id="fc-en2fr" ${settings.en2fr ? "checked" : ""}> EN → ${code} (${t("cards.produce")})</label>
+        <label><input type="checkbox" id="fc-fr2en" ${settings.fr2en ? "checked" : ""}> ${code} → ${meaningCode()} (${t("cards.recognise")})</label>
+        <label><input type="checkbox" id="fc-en2fr" ${settings.en2fr ? "checked" : ""}> ${meaningCode()} → ${code} (${t("cards.produce")})</label>
         <label><input type="checkbox" id="fc-auto" ${settings.autoSpeak ? "checked" : ""}> ${t("cards.autoSpeak")}</label>
         <label>${t("cards.newPerDay")} <input type="number" id="fc-new" min="0" max="50" value="${settings.newPerDay}" style="width:70px"></label>
       </div>
-      ${t("cards.meaningsNote") ? `<p class="muted">${t("cards.meaningsNote")}</p>` : ""}
       <h3>${t("cards.importTitle")}</h3>
-      <p class="muted">${t("cards.importFormat", { format: '<code>[{"fr":"la chanson","en":"song","gender":"f","note":"..."}]</code>' })}</p>
+      <p class="muted">${t("cards.importFormat", { format: '<code>[{"fr":"la chanson","en":"song","pt":"canção","gender":"f","note":"..."}]</code>' })}</p>
       <textarea id="fc-import" placeholder='[{"fr": "avoir la flemme", "en": "to not be bothered", "gender": null, "note": "colloquial"}]'></textarea>
       <div class="row"><button id="fc-import-btn">${t("cards.import")}</button><span id="fc-import-msg" class="muted"></span></div>
     </details>`;
@@ -305,8 +320,8 @@ function importCards() {
     const known = new Set(allEntries().map((e) => e.fr));
     let added = 0;
     data.forEach((d) => {
-      if (d && d.fr && d.en && !known.has(d.fr)) {
-        custom.push([String(d.fr), String(d.en), d.gender === "m" || d.gender === "f" ? d.gender : null, d.note ? String(d.note) : ""]);
+      if (d && d.fr && (d.en || d.pt) && !known.has(d.fr)) {
+        custom.push([String(d.fr), d.en ? String(d.en) : "", d.gender === "m" || d.gender === "f" ? d.gender : null, d.note ? String(d.note) : "", d.pt ? String(d.pt) : ""]);
         known.add(d.fr);
         added++;
       }
@@ -342,12 +357,12 @@ function drawCard() {
     return;
   }
   const isFr = c.dir === "fr2en";
-  const promptText = isFr ? c.fr : c.en;
+  const promptText = isFr ? c.fr : c.meaning;
   const hint = !isFr && c.gender ? `<span class="tag">${t("cards.includeArticle")}</span>` : "";
   const unitTag = `<span class="tag">${c.unit === "custom" ? t("common.custom") : t("common.unitLower", { n: c.unit })}</span>`;
   const code = COURSE.id.toUpperCase();
   box.innerHTML = `
-    <div class="row">${unitTag} <span class="muted">${isFr ? `${code} → EN` : `EN → ${code}`}</span> <span class="muted">${t("cards.left", { n: fc.queue.length })}</span></div>
+    <div class="row">${unitTag} <span class="muted">${isFr ? `${code} → ${meaningCode()}` : `${meaningCode()} → ${code}`}</span> <span class="muted">${t("cards.left", { n: fc.queue.length })}</span></div>
     <div class="prompt">${escapeHtml(promptText)} ${isFr ? speakBtn(c.fr) : ""}</div>
     ${hint}
     <input type="text" id="fc-typed" placeholder="${t("cards.typePlaceholder")}" autocomplete="off" autocapitalize="off" spellcheck="false">
@@ -369,7 +384,7 @@ function reveal() {
   $("#fc-typed").blur();
   let fb = "";
   if (typedVal.trim()) {
-    const expected = isFr ? c.en.split(/[,/]/).map((s) => s.trim()) : [c.fr, c.fr.replace(/\(.*?\)/g, "")].concat(c.fr.split("/").map((s) => s.trim()));
+    const expected = isFr ? c.meaning.split(/[,/]/).map((s) => s.trim()) : [c.fr, c.fr.replace(/\(.*?\)/g, "")].concat(c.fr.split("/").map((s) => s.trim()));
     const r = compare(typedVal, expected);
     fb = r === "ok" ? `<div class="feedback ok">${t("cards.matches")}</div>`
       : r === "accent" ? `<div class="feedback warn">${t("cards.checkAccents")}</div>`
@@ -381,7 +396,7 @@ function reveal() {
   const cls = ["again", "", "good", ""];
   $("#fc-reveal").remove();
   $("#fc-back").innerHTML = `
-    <div class="answer">${escapeHtml(isFr ? c.en : c.fr)} ${!isFr ? speakBtn(c.fr) : ""}</div>
+    <div class="answer">${escapeHtml(isFr ? c.meaning : c.fr)} ${!isFr ? speakBtn(c.fr) : ""}</div>
     ${c.note ? `<div class="note">${escapeHtml(c.note)}</div>` : ""}
     ${fb}
     <p class="muted">${t("cards.howWell")}</p>
@@ -594,7 +609,7 @@ function newConjQ() {
   const due = keys.filter((k) => srs[k] && srs[k].due <= now).length;
   box.innerHTML = `
     <div class="row"><span class="tag">${tLabel}</span>${kind ? `<span class="tag" id="conj-kind">${t("conj." + kind)}</span>` : ""}
-      <span class="muted">${v.inf}: ${v.en}</span>
+      <span class="muted">${v.inf}: ${escapeHtml(verbMeaning(v))}</span>
       <span class="muted">· <span id="conj-score">${scoreText(conj.right, conj.total)}</span> · ${t("cards.due", { n: due })}</span></div>
     <div class="prompt">${subjectFor(pron, res.display)} ___ <small class="muted">(${v.inf})</small></div>
     <div class="muted" id="conj-pron">${pron} = ${escapeHtml(pronounMeaning(pron))}</div>
@@ -706,7 +721,7 @@ function answerGender(g) {
   const word = stripArticle(c.fr);
   const article = c.gender === "m" ? "le / un" : "la / une";
   $("#gen-fb").innerHTML = `
-    <div class="feedback ${ok ? "ok" : "no"}">${ok ? "✅" : "❌"} <b>${escapeHtml(c.fr)}</b> (${article}): ${escapeHtml(c.en)} ${speakBtn(c.fr)}</div>
+    <div class="feedback ${ok ? "ok" : "no"}">${ok ? "✅" : "❌"} <b>${escapeHtml(c.fr)}</b> (${article}): ${escapeHtml(c.meaning)} ${speakBtn(c.fr)}</div>
     <p>${genderHint(word, c.gender)}</p>
     <button class="primary" id="gen-next">${t("common.next")}</button>`;
   $("#gen-next").onclick = nextGender;
@@ -959,7 +974,9 @@ function renderSongRead(s) {
     if (!fr || !en) return;
     const custom = store.get("custom", []);
     if (allEntries().some((e) => e.fr === fr)) { $("#sa-msg").textContent = t("songs.already"); return; }
-    custom.push([fr, en, $("#sa-g").value || null, t("songs.fromSong", { title: s.title })]);
+    // The meaning is typed in the interface language, so it goes in that language's slot.
+    const g = $("#sa-g").value || null, note = t("songs.fromSong", { title: s.title });
+    custom.push(lang === "pt-BR" ? [fr, "", g, note, en] : [fr, en, g, note]);
     store.set("custom", custom);
     fc.queue = []; fc.current = null;
     $("#sa-msg").textContent = t("songs.added", { word: fr });
@@ -1716,4 +1733,4 @@ try { startTab = sessionStorage.getItem(PREFIX + "tab") || "today"; } catch (e) 
 showTab(RENDER[startTab] && COURSE.tabs.includes(startTab) ? startTab : "today");
 
 // Exposed for tests (see app/test.mjs)
-window.__fr = { schedule, pickConjKey, conjReview, frenchNumber, conjugate, genderHint, stripArticle, compare, tokenize, renderMd, tutorSystem, claudeAiPrompt, estimateCost, formatDelay, exportAll: () => store.exportAll() };
+window.__fr = { allEntries, docLink, schedule, pickConjKey, conjReview, frenchNumber, conjugate, genderHint, stripArticle, compare, tokenize, renderMd, tutorSystem, claudeAiPrompt, estimateCost, formatDelay, exportAll: () => store.exportAll() };

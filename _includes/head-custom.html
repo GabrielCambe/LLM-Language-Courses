@@ -1,6 +1,33 @@
 <!-- Top bar on every page of the course site (Primer theme hook: included in every page's <head>):
-     a link to the study app, and a light/dark theme toggle. The theme is stored under the same key as
-     the study app ("llc.theme"), so one setting covers both. -->
+     a link to the study app, an English/Português switch and a light/dark theme toggle. The theme and the
+     language are stored under the same keys as the study app ("llc.theme", "llc.lang"), so one setting covers both.
+
+     Languages: every page "name.md" (English) has a Portuguese twin "name.pt.md" next to it, so relative
+     links work the same in both. Jekyll finds the twin at build time; pages without one get no switch. -->
+{%- assign llc_pt = false -%}
+{%- if page.path contains '.pt.md' -%}{%- assign llc_pt = true -%}{%- endif -%}
+{%- if llc_pt -%}
+  {%- assign llc_other_path = page.path | replace: '.pt.md', '.md' -%}
+{%- else -%}
+  {%- assign llc_other_path = page.path | replace: '.md', '.pt.md' -%}
+{%- endif -%}
+{%- assign llc_other = site.pages | where: "path", llc_other_path | first -%}
+<script>
+  window.LLC_PAGE = {
+    lang: "{% if llc_pt %}pt-BR{% else %}en{% endif %}",
+    other: "{% if llc_other %}{{ llc_other.url | relative_url }}{% endif %}"
+  };
+  document.documentElement.lang = window.LLC_PAGE.lang;
+  // Show the page in the reader's language: the one they picked (here or in the app), otherwise
+  // Portuguese if the device is set to it. Runs before first paint, so there is no flash.
+  (function () {
+    var p = window.LLC_PAGE, want = null;
+    if (!p.other) return;
+    try { want = localStorage.getItem("llc.lang"); } catch (e) {}
+    if (want !== "en" && want !== "pt-BR") want = /^pt/i.test(navigator.language || "") ? "pt-BR" : null;
+    if (want && want !== p.lang) location.replace(p.other);
+  })();
+</script>
 <script>
   (function () {
     var t = "auto";
@@ -49,8 +76,9 @@
   .llc-check-progress button { font: inherit; font-size: 13px; margin-left: 8px; padding: 2px 10px; border-radius: 999px; cursor: pointer;
     border: 1px solid var(--llc-border, #e1e4e8); background: var(--llc-bg, #fff); color: var(--llc-text, #24292e); }
 
-  .llc-theme-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .llc-theme-toggle, .markdown-body .llc-app-link {
+  .llc-theme-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .llc-bar-right { display: flex; gap: 8px; align-items: center; }
+  .llc-theme-toggle, .markdown-body .llc-app-link, .markdown-body .llc-lang-link {
     font: inherit; font-size: 14px; cursor: pointer;
     padding: 4px 12px; border-radius: 999px;
     border: 1px solid var(--llc-border, #e1e4e8);
@@ -59,6 +87,8 @@
   .llc-theme-toggle:hover { border-color: var(--llc-link, #0366d6); }
   .markdown-body .llc-app-link { display: inline-block; color: var(--llc-link, #0366d6); font-weight: 600; text-decoration: none; }
   .markdown-body .llc-app-link:hover { border-color: var(--llc-link, #0366d6); text-decoration: none; }
+  .markdown-body .llc-lang-link { display: inline-block; color: var(--llc-text, #24292e); text-decoration: none; }
+  .markdown-body .llc-lang-link:hover { border-color: var(--llc-link, #0366d6); text-decoration: none; }
 
   /* "Open the study app" button on the index page */
   .markdown-body .llc-app-cta { margin: 20px 0; }
@@ -71,7 +101,8 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     var KEY = "llc.theme", ORDER = ["auto", "light", "dark"];
-    var LABEL = { auto: "🌓 Auto", light: "☀️ Light", dark: "🌙 Dark" };
+    var PT = window.LLC_PAGE.lang === "pt-BR";
+    var LABEL = PT ? { auto: "🌓 Auto", light: "☀️ Claro", dark: "🌙 Escuro" } : { auto: "🌓 Auto", light: "☀️ Light", dark: "🌙 Dark" };
     var current = "auto";
     try { current = localStorage.getItem(KEY) || "auto"; } catch (e) {}
     var bar = document.createElement("div");
@@ -81,7 +112,7 @@
     btn.className = "llc-theme-toggle";
     var render = function () {
       btn.textContent = LABEL[current];
-      btn.setAttribute("aria-label", "Theme: " + current + ". Click to change.");
+      btn.setAttribute("aria-label", PT ? "Tema: " + LABEL[current] + ". Clique para mudar." : "Theme: " + current + ". Click to change.");
     };
     btn.addEventListener("click", function () {
       current = ORDER[(ORDER.indexOf(current) + 1) % ORDER.length];
@@ -95,9 +126,24 @@
     var app = document.createElement("a");
     app.className = "llc-app-link";
     app.href = "{{ '/app/' | relative_url }}";
-    app.textContent = "📱 Study app";
+    app.textContent = PT ? "📱 App de estudo" : "📱 Study app";
     bar.appendChild(app);
-    bar.appendChild(btn);
+    var right = document.createElement("span");
+    right.className = "llc-bar-right";
+    if (window.LLC_PAGE.other) {
+      // The same page in the other language. Clicking it also sets the app's language.
+      var sw = document.createElement("a");
+      sw.className = "llc-lang-link";
+      sw.href = window.LLC_PAGE.other;
+      sw.lang = PT ? "en" : "pt-BR";
+      sw.textContent = PT ? "🌐 English" : "🌐 Português";
+      sw.addEventListener("click", function () {
+        try { localStorage.setItem("llc.lang", PT ? "en" : "pt-BR"); } catch (e) {}
+      });
+      right.appendChild(sw);
+    }
+    right.appendChild(btn);
+    bar.appendChild(right);
     var body = document.querySelector(".markdown-body") || document.body;
     body.insertBefore(bar, body.firstChild);
   });
@@ -106,6 +152,7 @@
   // Make unit checklists tappable and remember them on this device (per page, per item text).
   document.addEventListener("DOMContentLoaded", function () {
     var KEY = "llc.checklists";
+    var PT = window.LLC_PAGE && window.LLC_PAGE.lang === "pt-BR";
     var page = location.pathname;
     var all = {};
     try { all = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; } catch (e) {}
@@ -145,11 +192,13 @@
         bar.className = "llc-check-progress";
         list.parentNode.insertBefore(bar, list);
       }
-      bar.textContent = (done === boxes.length ? "🎉 All done! " : "") + done + " / " + boxes.length + " done · saved on this device";
+      bar.textContent = PT
+        ? (done === boxes.length ? "🎉 Tudo feito! " : "") + done + " / " + boxes.length + " feitos · salvo neste dispositivo"
+        : (done === boxes.length ? "🎉 All done! " : "") + done + " / " + boxes.length + " done · saved on this device";
       if (done > 0) {
         var reset = document.createElement("button");
         reset.type = "button";
-        reset.textContent = "Reset";
+        reset.textContent = PT ? "Limpar" : "Reset";
         reset.addEventListener("click", function () {
           list.querySelectorAll(":scope > li > .task-list-item-checkbox").forEach(function (b) {
             if (b.checked) b.click();
