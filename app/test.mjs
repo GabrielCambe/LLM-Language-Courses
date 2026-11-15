@@ -329,7 +329,7 @@ await stale.route(/app\.js/, (r) => r.fulfill({ contentType: "text/javascript", 
 await stale.goto(url);
 eq("button still visible with a stale app.js", await stale.$eval("#theme-toggle", (b) => [b.textContent, b.offsetWidth > 40]), ["🌓 Auto", true]);
 eq("course and language pickers still usable with a stale app.js",
-  [await stale.$eval("#course-select", (s) => s.options.length), await stale.$eval("#lang-select", (s) => [...s.options].map((o) => o.value))], [5, ["en", "pt-BR"]]);
+  [await stale.$eval("#course-select", (s) => s.options.length), await stale.$eval("#lang-select", (s) => [...s.options].map((o) => o.value))], [6, ["en", "pt-BR"]]);
 await stale.close();
 
 // ── Tutor (Claude) against a mocked API: request shape, append-only history, errors ──
@@ -488,6 +488,44 @@ for (const tab of ["conj", "numbers"]) {
   await p.selectOption("#lang-select", "en");
   eq("back to English", [await p.textContent("#tabs [data-tab=today]"), await p.evaluate(() => window.__fr.tutorSystem("tutor").includes("speaks English"))], ["Today", true]);
   eq("language: no page errors", pErrors, []);
+
+  // Flashcards in Portuguese: every card of every course has a Portuguese meaning (and a note where English has one).
+  const missing = await p.evaluate(() => {
+    const out = [];
+    window.LLC_COURSES.forEach((c) => {
+      const pt = c.vocabPt || {};
+      const ids = new Set();
+      Object.values(c.vocab).flat().forEach(([w, , , note]) => {
+        ids.add(w);
+        if (!pt[w] || !pt[w][0]) out.push(`${c.id}: ${w}`);
+        else if (note && !pt[w][1]) out.push(`${c.id}: ${w} (note)`);
+      });
+      Object.keys(pt).filter((w) => !ids.has(w)).forEach((w) => out.push(`${c.id}: extra ${w}`));
+      (c.verbs || []).filter((v) => !v.pt).forEach((v) => out.push(`${c.id}: verb ${v.inf}`));
+    });
+    return out;
+  });
+  eq("every card and verb has a Portuguese meaning (and no stray entries)", missing, []);
+  await p.selectOption("#lang-select", "pt-BR");
+  eq("cards use the Portuguese meaning and note", await p.evaluate(() => {
+    const e = window.__fr.allEntries().find((x) => x.fr === "rester");
+    return [e.meaning, e.note, e.en];
+  }), ["ficar", "NÃO é 'restar'!", "to stay"]);
+  await p.click("#tabs button[data-tab=cards]");
+  eq("card direction says PT", (await p.textContent("#fc-card .row")).includes("FR → PT"), true);
+  await p.keyboard.press("Enter");
+  eq("card answer in Portuguese", (await p.textContent("#fc-back .answer")).trim(), "o vinho");
+  eq("course pages link to the Portuguese version", await p.evaluate(() => window.__fr.docLink("../french/units/unit-01-etre.md")), "../french/units/unit-01-etre.pt.md");
+  await p.evaluate(() => {
+    localStorage.setItem("llc.fr.custom", JSON.stringify([["la chanson", "song", "f", ""], ["le truc", "", null, "", "a coisa"]]));
+  });
+  eq("custom cards: Portuguese meaning, else the English one", await p.evaluate(() =>
+    window.__fr.allEntries().filter((e) => e.unit === "custom").map((e) => e.meaning)), ["song", "a coisa"]);
+  await p.selectOption("#lang-select", "en");
+  eq("back in English, cards use the English meaning", await p.evaluate(() =>
+    window.__fr.allEntries().filter((e) => e.fr === "rester" || e.unit === "custom").map((e) => e.meaning)), ["to stay", "song", "a coisa"]);
+  eq("English course pages stay English", await p.evaluate(() => window.__fr.docLink("../french/README.md")), "../french/README.md");
+  await p.evaluate(() => localStorage.removeItem("llc.fr.custom"));
   await p.close();
 
   const ptDevice = await browser.newPage({ locale: "pt-BR" });
@@ -675,6 +713,33 @@ for (const [id, firstCard, voice, tutorLine, articles] of [
   eq("ticking the checklist updates today's square", await level(keys.today), "4");
   eq("calendar: no page errors", pErrors, []);
   await p.close();
+}
+
+// ── Course pages: every page has a Portuguese twin, and Portuguese pages link to Portuguese pages ──
+// (the app's unit links and the site's 🌐 switch rely on "name.md" ↔ "name.pt.md")
+{
+  const { readdirSync, existsSync } = await import("fs");
+  const root = path.join(here, "..");
+  const pages = [];
+  const walk = (dir) => readdirSync(dir, { withFileTypes: true }).forEach((d) => {
+    if (d.name.startsWith(".") || d.name === "node_modules" || d.name === "_site") return;
+    const full = path.join(dir, d.name);
+    if (d.isDirectory()) walk(full); else if (d.name.endsWith(".md")) pages.push(full);
+  });
+  walk(root);
+  const rel = (f) => path.relative(root, f);
+  eq("every course page has a Portuguese twin",
+    pages.filter((f) => !f.endsWith(".pt.md") && !existsSync(f.replace(/\.md$/, ".pt.md"))).map(rel), []);
+  eq("every Portuguese page has an English original",
+    pages.filter((f) => f.endsWith(".pt.md") && !existsSync(f.replace(/\.pt\.md$/, ".md"))).map(rel), []);
+  const crossLinks = [];
+  pages.filter((f) => f.endsWith(".pt.md")).forEach((f) => {
+    for (const m of readFileSync(f, "utf8").matchAll(/\]\(([^)#\s]+\.md)\)/g)) {
+      // The Portuguese progress log points to the English one on purpose (keep only one log).
+      if (!m[1].endsWith(".pt.md") && !(rel(f).endsWith("progress-log.pt.md") && m[1] === "progress-log.md")) crossLinks.push(`${rel(f)} → ${m[1]}`);
+    }
+  });
+  eq("Portuguese pages link to Portuguese pages", crossLinks, []);
 }
 
 // ── Responsive: no horizontal scrolling on any tab, phone to desktop, in both languages ──
