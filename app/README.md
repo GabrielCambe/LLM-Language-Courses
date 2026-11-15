@@ -19,7 +19,8 @@ long-press a letter on the phone keyboard (e → é è ê).
 The first visit follows your device language. The tutor's "your language" follows it too, unless you typed your own.
 In every Tutor mode, explanations, translations, hints and feedback come in that language (pronunciation respellings
 use its spelling); only the course language you're practising stays as is.
-Only the app's interface and the Tutor are translated: card meanings and the course pages are still in English.
+Card meanings and notes follow it too (cards go FR → PT instead of FR → EN), and the unit and roadmap links open the
+course page in that language. Every course page has a Portuguese twin, and the site's 🌐 button switches between them.
 
 **Course:** the menu with the flag (top left) picks the course: French, Spanish, Italian, Latin, Polish or Japanese.
 Each course keeps its own progress, so switching never touches another course's cards.
@@ -66,19 +67,24 @@ The course website has the same button, and one choice applies to both.
 - **New cards/day** defaults to 10. Keep it low; reviews pile up fast. EN→FR (production) cards
   for a word only appear after you've got its FR→EN card right on an earlier day.
 - **Import cards:** use the *Flashcard Maker* prompt in `docs/llm-tutor-prompts.md`, then paste the JSON
-  into Flashcards → Deck settings.
+  into Flashcards → Deck settings. Each card can have an `en` meaning, a `pt` meaning or both; the app shows the one for
+  your interface language (or the other, if that's all there is).
 - **Lyrics** stay in your browser's local storage only. Don't commit them.
 - **Find lyrics** searches [LRCLIB](https://lrclib.net), a free community lyrics database (no key, no account).
   Only the title and artist you typed are sent, and only when you press the button. Community lyrics can have
   typos or belong to another version of the song, so check them against the recording.
 
 ## Developing
-- Vocabulary: `data/vocab.js` (French, by unit), `data/spanish.js`, `data/latin.js`, `data/polish.js`, `data/japanese.js`. French verbs: `data/verbs.js`.
+- Vocabulary: `data/vocab.js` (French, by unit), `data/spanish.js`, `data/italian.js`, `data/latin.js`, `data/polish.js`, `data/japanese.js`. French verbs: `data/verbs.js`.
+- Portuguese meanings and notes: one `data/*.pt.js` file per deck (`vocab.pt.js` for French), keyed by card ID.
+  A new card needs an entry there too, and a new French verb a `pt` meaning (the tests check both).
 - Courses: `data/courses.js` (units, voice, accent keys, which tabs exist, where progress is stored).
   A new course is a new entry there plus its own data files. Conjugation, Gender, Numbers and the Song Workshop
   are written for French, so list only the tabs a course really supports. The Tutor works for any course:
   its course-specific lines and role-play scenarios are in the course's `tutor` and `scenarios` fields.
 - Interface text: `i18n.js`, one block per language. Add every new key to both blocks (the tests check this).
+- Course pages: each `name.md` has a Portuguese twin `name.pt.md` in the same folder, with links pointing to other `.pt.md` pages.
+  Change both when you change one.
 - Don't rename existing French entries: the French text is the card ID.
 - **When you change any app file, bump the `?v=` date in `index.html`** (all links share one value).
   Phones cache each file separately, so without it they can mix new and old files. The tests enforce one shared value.
