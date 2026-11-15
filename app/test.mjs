@@ -715,6 +715,33 @@ for (const [id, firstCard, voice, tutorLine, articles] of [
   await p.close();
 }
 
+// ── Course pages: every page has a Portuguese twin, and Portuguese pages link to Portuguese pages ──
+// (the app's unit links and the site's 🌐 switch rely on "name.md" ↔ "name.pt.md")
+{
+  const { readdirSync, existsSync } = await import("fs");
+  const root = path.join(here, "..");
+  const pages = [];
+  const walk = (dir) => readdirSync(dir, { withFileTypes: true }).forEach((d) => {
+    if (d.name.startsWith(".") || d.name === "node_modules" || d.name === "_site") return;
+    const full = path.join(dir, d.name);
+    if (d.isDirectory()) walk(full); else if (d.name.endsWith(".md")) pages.push(full);
+  });
+  walk(root);
+  const rel = (f) => path.relative(root, f);
+  eq("every course page has a Portuguese twin",
+    pages.filter((f) => !f.endsWith(".pt.md") && !existsSync(f.replace(/\.md$/, ".pt.md"))).map(rel), []);
+  eq("every Portuguese page has an English original",
+    pages.filter((f) => f.endsWith(".pt.md") && !existsSync(f.replace(/\.pt\.md$/, ".md"))).map(rel), []);
+  const crossLinks = [];
+  pages.filter((f) => f.endsWith(".pt.md")).forEach((f) => {
+    for (const m of readFileSync(f, "utf8").matchAll(/\]\(([^)#\s]+\.md)\)/g)) {
+      // The Portuguese progress log points to the English one on purpose (keep only one log).
+      if (!m[1].endsWith(".pt.md") && !(rel(f).endsWith("progress-log.pt.md") && m[1] === "progress-log.md")) crossLinks.push(`${rel(f)} → ${m[1]}`);
+    }
+  });
+  eq("Portuguese pages link to Portuguese pages", crossLinks, []);
+}
+
 // ── Responsive: no horizontal scrolling on any tab, phone to desktop, in both languages ──
 for (const [width, lang] of [[320, "en"], [390, "en"], [768, "en"], [1280, "en"], [320, "pt-BR"], [390, "pt-BR"], [1280, "pt-BR"]]) {
   const p = await browser.newPage({ viewport: { width, height: 800 } });

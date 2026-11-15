@@ -34,6 +34,9 @@ tasks). A course without them has only a roadmap: you generate each lesson page 
 🌐 **Website (phone & computer):** https://gabrielcambe.github.io/LLM-Language-Courses/
 📱 **Study app:** https://gabrielcambe.github.io/LLM-Language-Courses/app/ (add it to your phone's home screen)
 
+🇧🇷 **Language:** every page is also in Brazilian Portuguese. Use the 🌐 button at the top of any page to switch;
+the choice applies to the study app too.
+
 ---
 
 ## Start here (10 minutes)
@@ -67,6 +70,8 @@ latin/, polish/, japanese/
 app/
   index.html              Offline study app: SRS flashcards, conjugation, gender, numbers, song workshop
 ```
+
+Every page `name.md` has its Portuguese version `name.pt.md` next to it.
 
 ## The experiment log
 
